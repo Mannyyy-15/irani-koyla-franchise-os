@@ -64,6 +64,7 @@ export type UserRole = "SUPER_ADMIN" | "FRANCHISE_OWNER";
 interface FranchiseContextType {
   role: UserRole;
   setRole: (role: UserRole) => void;
+  loginAsRole: (role: UserRole, outletId?: string) => void;
   toggleRole: () => void;
   selectedOutletId: string; // "all" or specific outlet id
   setSelectedOutletId: (id: string) => void;
@@ -134,7 +135,7 @@ interface FranchiseContextType {
 
 const FranchiseContext = createContext<FranchiseContextType | undefined>(undefined);
 
-const STORAGE_KEY = "irani_koyla_os_state_v1";
+const STORAGE_KEY = "irani_koyla_os_state_v2";
 
 export function FranchiseProvider({ children }: { children: React.ReactNode }) {
   const [role, setRoleState] = useState<UserRole>("SUPER_ADMIN");
@@ -161,7 +162,7 @@ export function FranchiseProvider({ children }: { children: React.ReactNode }) {
         const parsed = JSON.parse(saved);
         if (parsed.role) setRoleState(parsed.role);
         if (parsed.selectedOutletId) setSelectedOutletId(parsed.selectedOutletId);
-        if (parsed.outlets) setOutlets(parsed.outlets);
+        if (parsed.outlets && parsed.outlets.length > 0) setOutlets(parsed.outlets);
         if (parsed.meatBatches) setMeatBatches(parsed.meatBatches);
         if (parsed.shifts) setShifts(parsed.shifts);
         if (parsed.royalties) setRoyalties(parsed.royalties);
@@ -195,12 +196,18 @@ export function FranchiseProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
+  const loginAsRole = (newRole: UserRole, outletId?: string) => {
+    setRoleState(newRole);
+    const targetOutlet = newRole === "SUPER_ADMIN" ? "all" : (outletId || "mohak-city");
+    setSelectedOutletId(targetOutlet);
+    saveState({ role: newRole, selectedOutletId: targetOutlet });
+  };
+
   const setRole = (newRole: UserRole) => {
     setRoleState(newRole);
-    if (newRole === "FRANCHISE_OWNER" && selectedOutletId === "all") {
-      setSelectedOutletId("bandra-west");
-    }
-    saveState({ role: newRole });
+    const targetOutlet = newRole === "SUPER_ADMIN" ? "all" : (selectedOutletId === "all" ? "mohak-city" : selectedOutletId);
+    setSelectedOutletId(targetOutlet);
+    saveState({ role: newRole, selectedOutletId: targetOutlet });
   };
 
   const toggleRole = () => {
@@ -731,6 +738,7 @@ export function FranchiseProvider({ children }: { children: React.ReactNode }) {
       value={{
         role,
         setRole,
+        loginAsRole,
         toggleRole,
         selectedOutletId,
         setSelectedOutletId: handleSetSelectedOutletId,

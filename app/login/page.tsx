@@ -16,15 +16,16 @@ import {
   Key,
   Eye,
   EyeOff,
-  Compass,
 } from "lucide-react";
 import { motion } from "framer-motion";
 import { mockLoginAction } from "@/app/actions/auth";
 import { INITIAL_OUTLETS } from "@/lib/mock-data";
+import { useFranchise } from "@/lib/franchise-context";
 
 function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const { loginAsRole } = useFranchise();
 
   const [email, setEmail] = useState("admin@iranikoyla.com");
   const [password, setPassword] = useState("password123");
@@ -47,47 +48,30 @@ function LoginForm() {
 
       const timer = setTimeout(async () => {
         try {
-          // Identify outlet match
           const cleanEmail = decodedEmail.trim();
-          let targetOutletId = "bandra-west";
-
-          // Match in INITIAL_OUTLETS or dynamic accounts
-          const matchOutlet = INITIAL_OUTLETS.find(
-            (o) => o.loginEmail?.toLowerCase() === cleanEmail || o.ownerEmail?.toLowerCase() === cleanEmail || o.code.toLowerCase() === (paramOutlet || "").toLowerCase()
-          );
-
-          if (matchOutlet) {
-            targetOutletId = matchOutlet.id;
-          }
-
           const targetRole = cleanEmail.includes("admin") ? "SUPER_ADMIN" : "FRANCHISE_OWNER";
+          const targetOutletId = targetRole === "SUPER_ADMIN" ? "all" : "mohak-city";
 
           await mockLoginAction(targetRole);
-
-          const existing = localStorage.getItem("irani_koyla_os_state_v1");
-          const parsed = existing ? JSON.parse(existing) : {};
-          localStorage.setItem(
-            "irani_koyla_os_state_v1",
-            JSON.stringify({
-              ...parsed,
-              role: targetRole,
-              selectedOutletId: targetRole === "SUPER_ADMIN" ? "all" : targetOutletId,
-            })
-          );
+          loginAsRole(targetRole, targetOutletId);
 
           setMagicLoginProgress("Authenticated! Launching portal...");
           setTimeout(() => {
-            router.push("/select-portal");
-          }, 600);
+            if (targetRole === "SUPER_ADMIN") {
+              router.push("/admin");
+            } else {
+              router.push("/select-portal");
+            }
+          }, 400);
         } catch {
           setMagicLoginProgress(null);
           setErrorMsg("Direct magic login failed. Please enter your credentials manually.");
         }
-      }, 1000);
+      }, 800);
 
       return () => clearTimeout(timer);
     }
-  }, [searchParams, router]);
+  }, [searchParams, router, loginAsRole]);
 
   const handleCredentialsSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -95,37 +79,12 @@ function LoginForm() {
     setLoading(true);
 
     const cleanEmail = email.trim().toLowerCase();
-
-    // Check credentials against Super Admin or registered franchise accounts
     const isSuperAdmin = cleanEmail === "admin@iranikoyla.com" || cleanEmail.includes("admin");
-
-    // Dynamic accounts lookup
-    let registeredAccounts: any[] = [];
-    try {
-      registeredAccounts = JSON.parse(localStorage.getItem("koyla_registered_franchise_accounts") || "[]");
-    } catch {}
-
-    const matchedStaticOutlet = INITIAL_OUTLETS.find(
-      (o) => o.loginEmail?.toLowerCase() === cleanEmail || o.ownerEmail?.toLowerCase() === cleanEmail
-    );
-    const matchedDynamicAccount = registeredAccounts.find(
-      (a) => a.email?.toLowerCase() === cleanEmail
-    );
-
-    const isFranchise =
-      Boolean(matchedStaticOutlet) ||
-      Boolean(matchedDynamicAccount) ||
-      cleanEmail.includes("partner") ||
-      cleanEmail.includes("franchise") ||
-      cleanEmail.includes("bandra") ||
-      cleanEmail.includes("lokhandwala") ||
-      cleanEmail.includes("powai") ||
-      cleanEmail.includes("thane") ||
-      cleanEmail.includes("pune");
+    const isFranchise = cleanEmail.includes("mohak") || cleanEmail.includes("partner") || cleanEmail.includes("franchise");
 
     if (!isSuperAdmin && !isFranchise) {
       setLoading(false);
-      setErrorMsg("Invalid credentials. Please enter a registered Irani Koyla network email or use your Magic Link.");
+      setErrorMsg("Invalid credentials. Please select one of the authorized accounts below.");
       return;
     }
 
@@ -137,36 +96,10 @@ function LoginForm() {
 
     try {
       const targetRole = isSuperAdmin ? "SUPER_ADMIN" : "FRANCHISE_OWNER";
-      let targetOutlet = isSuperAdmin ? "all" : "bandra-west";
+      const targetOutlet = isSuperAdmin ? "all" : "mohak-city";
 
-      if (matchedStaticOutlet) {
-        targetOutlet = matchedStaticOutlet.id;
-      } else if (matchedDynamicAccount) {
-        targetOutlet = matchedDynamicAccount.id;
-      } else if (cleanEmail.includes("pune")) {
-        targetOutlet = "pune-kp";
-      } else if (cleanEmail.includes("thane")) {
-        targetOutlet = "thane";
-      } else if (cleanEmail.includes("powai")) {
-        targetOutlet = "powai";
-      } else if (cleanEmail.includes("lokhandwala")) {
-        targetOutlet = "lokhandwala";
-      }
-
-      // Execute server action to sign and set real JWT session cookie
       await mockLoginAction(targetRole);
-
-      // Persist local state for franchise context
-      const existing = localStorage.getItem("irani_koyla_os_state_v1");
-      const parsed = existing ? JSON.parse(existing) : {};
-      localStorage.setItem(
-        "irani_koyla_os_state_v1",
-        JSON.stringify({
-          ...parsed,
-          role: targetRole,
-          selectedOutletId: targetOutlet,
-        })
-      );
+      loginAsRole(targetRole, targetOutlet);
 
       if (isSuperAdmin) {
         router.push("/admin");
@@ -210,7 +143,7 @@ function LoginForm() {
               Sign In to Your Workspace
             </h1>
             <p className="text-xs sm:text-sm text-zinc-400 mt-1">
-              Enter your authorized franchise email and password, or use your 1-click magic login link.
+              Select between Brand HQ Super Admin or Mohak City Franchise Partner terminal.
             </p>
           </div>
 
@@ -275,7 +208,7 @@ function LoginForm() {
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3.5 top-1/2 -translate-y-1/2 text-zinc-500 hover:text-white"
+                  className="absolute right-3.5 top-1/2 -translate-y-1/2 text-zinc-500 hover:text-white cursor-pointer"
                 >
                   {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </button>
@@ -298,58 +231,42 @@ function LoginForm() {
             </button>
           </form>
 
-          {/* Quick Demo Test Accounts */}
+          {/* Quick Demo Test Accounts (Strictly 2 Accounts) */}
           <div className="p-4 rounded-2xl bg-[#1f1f1f] border border-[#303030] space-y-3">
             <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest block">
-              Quick Test Profile Accounts
+              1-Click Switch Authorized Profile
             </span>
 
             <div className="grid grid-cols-1 gap-2">
               <button
                 type="button"
                 onClick={() => populateAccount("admin@iranikoyla.com")}
-                className="p-2.5 rounded-xl bg-[#161618] border border-[#303030] hover:border-orange-500/50 flex items-center justify-between text-xs text-left transition-all cursor-pointer group"
+                className="p-3 rounded-xl bg-[#161618] border border-[#303030] hover:border-orange-500 flex items-center justify-between text-xs text-left transition-all cursor-pointer group"
               >
                 <div>
                   <span className="font-bold text-white block group-hover:text-orange-400 transition-colors">
-                    Super Admin (Brand HQ Executive)
+                    🏢 Irani Koyla Shawarma (Super Admin HQ)
                   </span>
-                  <span className="text-[10px] text-zinc-500 font-mono">admin@iranikoyla.com</span>
+                  <span className="text-[10px] text-zinc-500 font-mono">admin@iranikoyla.com &middot; password123</span>
                 </div>
                 <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-orange-500/10 text-orange-400 border border-orange-500/20">
-                  Full Network
+                  Brand HQ
                 </span>
               </button>
 
               <button
                 type="button"
-                onClick={() => populateAccount("partner.bandra@iranikoyla.com")}
-                className="p-2.5 rounded-xl bg-[#161618] border border-[#303030] hover:border-emerald-500/50 flex items-center justify-between text-xs text-left transition-all cursor-pointer group"
+                onClick={() => populateAccount("partner.mohak@iranikoyla.com")}
+                className="p-3 rounded-xl bg-[#161618] border border-[#303030] hover:border-emerald-500 flex items-center justify-between text-xs text-left transition-all cursor-pointer group"
               >
                 <div>
                   <span className="font-bold text-white block group-hover:text-emerald-400 transition-colors">
-                    Franchise Partner (Bandra West Flagship)
+                    🏪 Mohak City Branch (Franchise Partner)
                   </span>
-                  <span className="text-[10px] text-zinc-500 font-mono">partner.bandra@iranikoyla.com</span>
+                  <span className="text-[10px] text-zinc-500 font-mono">partner.mohak@iranikoyla.com &middot; password123</span>
                 </div>
                 <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
                   Store + POS
-                </span>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => populateAccount("partner.pune@iranikoyla.com")}
-                className="p-2.5 rounded-xl bg-[#161618] border border-[#303030] hover:border-blue-500/50 flex items-center justify-between text-xs text-left transition-all cursor-pointer group"
-              >
-                <div>
-                  <span className="font-bold text-white block group-hover:text-blue-400 transition-colors">
-                    Franchise Partner (Pune Koregaon Park)
-                  </span>
-                  <span className="text-[10px] text-zinc-500 font-mono">partner.pune@iranikoyla.com</span>
-                </div>
-                <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-blue-500/10 text-blue-400 border border-blue-500/20">
-                  New Branch
                 </span>
               </button>
             </div>
@@ -359,7 +276,6 @@ function LoginForm() {
 
       {/* Right Panel: Irani Koyla Brand Visual */}
       <div className="hidden lg:flex w-1/2 relative bg-[#121214] border-l border-[#303030] flex-col justify-between p-12 overflow-hidden">
-        {/* Background Visual Texture */}
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-orange-600/15 via-transparent to-black" />
 
         <div className="relative z-10 flex justify-end">
@@ -385,16 +301,16 @@ function LoginForm() {
 
           <div className="grid grid-cols-3 gap-3 pt-4 border-t border-[#303030]">
             <div className="p-3 rounded-2xl bg-[#1f1f1f] border border-[#303030]">
-              <span className="text-xl font-black text-emerald-400 font-mono block">93.4%</span>
-              <span className="text-[10px] text-zinc-400 uppercase font-bold">Avg Spit Yield</span>
+              <span className="text-xl font-black text-emerald-400 font-mono block">94.2%</span>
+              <span className="text-[10px] text-zinc-400 uppercase font-bold">Mohak Spit Yield</span>
             </div>
             <div className="p-3 rounded-2xl bg-[#1f1f1f] border border-[#303030]">
               <span className="text-xl font-black text-orange-400 font-mono block">6.5%</span>
-              <span className="text-[10px] text-zinc-400 uppercase font-bold">Net Royalty Rate</span>
+              <span className="text-[10px] text-zinc-400 uppercase font-bold">Royalty Rate</span>
             </div>
             <div className="p-3 rounded-2xl bg-[#1f1f1f] border border-[#303030]">
               <span className="text-xl font-black text-blue-400 font-mono block">&lt; 15s</span>
-              <span className="text-[10px] text-zinc-400 uppercase font-bold">Counter POS Punch</span>
+              <span className="text-[10px] text-zinc-400 uppercase font-bold">POS Punch Time</span>
             </div>
           </div>
         </div>

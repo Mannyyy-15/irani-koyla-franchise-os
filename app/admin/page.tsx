@@ -186,8 +186,8 @@ export default function AdminDashboardPage() {
                 </div>
                 <div>
                   <span className="text-[10px] font-bold text-[#b8b8c5]/70 uppercase tracking-wider block">Active Franchise Network</span>
-                  <p className="text-xl font-black text-white font-mono mt-0.5">{outlets.length} Hubs</p>
-                  <span className="text-[10px] text-emerald-400 font-semibold block">4 Live & Billing · 1 Launching</span>
+                  <p className="text-xl font-black text-white font-mono mt-0.5">{outlets.length} Live Hub</p>
+                  <span className="text-[10px] text-emerald-400 font-semibold block">Mohak City Branch (Active)</span>
                 </div>
               </CardContent>
             </Card>
