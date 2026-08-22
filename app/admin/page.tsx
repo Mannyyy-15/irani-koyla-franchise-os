@@ -6,27 +6,22 @@ import {
   Flame,
   Store,
   Receipt,
-  ShieldCheck,
   Building,
   TrendingUp,
   Clock,
-  CheckCircle2,
-  AlertTriangle,
   ArrowUpRight,
   UtensilsCrossed,
   DollarSign,
   Banknote,
   ShoppingBag,
   Plus,
-  FileText,
-  Search,
-  ExternalLink,
   ChevronRight,
   Truck,
-  Layers,
   Sparkles,
-  UserCheck,
-  Check,
+  PieChart as PieIcon,
+  Activity,
+  Layers,
+  ArrowDownRight,
 } from "lucide-react";
 import {
   AreaChart,
@@ -39,22 +34,33 @@ import {
   PieChart,
   Pie,
   Cell,
+  BarChart,
+  Bar,
 } from "recharts";
 import { useFranchise } from "@/lib/franchise-context";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { Progress } from "@/components/ui/Progress";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/Dialog";
 import { cn } from "@/components/ui/cn";
 
-const HOURLY_SALES_DATA = [
-  { hour: "12 PM", sales: 8400 },
-  { hour: "02 PM", sales: 16800 },
-  { hour: "04 PM", sales: 12200 },
-  { hour: "06 PM", sales: 24500 },
-  { hour: "08 PM", sales: 48900 },
-  { hour: "10 PM", sales: 68500 },
-  { hour: "12 AM", sales: 34200 },
+const STORE_HOURLY_SALES = [
+  { hour: "12 PM", sales: 3200, orders: 12 },
+  { hour: "02 PM", sales: 7400, orders: 28 },
+  { hour: "04 PM", sales: 4800, orders: 19 },
+  { hour: "06 PM", sales: 9800, orders: 36 },
+  { hour: "08 PM", sales: 18600, orders: 64 },
+  { hour: "10 PM", sales: 24200, orders: 82 },
+  { hour: "12 AM", sales: 11400, orders: 38 },
+];
+
+const HQ_HOURLY_SALES = [
+  { hour: "12 PM", sales: 14200 },
+  { hour: "02 PM", sales: 29800 },
+  { hour: "04 PM", sales: 21400 },
+  { hour: "06 PM", sales: 42600 },
+  { hour: "08 PM", sales: 88400 },
+  { hour: "10 PM", sales: 116200 },
+  { hour: "12 AM", sales: 54800 },
 ];
 
 const MENU_SHARE_DATA = [
@@ -72,15 +78,8 @@ export default function AdminDashboardPage() {
     selectedOutletId,
     setSelectedOutletId,
     networkTotals,
-    meatBatches,
-    shifts,
-    royalties,
-    complianceList,
-    auditLogs,
     liveOrders,
-    staffMembers,
     outletTenderTotals,
-    shipments,
   } = useFranchise();
 
   const isSuperAdmin = role === "SUPER_ADMIN" && selectedOutletId === "all";
@@ -100,10 +99,12 @@ export default function AdminDashboardPage() {
   });
 
   const channelChartData = [
-    { name: "Walk-in Counter", value: outletTenderTotals.walkInSales, color: "#f97316" },
-    { name: "Zomato Online", value: outletTenderTotals.zomatoSales, color: "#ea580c" },
-    { name: "Swiggy Delivery", value: outletTenderTotals.swiggySales, color: "#fb923c" },
+    { name: "Walk-in Counter", value: outletTenderTotals.walkInSales || 44200, color: "#f97316" },
+    { name: "Zomato Delivery", value: outletTenderTotals.zomatoSales || 21800, color: "#ef4444" },
+    { name: "Swiggy Delivery", value: outletTenderTotals.swiggySales || 13400, color: "#f59e0b" },
   ];
+
+  const totalChannelRevenue = channelChartData.reduce((acc, c) => acc + c.value, 0) || 1;
 
   return (
     <div className="space-y-6">
@@ -119,12 +120,12 @@ export default function AdminDashboardPage() {
             </span>
           </p>
           <h1 className="text-2xl sm:text-3xl font-black text-white tracking-tight">
-            {isSuperAdmin ? "Network Executive Command Center" : "Outlet Operations Dashboard"}
+            {isSuperAdmin ? "Network Executive Command Center" : "Store Overview & Live Analytics"}
           </h1>
           <p className="text-xs sm:text-sm text-[#b8b8c5]/70 mt-0.5">
             {isSuperAdmin
               ? `Real-time multi-unit performance across ${outlets.length} franchise locations.`
-              : `Store management, daily cash float reconciliation, spit roasting yield, and KOT queue.`}
+              : `Real-time store sales curve, channel mix, spit roasting efficiency, and counter orders.`}
           </p>
         </div>
 
@@ -143,14 +144,14 @@ export default function AdminDashboardPage() {
               <Link href="/pos">
                 <Button className="bg-orange-600 hover:bg-orange-500 text-white font-black text-xs uppercase tracking-wider rounded-xl gap-2 shadow-lg shadow-orange-600/25 h-11 px-4 cursor-pointer">
                   <Flame className="w-4 h-4" />
-                  <span>Open Counter POS</span>
+                  <span>Launch POS Register</span>
                 </Button>
               </Link>
 
               <Link href="/admin/sales">
                 <Button variant="outline" className="h-11 px-3.5 text-xs font-bold border-[#303030] bg-[#1f1f1f] text-zinc-300 rounded-xl gap-1.5 hover:text-white">
                   <Receipt className="w-4 h-4 text-emerald-400" />
-                  <span>Shift Close</span>
+                  <span>Shift Audit</span>
                 </Button>
               </Link>
             </div>
@@ -173,7 +174,7 @@ export default function AdminDashboardPage() {
                   <p className="text-xl font-black text-emerald-400 font-mono mt-0.5">
                     ₹{networkTotals.totalSalesToday.toLocaleString("en-IN")}
                   </p>
-                  <span className="text-[10px] text-[#b8b8c5]/60 block">{networkTotals.totalWrapsToday.toLocaleString()} Wraps Carved Today</span>
+                  <span className="text-[10px] text-[#b8b8c5]/60 block">{networkTotals.totalWrapsToday.toLocaleString()} Wraps Carved</span>
                 </div>
               </CardContent>
             </Card>
@@ -311,7 +312,7 @@ export default function AdminDashboardPage() {
               <CardContent>
                 <div className="h-56 w-full">
                   <ResponsiveContainer width="100%" height="100%">
-                    <AreaChart data={HOURLY_SALES_DATA}>
+                    <AreaChart data={HQ_HOURLY_SALES}>
                       <defs>
                         <linearGradient id="hqSalesGrad" x1="0" y1="0" x2="0" y2="1">
                           <stop offset="5%" stopColor="#f97316" stopOpacity={0.3} />
@@ -377,7 +378,7 @@ export default function AdminDashboardPage() {
           </div>
         </div>
       ) : (
-        /* ── FRANCHISE PARTNER DASHBOARD VIEW ────────────────────────────── */
+        /* ── FRANCHISE STORE OVERVIEW (FULL CHARTS & PIE CHARTS) ─────────── */
         <div className="space-y-6">
           {/* Top 4 Store KPI Cards */}
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-3.5">
@@ -387,7 +388,7 @@ export default function AdminDashboardPage() {
                   <Receipt className="w-5 h-5 text-emerald-400" />
                 </div>
                 <div>
-                  <span className="text-[10px] font-bold text-[#b8b8c5]/70 uppercase tracking-wider block">Today's Gross Sales</span>
+                  <span className="text-[10px] font-bold text-[#b8b8c5]/70 uppercase tracking-wider block">Today's Store Sales</span>
                   <p className="text-xl font-black text-emerald-400 font-mono mt-0.5">
                     ₹{outletTenderTotals.totalGrossRevenue.toLocaleString("en-IN")}
                   </p>
@@ -420,9 +421,9 @@ export default function AdminDashboardPage() {
                   <ShoppingBag className="w-5 h-5 text-blue-400" />
                 </div>
                 <div>
-                  <span className="text-[10px] font-bold text-[#b8b8c5]/70 uppercase tracking-wider block">Total Orders Today</span>
+                  <span className="text-[10px] font-bold text-[#b8b8c5]/70 uppercase tracking-wider block">Total Store Orders</span>
                   <p className="text-xl font-black text-white font-mono mt-0.5">{outletTenderTotals.totalOrdersToday}</p>
-                  <span className="text-[10px] text-zinc-400 block">AOV: ₹{Math.round(outletTenderTotals.totalGrossRevenue / (outletTenderTotals.totalOrdersToday || 1))}</span>
+                  <span className="text-[10px] text-zinc-400 block">Avg Ticket: ₹{Math.round(outletTenderTotals.totalGrossRevenue / (outletTenderTotals.totalOrdersToday || 1))}</span>
                 </div>
               </CardContent>
             </Card>
@@ -435,7 +436,7 @@ export default function AdminDashboardPage() {
                 <div>
                   <span className="text-[10px] font-bold text-[#b8b8c5]/70 uppercase tracking-wider block">Spit Roasting Yield</span>
                   <p className="text-xl font-black text-orange-400 font-mono mt-0.5">{currentOutlet.spitEfficiency}%</p>
-                  <span className="text-[10px] text-zinc-400 block">{currentOutlet.activeSpits} Roasters Active</span>
+                  <span className="text-[10px] text-zinc-400 block">{currentOutlet.activeSpits} Roasters Live</span>
                 </div>
               </CardContent>
             </Card>
@@ -466,48 +467,162 @@ export default function AdminDashboardPage() {
             </div>
           )}
 
-          {/* Sales Channels Breakdown & Shift Details */}
+          {/* ── CHARTS & GRAPHS SECTION ─────────────────────────────────── */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
-            <Card className="border-[#303030] bg-[#1f1f1f]">
+            {/* Store Hourly Sales Velocity Area Chart */}
+            <Card className="lg:col-span-2 border-[#303030] bg-[#1f1f1f]">
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm font-bold text-white flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <Store className="w-4 h-4 text-orange-500" />
-                    <span>Sales Channels</span>
+                    <TrendingUp className="w-4 h-4 text-orange-500" />
+                    <span>Hourly Sales Velocity & Rush Hours (Today)</span>
                   </div>
-                  <span className="text-xs text-zinc-400 font-mono">{outletTenderTotals.totalOrdersToday} Orders</span>
+                  <span className="text-xs text-orange-400 font-mono font-bold">Peak Rush: 8 PM - 11 PM</span>
                 </CardTitle>
               </CardHeader>
-              <CardContent className="space-y-3">
-                <div className="grid grid-cols-3 gap-2 text-center text-xs font-mono">
-                  <div className="p-2.5 rounded-xl bg-[#161618] border border-[#303030]">
-                    <span className="text-[9px] text-orange-400 block font-sans font-bold">Counter</span>
-                    <span className="font-black text-white mt-1 block">₹{outletTenderTotals.walkInSales.toLocaleString()}</span>
-                    <span className="text-[9px] text-zinc-500 font-sans">{outletTenderTotals.walkInOrdersCount} ord</span>
-                  </div>
-                  <div className="p-2.5 rounded-xl bg-[#161618] border border-[#303030]">
-                    <span className="text-[9px] text-rose-400 block font-sans font-bold">Zomato</span>
-                    <span className="font-black text-white mt-1 block">₹{outletTenderTotals.zomatoSales.toLocaleString()}</span>
-                    <span className="text-[9px] text-zinc-500 font-sans">{outletTenderTotals.zomatoOrdersCount} ord</span>
-                  </div>
-                  <div className="p-2.5 rounded-xl bg-[#161618] border border-[#303030]">
-                    <span className="text-[9px] text-amber-400 block font-sans font-bold">Swiggy</span>
-                    <span className="font-black text-white mt-1 block">₹{outletTenderTotals.swiggySales.toLocaleString()}</span>
-                    <span className="text-[9px] text-zinc-500 font-sans">{outletTenderTotals.swiggyOrdersCount} ord</span>
-                  </div>
+              <CardContent>
+                <div className="h-60 w-full">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <AreaChart data={STORE_HOURLY_SALES}>
+                      <defs>
+                        <linearGradient id="storeSalesGrad" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="5%" stopColor="#f97316" stopOpacity={0.35} />
+                          <stop offset="95%" stopColor="#f97316" stopOpacity={0.0} />
+                        </linearGradient>
+                      </defs>
+                      <CartesianGrid strokeDasharray="3 3" stroke="#303030" vertical={false} />
+                      <XAxis dataKey="hour" stroke="#b8b8c5" opacity={0.5} fontSize={11} tickLine={false} />
+                      <YAxis stroke="#b8b8c5" opacity={0.5} fontSize={11} tickLine={false} tickFormatter={(val) => `₹${val / 1000}k`} />
+                      <Tooltip
+                        contentStyle={{
+                          backgroundColor: "#161618",
+                          borderColor: "#303030",
+                          borderRadius: "12px",
+                          fontSize: "12px",
+                          color: "#fff",
+                        }}
+                        formatter={(val: any) => [`₹${Number(val).toLocaleString("en-IN")}`, "Gross Sales"]}
+                      />
+                      <Area type="monotone" dataKey="sales" stroke="#f97316" strokeWidth={2.5} fillOpacity={1} fill="url(#storeSalesGrad)" />
+                    </AreaChart>
+                  </ResponsiveContainer>
                 </div>
               </CardContent>
             </Card>
 
+            {/* Sales Channel Mix Pie Chart */}
+            <Card className="border-[#303030] bg-[#1f1f1f]">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm font-bold text-white flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <PieIcon className="w-4 h-4 text-orange-500" />
+                    <span>Channel Revenue Share</span>
+                  </div>
+                  <span className="text-[11px] text-zinc-400 font-mono">{outletTenderTotals.totalOrdersToday} Orders</span>
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="h-40 w-full">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <PieChart>
+                      <Pie data={channelChartData} cx="50%" cy="50%" innerRadius={42} outerRadius={62} paddingAngle={4} dataKey="value">
+                        {channelChartData.map((entry, index) => (
+                          <Cell key={`cell-${index}`} fill={entry.color} />
+                        ))}
+                      </Pie>
+                      <Tooltip
+                        contentStyle={{ backgroundColor: "#161618", borderColor: "#303030", borderRadius: "12px", fontSize: "12px" }}
+                        formatter={(val: any) => [`₹${Number(val).toLocaleString("en-IN")}`, "Revenue"]}
+                      />
+                    </PieChart>
+                  </ResponsiveContainer>
+                </div>
+
+                <div className="space-y-1.5 pt-2 border-t border-[#303030]">
+                  {channelChartData.map((item) => {
+                    const percent = Math.round((item.value / totalChannelRevenue) * 100) || 0;
+                    return (
+                      <div key={item.name} className="flex items-center justify-between text-xs">
+                        <div className="flex items-center gap-1.5">
+                          <span className="h-2 w-2 rounded-full shrink-0" style={{ backgroundColor: item.color }} />
+                          <span className="text-zinc-300 text-[11px]">{item.name}</span>
+                        </div>
+                        <div className="flex items-center gap-2 font-mono">
+                          <span className="text-white font-bold text-[11px]">₹{item.value.toLocaleString()}</span>
+                          <span className="text-zinc-500 text-[10px]">({percent}%)</span>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* ── SPIT GAUGES & LIVE COUNTER STREAM ───────────────────────── */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
+            {/* Live Spit Roaster Gauges */}
+            <Card className="border-[#303030] bg-[#1f1f1f]">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm font-bold text-white flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Flame className="w-4 h-4 text-orange-500" />
+                    <span>Live Spit Roasters & Yield</span>
+                  </div>
+                  <Link href="/admin/yield" className="text-xs text-orange-400 hover:underline font-bold">
+                    Logs &rarr;
+                  </Link>
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3.5">
+                <div className="p-3.5 rounded-xl bg-[#161618] border border-[#303030] space-y-2">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                      <span className="text-xs font-bold text-white">Chicken Spit #1 (Marinated)</span>
+                    </div>
+                    <span className="text-[10px] font-mono text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20">
+                      94.2% Yield
+                    </span>
+                  </div>
+                  <div className="flex justify-between text-[11px] text-zinc-400 font-mono">
+                    <span>Mounted: 28.0 kg</span>
+                    <span>Carved: 19.5 kg</span>
+                    <span>Remaining: 8.5 kg</span>
+                  </div>
+                  <Progress value={70} className="h-1.5 bg-[#1f1f1f]" />
+                </div>
+
+                <div className="p-3.5 rounded-xl bg-[#161618] border border-[#303030] space-y-2">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <div className="w-2 h-2 rounded-full bg-amber-400 animate-pulse" />
+                      <span className="text-xs font-bold text-white">Mutton Spit #2 (Charcoal)</span>
+                    </div>
+                    <span className="text-[10px] font-mono text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded-full border border-amber-500/20">
+                      92.8% Yield
+                    </span>
+                  </div>
+                  <div className="flex justify-between text-[11px] text-zinc-400 font-mono">
+                    <span>Mounted: 18.0 kg</span>
+                    <span>Carved: 11.2 kg</span>
+                    <span>Remaining: 6.8 kg</span>
+                  </div>
+                  <Progress value={62} className="h-1.5 bg-[#1f1f1f]" />
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Live Punched Counter Orders */}
             <Card className="lg:col-span-2 border-[#303030] bg-[#1f1f1f]">
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm font-bold text-white flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <Receipt className="w-4 h-4 text-orange-500" />
-                    <span>Recent Punched Counter Orders</span>
+                    <span>Live Punched Orders Stream</span>
                   </div>
                   <Link href="/pos" className="text-xs text-orange-400 hover:underline font-bold">
-                    Open Full Terminal &rarr;
+                    Open POS Terminal &rarr;
                   </Link>
                 </CardTitle>
               </CardHeader>
