@@ -17,7 +17,6 @@ import {
   CheckCircle2,
   X,
   Search,
-  SlidersHorizontal,
   PauseCircle,
   PlayCircle,
   QrCode,
@@ -27,6 +26,7 @@ import {
   WifiOff,
   AlertCircle,
   Check,
+  Star,
 } from "lucide-react";
 import { useFranchise } from "@/lib/franchise-context";
 import { Button } from "@/components/ui/Button";
@@ -62,11 +62,12 @@ export default function PosBillingTerminal() {
     meatWeight: m.meatWeight || (m.meatPortionGrams > 0 ? `${m.meatPortionGrams}g` : "N/A"),
     spit: m.spitType,
     tag: m.tag || "",
+    popularRank: m.popularRank || 99,
     image: m.image || "https://images.unsplash.com/photo-1529006557810-274b9b2fc783?auto=format&fit=crop&w=600&q=80",
     modifiers: m.modifiers || [],
   }));
 
-  const [activeCategory, setActiveCategory] = useState<string>("All Items");
+  const [activeCategory, setActiveCategory] = useState<string>("Most Ordered");
   const [searchTerm, setSearchTerm] = useState("");
 
   // Cart & Order State
@@ -92,6 +93,7 @@ export default function PosBillingTerminal() {
   const [offlineQueuedToast, setOfflineQueuedToast] = useState(false);
 
   const categories = [
+    { name: "Most Ordered", icon: "⭐" },
     { name: "All Items", icon: "🔥" },
     { name: "Shawarma Wraps", icon: "🌯" },
     { name: "Combos & Meals", icon: "🍱" },
@@ -101,7 +103,15 @@ export default function PosBillingTerminal() {
   ];
 
   const filteredMenuItems = activePosItems.filter((item) => {
-    const matchesCat = activeCategory === "All Items" || item.category === activeCategory;
+    let matchesCat = false;
+    if (activeCategory === "All Items") {
+      matchesCat = true;
+    } else if (activeCategory === "Most Ordered") {
+      matchesCat = ["pos-01", "pos-02", "pos-03", "pos-05", "pos-07"].includes(item.id) || item.popularRank <= 4;
+    } else {
+      matchesCat = item.category === activeCategory;
+    }
+
     const matchesSearch = item.name.toLowerCase().includes(searchTerm.toLowerCase());
     return matchesCat && matchesSearch;
   });
@@ -289,18 +299,18 @@ export default function PosBillingTerminal() {
         </div>
       )}
 
-      {/* LEFT COLUMN: Big Touch Visual Menu (7 or 8 cols depending on screen) */}
+      {/* LEFT COLUMN: Big Touch Visual Menu */}
       <div className="lg:col-span-7 xl:col-span-8 space-y-4">
         {/* Category Filters Bar & Fast Search */}
-        <div className="flex flex-col sm:flex-row items-center gap-2.5">
+        <div className="flex flex-col sm:flex-row items-center gap-3">
           <div className="relative w-full sm:w-72 shrink-0">
-            <Search className="w-4 h-4 text-zinc-500 absolute left-3.5 top-1/2 -translate-y-1/2" />
+            <Search className="w-4 h-4 text-zinc-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
             <input
               type="text"
               placeholder="Search shawarma, combo, chai…"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full h-11 pl-10 pr-3 rounded-2xl bg-[#1f1f1f] border border-[#303030] text-sm text-white placeholder-zinc-500 focus:outline-none focus:border-orange-500 transition-colors font-medium shadow-inner"
+              className="w-full h-11 pl-10 pr-4 rounded-2xl bg-[#1f1f1f] border border-[#303030] text-sm text-white placeholder-zinc-500 focus:outline-none focus:border-orange-500 transition-colors font-medium shadow-inner"
             />
             {searchTerm && (
               <button
@@ -313,12 +323,14 @@ export default function PosBillingTerminal() {
             )}
           </div>
 
-          {/* Big Touch Category Pills */}
-          <div className="flex items-center gap-2 w-full sm:flex-1 overflow-x-auto pb-1 sm:pb-0 scrollbar-none">
+          {/* Clean Touch Category Pills (Zero Scrollbar Visible) */}
+          <div className="flex items-center gap-2 w-full sm:flex-1 overflow-x-auto pb-1 sm:pb-0 no-scrollbar scrollbar-none">
             {categories.map((cat) => {
-              const count = activePosItems.filter(
-                (i) => cat.name === "All Items" || i.category === cat.name
-              ).length;
+              const count = activePosItems.filter((i) => {
+                if (cat.name === "All Items") return true;
+                if (cat.name === "Most Ordered") return ["pos-01", "pos-02", "pos-03", "pos-05", "pos-07"].includes(i.id) || i.popularRank <= 4;
+                return i.category === cat.name;
+              }).length;
               const isActive = activeCategory === cat.name;
 
               return (
@@ -326,13 +338,13 @@ export default function PosBillingTerminal() {
                   key={cat.name}
                   onClick={() => setActiveCategory(cat.name)}
                   className={cn(
-                    "px-4 py-2.5 rounded-2xl text-xs sm:text-sm font-black whitespace-nowrap transition-all cursor-pointer flex items-center gap-2 shadow-sm shrink-0",
+                    "px-4 py-2.5 rounded-2xl text-xs sm:text-sm font-black whitespace-nowrap transition-all cursor-pointer flex items-center gap-2 shadow-sm shrink-0 select-none",
                     isActive
                       ? "bg-gradient-to-r from-orange-600 to-amber-600 text-white shadow-lg shadow-orange-600/30 scale-[1.02]"
                       : "bg-[#1f1f1f] text-zinc-300 border border-[#303030] hover:border-orange-500/50 hover:text-white"
                   )}
                 >
-                  <span>{cat.icon}</span>
+                  <span className="text-base">{cat.icon}</span>
                   <span>{cat.name}</span>
                   <span className={cn(
                     "text-[10px] px-1.5 py-0.5 rounded-full font-mono font-bold",
@@ -346,7 +358,7 @@ export default function PosBillingTerminal() {
           </div>
         </div>
 
-        {/* Big High-Visibility Food Cards Grid */}
+        {/* Big Food Cards Grid (Ultra-Clean, Large Photos, Zero Extra Clutter Pills) */}
         <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-3.5 sm:gap-4">
           {filteredMenuItems.map((item) => {
             const inCartQty = getItemCartQuantity(item.id);
@@ -362,60 +374,37 @@ export default function PosBillingTerminal() {
                     : "border-[#303030] hover:border-orange-500/80"
                 )}
               >
-                {/* Big Food Photo with Badges */}
-                <div className="relative h-36 sm:h-40 w-full overflow-hidden bg-[#161618]">
+                {/* Big Full-Bleed Clear Food Photo (Zero overlay pills blocking the food) */}
+                <div className="relative h-44 sm:h-48 w-full overflow-hidden bg-[#161618]">
                   <img
                     src={item.image}
                     alt={item.name}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#1f1f1f] via-black/20 to-black/50" />
 
-                  {/* Meat Weight & Category Tag */}
-                  <div className="absolute top-2.5 left-2.5 flex items-center gap-1.5">
-                    {item.meatWeight !== "N/A" && (
-                      <span className="text-[10px] font-mono font-black text-amber-300 bg-black/80 backdrop-blur-md px-2.5 py-0.5 rounded-lg border border-amber-500/40 shadow-sm">
-                        {item.meatWeight}
-                      </span>
-                    )}
-                    {item.tag && (
-                      <span className="text-[10px] font-black uppercase text-orange-400 bg-orange-500/20 backdrop-blur-md px-2 py-0.5 rounded-lg border border-orange-500/30">
-                        {item.tag}
-                      </span>
-                    )}
-                  </div>
-
-                  {/* Spit Badge */}
-                  <div className="absolute top-2.5 right-2.5">
-                    <span className="text-[10px] font-bold uppercase text-zinc-200 bg-black/80 backdrop-blur-md px-2 py-0.5 rounded-lg border border-[#404040]">
-                      {item.spit}
-                    </span>
-                  </div>
-
-                  {/* In-Basket Overlay Badge if > 0 */}
+                  {/* Quantity In-Basket Float Tag */}
                   {inCartQty > 0 && (
-                    <div className="absolute bottom-2 left-2.5 z-10 flex items-center gap-1 bg-orange-600 text-white font-black text-xs px-2.5 py-1 rounded-xl shadow-lg border border-orange-400/40 animate-in fade-in">
+                    <div className="absolute top-3 right-3 z-10 flex items-center gap-1.5 bg-orange-600 text-white font-black text-xs px-3 py-1.5 rounded-xl shadow-2xl border border-orange-400/50 animate-in fade-in">
                       <Check className="w-3.5 h-3.5 stroke-[3]" />
                       <span>{inCartQty} in Basket</span>
                     </div>
                   )}
                 </div>
 
-                {/* Card Body & Direct Action */}
-                <div className="p-3.5 flex flex-col justify-between flex-1 space-y-3">
-                  <h3 className="text-sm font-black text-white group-hover:text-orange-400 transition-colors leading-snug line-clamp-2">
+                {/* Card Body with Large Title & Price */}
+                <div className="p-4 flex flex-col justify-between flex-1 space-y-3">
+                  <h3 className="text-sm sm:text-base font-black text-white group-hover:text-orange-400 transition-colors leading-snug line-clamp-2">
                     {item.name}
                   </h3>
 
                   <div className="flex items-center justify-between pt-2 border-t border-[#303030]">
                     <div className="flex flex-col">
-                      <span className="font-mono text-base sm:text-lg font-black text-orange-400">
+                      <span className="font-mono text-lg sm:text-xl font-black text-orange-400">
                         ₹{item.price}
                       </span>
-                      <span className="text-[10px] text-zinc-500 font-semibold uppercase">Inclusive GST</span>
                     </div>
 
-                    {/* Quick + / - Controls on Card */}
+                    {/* Quick + / - Controls or 1-Tap Add */}
                     {inCartQty > 0 ? (
                       <div
                         className="flex items-center gap-1 bg-[#161618] p-1 rounded-2xl border border-orange-500/50 shadow-sm"
@@ -424,17 +413,17 @@ export default function PosBillingTerminal() {
                         <button
                           type="button"
                           onClick={() => removeFromCart(item.id)}
-                          className="w-7 h-7 rounded-xl bg-[#1f1f1f] hover:bg-rose-500/20 text-white hover:text-rose-400 text-sm font-bold flex items-center justify-center transition-colors cursor-pointer"
+                          className="w-8 h-8 rounded-xl bg-[#1f1f1f] hover:bg-rose-500/20 text-white hover:text-rose-400 text-sm font-bold flex items-center justify-center transition-colors cursor-pointer"
                         >
                           -
                         </button>
-                        <span className="font-mono text-xs font-black text-white px-1 text-center">
+                        <span className="font-mono text-xs sm:text-sm font-black text-white px-1.5 text-center">
                           {inCartQty}
                         </span>
                         <button
                           type="button"
                           onClick={() => addToCart(item)}
-                          className="w-7 h-7 rounded-xl bg-orange-600 hover:bg-orange-500 text-white text-sm font-bold flex items-center justify-center transition-colors cursor-pointer shadow-md"
+                          className="w-8 h-8 rounded-xl bg-orange-600 hover:bg-orange-500 text-white text-sm font-bold flex items-center justify-center transition-colors cursor-pointer shadow-md"
                         >
                           +
                         </button>
@@ -442,9 +431,9 @@ export default function PosBillingTerminal() {
                     ) : (
                       <button
                         type="button"
-                        className="h-8 px-3.5 rounded-xl bg-orange-600/20 text-orange-400 group-hover:bg-orange-600 group-hover:text-white flex items-center gap-1 font-black text-xs uppercase tracking-wider transition-colors shadow-sm cursor-pointer"
+                        className="h-9 px-4 rounded-2xl bg-orange-600/20 text-orange-400 group-hover:bg-orange-600 group-hover:text-white flex items-center gap-1.5 font-black text-xs uppercase tracking-wider transition-colors shadow-sm cursor-pointer"
                       >
-                        <Plus className="w-3.5 h-3.5 stroke-[3]" />
+                        <Plus className="w-4 h-4 stroke-[3]" />
                         <span>Add</span>
                       </button>
                     )}
@@ -456,7 +445,7 @@ export default function PosBillingTerminal() {
         </div>
       </div>
 
-      {/* RIGHT COLUMN: Ultra-Clean Counter Billing Register (5 or 4 cols) */}
+      {/* RIGHT COLUMN: Ultra-Clean Counter Billing Register */}
       <div className="lg:col-span-5 xl:col-span-4">
         <form onSubmit={handlePunchOrder} className="rounded-3xl bg-[#1f1f1f] border border-[#303030] p-4 sm:p-5 space-y-4 shadow-2xl sticky top-4">
           {/* Header Bar */}
@@ -797,68 +786,152 @@ export default function PosBillingTerminal() {
         </form>
       </div>
 
-      {/* ── MODAL: KOT & Customer Receipt ─────────────────────────────── */}
+      {/* ── MODAL: Authentic Realistic Paper Receipt KOT & Bill ─────────────────────── */}
       {showKotModal && completedOrder && (
         <Dialog open={true} onOpenChange={setShowKotModal}>
-          <DialogContent className="max-w-sm bg-[#1f1f1f] border border-[#303030] text-white p-5 rounded-3xl">
-            <DialogHeader>
-              <DialogTitle className="text-base font-black text-white flex items-center justify-between">
-                <span className="flex items-center gap-2">
-                  <Printer className="w-5 h-5 text-orange-500" />
-                  <span>KOT & Bill Generated</span>
-                </span>
-                <span className="text-xs font-mono px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">
-                  Paid ({completedOrder.paymentMethod})
-                </span>
-              </DialogTitle>
-            </DialogHeader>
+          <DialogContent className="max-w-sm bg-transparent border-0 text-zinc-900 p-0 shadow-none overflow-visible">
+            {/* Realistic Thermal Paper Receipt Container */}
+            <div className="bg-[#fcfbf7] rounded-xl shadow-[0_25px_50px_-12px_rgba(0,0,0,0.85)] border border-zinc-300/80 p-6 font-mono text-xs text-zinc-900 relative overflow-hidden">
+              {/* Paper Jagged Top Tear Effect */}
+              <div className="absolute top-0 left-0 right-0 h-2 bg-[radial-gradient(circle,_transparent_3px,_#fcfbf7_3px)] bg-[length:10px_10px] -mt-1" />
 
-            {/* Thermal Print Slip Preview */}
-            <div className="bg-[#161618] p-4 rounded-2xl border border-[#303030] font-mono text-xs space-y-2 mt-2">
-              <div className="text-center pb-2 border-b border-[#303030]">
-                <h4 className="font-black text-sm text-white">IRANI KOYLA SHAWARMA</h4>
-                <p className="text-[10px] text-zinc-400">{currentOutlet.name}</p>
-                <p className="text-[10px] text-zinc-500">{completedOrder.orderNumber} &middot; {completedOrder.time}</p>
+              {/* Receipt Header */}
+              <div className="text-center pb-3 border-b-2 border-dashed border-zinc-400 space-y-1">
+                <div className="w-10 h-10 rounded-xl bg-orange-500/10 border border-orange-500/30 text-orange-600 flex items-center justify-center mx-auto mb-1">
+                  <Flame className="w-6 h-6" />
+                </div>
+                <h3 className="text-base font-black tracking-tight text-zinc-950">
+                  IRANI KOYLA SHAWARMA
+                </h3>
+                <p className="text-[11px] font-bold text-zinc-700 uppercase tracking-wider">
+                  {currentOutlet.name}
+                </p>
+                <p className="text-[10px] text-zinc-600">
+                  Shop 1-2, Mohak City Boulevard, Mumbai
+                </p>
+                <p className="text-[10px] text-zinc-600">
+                  GSTIN: <span className="font-bold">27AABCI4920F1ZV</span> | FSSAI: <span className="font-bold">11524008000492</span>
+                </p>
               </div>
 
-              <div className="space-y-1.5 py-2 border-b border-[#303030]">
+              {/* Order Meta Info */}
+              <div className="py-2.5 border-b border-dashed border-zinc-300 text-[11px] space-y-1">
+                <div className="flex justify-between font-bold text-zinc-950">
+                  <span>Order: {completedOrder.orderNumber}</span>
+                  <span>{completedOrder.customerName}</span>
+                </div>
+                <div className="flex justify-between text-zinc-600 text-[10px]">
+                  <span>Date: {new Date().toLocaleDateString("en-IN")}</span>
+                  <span>Time: {completedOrder.time}</span>
+                </div>
+                <div className="flex justify-between text-zinc-600 text-[10px]">
+                  <span>Cashier: Imran S.</span>
+                  <span>POS: Terminal #01</span>
+                </div>
+              </div>
+
+              {/* Items Table */}
+              <div className="py-3 border-b-2 border-dashed border-zinc-400 space-y-2">
+                <div className="flex justify-between text-[10px] font-black uppercase text-zinc-700 border-b border-zinc-300 pb-1">
+                  <span className="w-1/2">Item</span>
+                  <span className="w-12 text-center">Qty</span>
+                  <span className="w-16 text-right">Rate</span>
+                  <span className="w-16 text-right">Amount</span>
+                </div>
+
                 {completedOrder.items.map((it: any, i: number) => (
-                  <div key={i} className="flex justify-between text-zinc-300">
-                    <span>{it.quantity}x {it.name}</span>
-                    <span>₹{(it.price * it.quantity).toFixed(2)}</span>
+                  <div key={i} className="flex justify-between text-[11px] text-zinc-900 leading-tight">
+                    <span className="w-1/2 font-bold truncate pr-1">{it.name}</span>
+                    <span className="w-12 text-center font-bold">{it.quantity}</span>
+                    <span className="w-16 text-right text-zinc-600">₹{it.price}</span>
+                    <span className="w-16 text-right font-bold">₹{(it.price * it.quantity).toFixed(2)}</span>
                   </div>
                 ))}
               </div>
 
-              <div className="space-y-1 pt-1 text-[11px]">
-                <div className="flex justify-between text-zinc-400">
+              {/* Taxes & Bill Totals */}
+              <div className="py-2.5 border-b-2 border-zinc-900 space-y-1 text-[11px]">
+                <div className="flex justify-between text-zinc-700">
                   <span>Subtotal:</span>
                   <span>₹{completedOrder.subtotal.toFixed(2)}</span>
                 </div>
-                <div className="flex justify-between text-zinc-400">
-                  <span>GST (5%):</span>
-                  <span>₹{completedOrder.gstAmount.toFixed(2)}</span>
+                <div className="flex justify-between text-zinc-600 text-[10px]">
+                  <span>CGST (2.5%):</span>
+                  <span>₹{(completedOrder.gstAmount / 2).toFixed(2)}</span>
                 </div>
-                <div className="flex justify-between text-orange-400 font-bold text-sm pt-1 border-t border-[#303030]">
-                  <span>Total Paid:</span>
+                <div className="flex justify-between text-zinc-600 text-[10px]">
+                  <span>SGST (2.5%):</span>
+                  <span>₹{(completedOrder.gstAmount / 2).toFixed(2)}</span>
+                </div>
+
+                <div className="flex justify-between text-base font-black text-zinc-950 pt-2 border-t border-dashed border-zinc-300">
+                  <span>NET TOTAL:</span>
                   <span>₹{completedOrder.totalAmount.toFixed(2)}</span>
                 </div>
+              </div>
+
+              {/* Settlement & Change */}
+              <div className="py-2.5 border-b border-dashed border-zinc-400 text-[11px] space-y-1">
+                <div className="flex justify-between font-bold text-zinc-800">
+                  <span>Payment Mode:</span>
+                  <span className="uppercase">{completedOrder.paymentMethod}</span>
+                </div>
+
                 {completedOrder.paymentMethod === "Cash" && (
-                  <div className="flex justify-between text-emerald-400 text-[11px] pt-1">
-                    <span>Change Returned:</span>
-                    <span>₹{completedOrder.changeDue.toFixed(2)}</span>
+                  <>
+                    <div className="flex justify-between text-zinc-700">
+                      <span>Cash Received:</span>
+                      <span>₹{parseFloat(completedOrder.cashTendered).toFixed(2)}</span>
+                    </div>
+                    <div className="flex justify-between font-black text-emerald-800 text-xs pt-1 border-t border-zinc-200">
+                      <span>CHANGE RETURNED:</span>
+                      <span>₹{completedOrder.changeDue.toFixed(2)}</span>
+                    </div>
+                  </>
+                )}
+
+                {completedOrder.paymentMethod === "Split Payment" && (
+                  <div className="text-[10px] text-zinc-600">
+                    <span>Split Paid: Cash + Digital Settled</span>
                   </div>
                 )}
               </div>
+
+              {/* Barcode & Footer */}
+              <div className="pt-3 text-center space-y-1.5">
+                {/* Barcode representation */}
+                <div className="h-7 w-48 mx-auto bg-[repeating-linear-gradient(90deg,#000,#000_2px,transparent_2px,transparent_4px,#000_4px,#000_7px,transparent_7px,transparent_9px)] opacity-80" />
+                <p className="text-[10px] text-zinc-500 font-mono tracking-widest">{completedOrder.orderNumber}-KOT-VERIFIED</p>
+
+                <p className="text-xs font-black text-zinc-900 uppercase pt-1">
+                  *** THANK YOU! VISIT AGAIN ***
+                </p>
+                <p className="text-[9px] text-zinc-500">
+                  Authentic Koyla Charcoal Shawarmas &bull; Fresh Daily
+                </p>
+              </div>
+
+              {/* Paper Jagged Bottom Tear Effect */}
+              <div className="absolute bottom-0 left-0 right-0 h-2 bg-[radial-gradient(circle,_transparent_3px,_#fcfbf7_3px)] bg-[length:10px_10px] -mb-1" />
             </div>
 
-            <div className="flex gap-2 pt-2">
+            {/* Action Buttons */}
+            <div className="flex gap-2.5 pt-3">
+              <Button
+                type="button"
+                onClick={() => window.print()}
+                className="flex-1 bg-zinc-800 hover:bg-zinc-700 text-white font-black text-xs uppercase h-11 rounded-2xl gap-2 shadow-lg"
+              >
+                <Printer className="w-4 h-4" />
+                <span>Print Slip</span>
+              </Button>
+
               <Button
                 type="button"
                 onClick={() => setShowKotModal(false)}
-                className="w-full bg-orange-600 hover:bg-orange-500 text-white font-black text-xs uppercase"
+                className="flex-1 bg-gradient-to-r from-orange-600 to-amber-600 hover:opacity-95 text-white font-black text-xs uppercase h-11 rounded-2xl shadow-lg shadow-orange-600/30"
               >
-                Done & Next Customer
+                Done & Next (1-Tap)
               </Button>
             </div>
           </DialogContent>
