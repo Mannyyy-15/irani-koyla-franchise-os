@@ -129,34 +129,16 @@ export default function AdminDashboardPage() {
           )}
         </div>
 
-        <div className="flex items-center gap-2">
-          {isSuperAdmin ? (
-            <div className="flex items-center gap-2">
-              <Link href="/admin/outlets">
-                <Button className="bg-orange-600 hover:bg-orange-500 text-white font-black text-xs uppercase tracking-wider rounded-xl gap-2 shadow-lg shadow-orange-600/25 h-11 px-4 cursor-pointer">
-                  <Plus className="w-4 h-4" />
-                  <span>Onboard Franchise Hub</span>
-                </Button>
-              </Link>
-            </div>
-          ) : (
-            <div className="flex items-center gap-2">
-              <Link href="/pos">
-                <Button className="bg-orange-600 hover:bg-orange-500 text-white font-black text-xs uppercase tracking-wider rounded-xl gap-2 shadow-lg shadow-orange-600/25 h-11 px-4 cursor-pointer">
-                  <Flame className="w-4 h-4" />
-                  <span>Launch POS Register</span>
-                </Button>
-              </Link>
-
-              <Link href="/admin/sales">
-                <Button variant="outline" className="h-11 px-3.5 text-xs font-bold border-[#303030] bg-[#1f1f1f] text-zinc-300 rounded-xl gap-1.5 hover:text-white">
-                  <Receipt className="w-4 h-4 text-emerald-400" />
-                  <span>Shift Audit</span>
-                </Button>
-              </Link>
-            </div>
-          )}
-        </div>
+        {isSuperAdmin && (
+          <div className="flex items-center gap-2">
+            <Link href="/admin/outlets">
+              <Button className="bg-orange-600 hover:bg-orange-500 text-white font-black text-xs uppercase tracking-wider rounded-xl gap-2 shadow-lg shadow-orange-600/25 h-11 px-4 cursor-pointer">
+                <Plus className="w-4 h-4" />
+                <span>Onboard Franchise Hub</span>
+              </Button>
+            </Link>
+          </div>
+        )}
       </div>
 
       {/* ── SUPER ADMIN DASHBOARD VIEW ──────────────────────────────────── */}
