@@ -560,62 +560,62 @@ export default function PosBillingTerminal() {
             </div>
           </div>
 
-          {/* Cart Items Scroll Area - Flexible Height with internal scrolling */}
-          <div className="flex-1 min-h-[90px] max-h-[calc(100vh-27rem)] overflow-y-auto py-1 space-y-2 pr-1 no-scrollbar scrollbar-none">
+          {/* Cart Items Scroll Area - Big, Clear, High-Visibility Item Cards */}
+          <div className="flex-1 min-h-[140px] max-h-[calc(100vh-27rem)] overflow-y-auto py-1 space-y-2.5 pr-1 no-scrollbar scrollbar-none">
             {cart.length === 0 ? (
-              <div className="h-full min-h-[140px] flex flex-col items-center justify-center text-center text-xs text-zinc-500 font-semibold space-y-2">
-                <div className="w-10 h-10 rounded-2xl bg-[#161618] border border-[#303030] flex items-center justify-center text-zinc-600">
-                  <ShoppingBag className="w-5 h-5" />
+              <div className="h-full min-h-[160px] flex flex-col items-center justify-center text-center text-xs text-zinc-500 font-semibold space-y-2.5">
+                <div className="w-12 h-12 rounded-2xl bg-[#161618] border border-[#303030] flex items-center justify-center text-zinc-600">
+                  <ShoppingBag className="w-6 h-6" />
                 </div>
-                <span className="text-xs text-zinc-400 font-bold block">Basket is empty</span>
-                <span className="text-[10px] text-zinc-500 block max-w-[200px]">Tap food cards on the left to add items.</span>
+                <span className="text-sm text-zinc-400 font-bold block">Basket is empty</span>
+                <span className="text-xs text-zinc-500 block max-w-[220px]">Tap food cards on the left to add items to the order.</span>
               </div>
             ) : (
               cart.map((item, idx) => (
-                <div key={idx} className="p-2.5 rounded-2xl bg-[#161618] border border-[#303030] flex items-center justify-between gap-2.5 hover:border-[#3d3d3d] transition-colors">
+                <div key={idx} className="p-3 sm:p-3.5 rounded-2xl bg-[#161618] border border-[#303030] flex items-center justify-between gap-3 hover:border-[#3d3d3d] transition-colors shadow-sm">
                   {/* Item Thumbnail & Name */}
-                  <div className="flex items-center gap-2.5 min-w-0 flex-1">
+                  <div className="flex items-center gap-3 min-w-0 flex-1">
                     <img
                       src={item.image}
                       alt={item.name}
                       onError={(e) => {
                         (e.target as HTMLImageElement).src = "https://images.unsplash.com/photo-1529006557810-274b9b2fc783?auto=format&fit=crop&w=300&q=80";
                       }}
-                      className="w-10 h-10 rounded-xl object-cover border border-[#303030] shrink-0 bg-[#252525]"
+                      className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl object-cover border border-[#303030] shrink-0 bg-[#252525]"
                     />
                     <div className="min-w-0 flex-1">
-                      <span className="text-xs font-black text-white block truncate leading-tight">
+                      <span className="text-sm sm:text-base font-black text-white block truncate leading-tight">
                         {item.name}
                       </span>
-                      <span className="text-[10px] text-orange-400 font-mono font-bold block mt-0.5">
+                      <span className="text-xs sm:text-sm text-orange-400 font-mono font-bold block mt-1">
                         ₹{item.price} each
                       </span>
                     </div>
                   </div>
 
                   {/* Quantity Stepper & Line Price */}
-                  <div className="flex items-center gap-2 shrink-0">
-                    <div className="flex items-center gap-0.5 bg-[#1f1f1f] p-0.5 rounded-xl border border-[#303030]">
+                  <div className="flex items-center gap-2.5 shrink-0">
+                    <div className="flex items-center gap-1 bg-[#1f1f1f] p-1 rounded-xl border border-[#303030]">
                       <button
                         type="button"
                         onClick={() => updateQuantity(idx, -1)}
-                        className="w-6 h-6 rounded-lg bg-[#161618] text-white text-xs font-bold flex items-center justify-center hover:bg-rose-500/20 hover:text-rose-400 transition-colors cursor-pointer"
+                        className="w-8 h-8 rounded-xl bg-[#161618] text-white text-sm font-bold flex items-center justify-center hover:bg-rose-500/20 hover:text-rose-400 transition-colors cursor-pointer"
                       >
                         -
                       </button>
-                      <span className="font-mono text-xs font-black text-white w-5 text-center">
+                      <span className="font-mono text-sm sm:text-base font-black text-white w-6 text-center">
                         {item.quantity}
                       </span>
                       <button
                         type="button"
                         onClick={() => updateQuantity(idx, 1)}
-                        className="w-6 h-6 rounded-lg bg-orange-600 text-white text-xs font-bold flex items-center justify-center hover:bg-orange-500 transition-colors cursor-pointer shadow-sm"
+                        className="w-8 h-8 rounded-xl bg-orange-600 text-white text-sm font-bold flex items-center justify-center hover:bg-orange-500 transition-colors cursor-pointer shadow-sm"
                       >
                         +
                       </button>
                     </div>
 
-                    <span className="font-mono text-xs sm:text-sm font-black text-white w-12 text-right">
+                    <span className="font-mono text-sm sm:text-base font-black text-white w-14 text-right">
                       ₹{(item.price * item.quantity).toFixed(0)}
                     </span>
                   </div>
