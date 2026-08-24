@@ -319,7 +319,7 @@ export default function PosBillingTerminal() {
   };
 
   return (
-    <div className="h-full lg:h-[calc(100vh-5.5rem)] grid grid-cols-1 lg:grid-cols-12 gap-3 lg:gap-4 overflow-hidden relative">
+    <div className="grid grid-cols-1 lg:grid-cols-12 gap-3 lg:gap-4 relative items-start pb-6">
       {/* Offline Toast Notification */}
       {offlineQueuedToast && (
         <div className="fixed bottom-6 right-6 z-50 p-4 rounded-2xl bg-amber-950/90 border border-amber-500/50 text-amber-200 text-xs font-bold shadow-2xl flex items-center gap-3">
@@ -331,10 +331,10 @@ export default function PosBillingTerminal() {
         </div>
       )}
 
-      {/* LEFT COLUMN: Big Touch Visual Menu (Internal Scrollable Grid) */}
-      <div className="lg:col-span-7 xl:col-span-8 flex flex-col h-full overflow-hidden min-h-0 space-y-3">
+      {/* LEFT COLUMN: Big Touch Visual Menu */}
+      <div className="lg:col-span-7 xl:col-span-8 space-y-3 min-w-0">
         {/* Category Filters Bar & Fast Search */}
-        <div className="shrink-0 flex flex-col sm:flex-row items-center gap-2.5">
+        <div className="flex flex-col sm:flex-row items-center gap-2.5">
           <div className="relative w-full sm:w-64 xl:w-72 shrink-0">
             <Search className="w-4 h-4 text-zinc-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
             <input
@@ -418,101 +418,99 @@ export default function PosBillingTerminal() {
           </div>
         </div>
 
-        {/* Big Food Cards Grid with Dedicated Internal Scroll Area */}
-        <div className="flex-1 min-h-0 overflow-y-auto pr-1 pb-2 no-scrollbar scrollbar-none">
-          <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-3.5">
-            {filteredMenuItems.map((item) => {
-              const inCartQty = getItemCartQuantity(item.id);
+        {/* Big Food Cards Grid */}
+        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-3.5">
+          {filteredMenuItems.map((item) => {
+            const inCartQty = getItemCartQuantity(item.id);
 
-              return (
-                <div
-                  key={item.id}
-                  onClick={() => addToCart(item)}
-                  className={cn(
-                    "group relative rounded-3xl bg-[#1f1f1f] border overflow-hidden transition-all duration-200 cursor-pointer shadow-md hover:shadow-2xl flex flex-col justify-between select-none",
-                    inCartQty > 0
-                      ? "border-orange-500 bg-[#25201d] ring-1 ring-orange-500/50 shadow-orange-600/20"
-                      : "border-[#303030] hover:border-orange-500/80"
+            return (
+              <div
+                key={item.id}
+                onClick={() => addToCart(item)}
+                className={cn(
+                  "group relative rounded-3xl bg-[#1f1f1f] border overflow-hidden transition-all duration-200 cursor-pointer shadow-md hover:shadow-2xl flex flex-col justify-between select-none",
+                  inCartQty > 0
+                    ? "border-orange-500 bg-[#25201d] ring-1 ring-orange-500/50 shadow-orange-600/20"
+                    : "border-[#303030] hover:border-orange-500/80"
+                )}
+              >
+                {/* Big Full-Bleed Clear Food Photo */}
+                <div className="relative h-36 sm:h-40 w-full overflow-hidden bg-[#161618]">
+                  <img
+                    src={item.image}
+                    alt={item.name}
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).src = "https://images.unsplash.com/photo-1529006557810-274b9b2fc783?auto=format&fit=crop&w=600&q=80";
+                    }}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                  />
+
+                  {/* Quantity In-Basket Float Tag */}
+                  {inCartQty > 0 && (
+                    <div className="absolute top-2.5 right-2.5 z-10 flex items-center gap-1 bg-orange-600 text-white font-black text-[11px] px-2.5 py-1 rounded-xl shadow-2xl border border-orange-400/50 animate-in fade-in">
+                      <Check className="w-3 h-3 stroke-[3]" />
+                      <span>{inCartQty} in Basket</span>
+                    </div>
                   )}
-                >
-                  {/* Big Full-Bleed Clear Food Photo */}
-                  <div className="relative h-36 sm:h-40 w-full overflow-hidden bg-[#161618]">
-                    <img
-                      src={item.image}
-                      alt={item.name}
-                      onError={(e) => {
-                        (e.target as HTMLImageElement).src = "https://images.unsplash.com/photo-1529006557810-274b9b2fc783?auto=format&fit=crop&w=600&q=80";
-                      }}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                    />
+                </div>
 
-                    {/* Quantity In-Basket Float Tag */}
-                    {inCartQty > 0 && (
-                      <div className="absolute top-2.5 right-2.5 z-10 flex items-center gap-1 bg-orange-600 text-white font-black text-[11px] px-2.5 py-1 rounded-xl shadow-2xl border border-orange-400/50 animate-in fade-in">
-                        <Check className="w-3 h-3 stroke-[3]" />
-                        <span>{inCartQty} in Basket</span>
-                      </div>
-                    )}
-                  </div>
+                {/* Card Body with Large Title & Price */}
+                <div className="p-3 sm:p-3.5 flex flex-col justify-between flex-1 space-y-2.5">
+                  <h3 className="text-xs sm:text-sm font-black text-white group-hover:text-orange-400 transition-colors leading-snug line-clamp-2">
+                    {item.name}
+                  </h3>
 
-                  {/* Card Body with Large Title & Price */}
-                  <div className="p-3 sm:p-3.5 flex flex-col justify-between flex-1 space-y-2.5">
-                    <h3 className="text-xs sm:text-sm font-black text-white group-hover:text-orange-400 transition-colors leading-snug line-clamp-2">
-                      {item.name}
-                    </h3>
+                  <div className="flex items-center justify-between pt-2 border-t border-[#303030]">
+                    <div className="flex flex-col">
+                      <span className="font-mono text-base sm:text-lg font-black text-orange-400">
+                        ₹{item.price}
+                      </span>
+                    </div>
 
-                    <div className="flex items-center justify-between pt-2 border-t border-[#303030]">
-                      <div className="flex flex-col">
-                        <span className="font-mono text-base sm:text-lg font-black text-orange-400">
-                          ₹{item.price}
-                        </span>
-                      </div>
-
-                      {/* Quick + / - Controls or 1-Tap Add */}
-                      {inCartQty > 0 ? (
-                        <div
-                          className="flex items-center gap-1 bg-[#161618] p-1 rounded-xl border border-orange-500/50 shadow-sm"
-                          onClick={(e) => e.stopPropagation()}
-                        >
-                          <button
-                            type="button"
-                            onClick={() => removeFromCart(item.id)}
-                            className="w-7 h-7 rounded-lg bg-[#1f1f1f] hover:bg-rose-500/20 text-white hover:text-rose-400 text-xs font-bold flex items-center justify-center transition-colors cursor-pointer"
-                          >
-                            -
-                          </button>
-                          <span className="font-mono text-xs font-black text-white px-1 text-center">
-                            {inCartQty}
-                          </span>
-                          <button
-                            type="button"
-                            onClick={() => addToCart(item)}
-                            className="w-7 h-7 rounded-lg bg-orange-600 hover:bg-orange-500 text-white text-xs font-bold flex items-center justify-center transition-colors cursor-pointer shadow-md"
-                          >
-                            +
-                          </button>
-                        </div>
-                      ) : (
+                    {/* Quick + / - Controls or 1-Tap Add */}
+                    {inCartQty > 0 ? (
+                      <div
+                        className="flex items-center gap-1 bg-[#161618] p-1 rounded-xl border border-orange-500/50 shadow-sm"
+                        onClick={(e) => e.stopPropagation()}
+                      >
                         <button
                           type="button"
-                          className="h-8 px-3 rounded-xl bg-orange-600/20 text-orange-400 group-hover:bg-orange-600 group-hover:text-white flex items-center gap-1 font-black text-xs uppercase tracking-wider transition-colors shadow-sm cursor-pointer"
+                          onClick={() => removeFromCart(item.id)}
+                          className="w-7 h-7 rounded-lg bg-[#1f1f1f] hover:bg-rose-500/20 text-white hover:text-rose-400 text-xs font-bold flex items-center justify-center transition-colors cursor-pointer"
                         >
-                          <Plus className="w-3.5 h-3.5 stroke-[3]" />
-                          <span>Add</span>
+                          -
                         </button>
-                      )}
-                    </div>
+                        <span className="font-mono text-xs font-black text-white px-1 text-center">
+                          {inCartQty}
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => addToCart(item)}
+                          className="w-7 h-7 rounded-lg bg-orange-600 hover:bg-orange-500 text-white text-xs font-bold flex items-center justify-center transition-colors cursor-pointer shadow-md"
+                        >
+                          +
+                        </button>
+                      </div>
+                    ) : (
+                      <button
+                        type="button"
+                        className="h-8 px-3 rounded-xl bg-orange-600/20 text-orange-400 group-hover:bg-orange-600 group-hover:text-white flex items-center gap-1 font-black text-xs uppercase tracking-wider transition-colors shadow-sm cursor-pointer"
+                      >
+                        <Plus className="w-3.5 h-3.5 stroke-[3]" />
+                        <span>Add</span>
+                      </button>
+                    )}
                   </div>
                 </div>
-              );
-            })}
-          </div>
+              </div>
+            );
+          })}
         </div>
       </div>
 
-      {/* RIGHT COLUMN: Ultra-Clean Counter Billing Register (Locked Viewport Height) */}
-      <div className="lg:col-span-5 xl:col-span-4 h-full flex flex-col min-h-0 overflow-hidden">
-        <form onSubmit={handlePunchOrder} className="h-full flex flex-col justify-between overflow-hidden rounded-3xl bg-[#1f1f1f] border border-[#303030] p-3.5 sm:p-4 shadow-2xl space-y-2.5">
+      {/* RIGHT COLUMN: Ultra-Clean Counter Billing Register (Sticky & Max-Height Constrained) */}
+      <div className="lg:col-span-5 xl:col-span-4 sticky top-3 lg:top-4 z-20 self-start w-full">
+        <form onSubmit={handlePunchOrder} className="flex flex-col justify-between overflow-hidden rounded-3xl bg-[#1f1f1f] border border-[#303030] p-3.5 sm:p-4 shadow-2xl space-y-2.5 max-h-[calc(100vh-5.5rem)]">
           {/* Header Bar */}
           <div className="shrink-0 flex items-center justify-between border-b border-[#303030] pb-2.5">
             <div className="flex items-center gap-2">
@@ -562,8 +560,8 @@ export default function PosBillingTerminal() {
             </div>
           </div>
 
-          {/* Cart Items Scroll Area - Flexible Height that takes all remaining space */}
-          <div className="flex-1 min-h-0 overflow-y-auto py-1 space-y-2 pr-1 no-scrollbar scrollbar-none">
+          {/* Cart Items Scroll Area - Flexible Height with internal scrolling */}
+          <div className="flex-1 min-h-[90px] max-h-[calc(100vh-27rem)] overflow-y-auto py-1 space-y-2 pr-1 no-scrollbar scrollbar-none">
             {cart.length === 0 ? (
               <div className="h-full min-h-[140px] flex flex-col items-center justify-center text-center text-xs text-zinc-500 font-semibold space-y-2">
                 <div className="w-10 h-10 rounded-2xl bg-[#161618] border border-[#303030] flex items-center justify-center text-zinc-600">
