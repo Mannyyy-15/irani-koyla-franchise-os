@@ -306,12 +306,9 @@ export default function AdminDashboardPage() {
             {/* Sales Velocity Area Chart */}
             <Card className="lg:col-span-7 border-[#303030] bg-[#1f1f1f] shadow-xl rounded-3xl">
               <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-bold text-white flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <TrendingUp className="w-4 h-4 text-orange-500" />
-                    <span>Hourly Network Velocity Curve (Today)</span>
-                  </div>
-                  <span className="text-xs text-orange-400 font-mono font-bold">Network Peak: 9 PM - 11 PM</span>
+                <CardTitle className="text-sm font-bold text-white flex items-center gap-2">
+                  <TrendingUp className="w-4 h-4 text-orange-500" />
+                  <span>Hourly Network Velocity Curve (Today)</span>
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -356,12 +353,9 @@ export default function AdminDashboardPage() {
 
             <Card className="lg:col-span-5 border-[#303030] bg-[#1f1f1f] shadow-xl rounded-3xl flex flex-col justify-between">
               <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-bold text-white flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <UtensilsCrossed className="w-4 h-4 text-orange-500" />
-                    <span>Category Revenue Share</span>
-                  </div>
-                  <span className="text-xs text-orange-400 font-mono font-bold">4 Main Categories</span>
+                <CardTitle className="text-sm font-bold text-white flex items-center gap-2">
+                  <UtensilsCrossed className="w-4 h-4 text-orange-500" />
+                  <span>Category Revenue Share</span>
                 </CardTitle>
               </CardHeader>
               <CardContent className="flex-1 flex flex-col justify-center">
@@ -510,12 +504,9 @@ export default function AdminDashboardPage() {
             {/* Store Hourly Sales Velocity Area Chart */}
             <Card className="lg:col-span-7 border-[#303030] bg-[#1f1f1f] shadow-xl rounded-3xl">
               <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-bold text-white flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <TrendingUp className="w-4 h-4 text-orange-500" />
-                    <span>Hourly Sales Velocity & Rush Hours (Today)</span>
-                  </div>
-                  <span className="text-xs text-orange-400 font-mono font-bold">Peak Rush: 8 PM - 11 PM</span>
+                <CardTitle className="text-sm font-bold text-white flex items-center gap-2">
+                  <TrendingUp className="w-4 h-4 text-orange-500" />
+                  <span>Hourly Sales Velocity (Today)</span>
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -561,12 +552,9 @@ export default function AdminDashboardPage() {
             {/* Sales Channel Mix Pie Chart */}
             <Card className="lg:col-span-5 border-[#303030] bg-[#1f1f1f] shadow-xl rounded-3xl flex flex-col justify-between">
               <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-bold text-white flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <PieIcon className="w-4 h-4 text-orange-500" />
-                    <span>Channel Revenue Share</span>
-                  </div>
-                  <span className="text-xs text-orange-400 font-mono font-bold">{outletTenderTotals.totalOrdersToday} Orders Today</span>
+                <CardTitle className="text-sm font-bold text-white flex items-center gap-2">
+                  <PieIcon className="w-4 h-4 text-orange-500" />
+                  <span>Channel Revenue Share</span>
                 </CardTitle>
               </CardHeader>
               <CardContent className="flex-1 flex flex-col justify-center">
