@@ -122,11 +122,11 @@ export default function AdminDashboardPage() {
           <h1 className="text-2xl sm:text-3xl font-black text-white tracking-tight pt-0.5">
             {isSuperAdmin ? "Network Executive Command Center" : "Store Overview & Live Analytics"}
           </h1>
-          <p className="text-xs sm:text-sm text-zinc-400 leading-relaxed max-w-2xl pt-1">
-            {isSuperAdmin
-              ? `Real-time multi-unit performance, sales velocity, spit yield benchmarks, and live counter stream across ${outlets.length} franchise locations.`
-              : `Real-time store sales curve, tender channel mix, spit roasting yield efficiency, and counter orders.`}
-          </p>
+          {isSuperAdmin && (
+            <p className="text-xs sm:text-sm text-zinc-400 leading-relaxed max-w-2xl pt-1">
+              Real-time multi-unit performance, sales velocity, spit yield benchmarks, and live counter stream across {outlets.length} franchise locations.
+            </p>
+          )}
         </div>
 
         <div className="flex items-center gap-2">
@@ -622,14 +622,9 @@ export default function AdminDashboardPage() {
             {/* Live Spit Roaster Gauges */}
             <Card className="border-[#303030] bg-[#1f1f1f]">
               <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-bold text-white flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <Flame className="w-4 h-4 text-orange-500" />
-                    <span>Live Spit Roasters & Yield</span>
-                  </div>
-                  <Link href="/admin/yield" className="text-xs text-orange-400 hover:underline font-bold">
-                    Logs &rarr;
-                  </Link>
+                <CardTitle className="text-sm font-bold text-white flex items-center gap-2">
+                  <Flame className="w-4 h-4 text-orange-500" />
+                  <span>Live Spit Roasters & Yield</span>
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-3.5">
@@ -674,14 +669,9 @@ export default function AdminDashboardPage() {
             {/* Live Punched Counter Orders */}
             <Card className="lg:col-span-2 border-[#303030] bg-[#1f1f1f]">
               <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-bold text-white flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <Receipt className="w-4 h-4 text-orange-500" />
-                    <span>Live Punched Orders Stream</span>
-                  </div>
-                  <Link href="/pos" className="text-xs text-orange-400 hover:underline font-bold">
-                    Open POS Terminal &rarr;
-                  </Link>
+                <CardTitle className="text-sm font-bold text-white flex items-center gap-2">
+                  <Receipt className="w-4 h-4 text-orange-500" />
+                  <span>Live Punched Orders Stream</span>
                 </CardTitle>
               </CardHeader>
               <CardContent className="p-0">
