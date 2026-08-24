@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
@@ -43,18 +43,38 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   const [showOthersDrawer, setShowOthersDrawer] = useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const pathname = usePathname();
+
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem("koyla_admin_sidebar_collapsed");
+      if (saved !== null) {
+        setSidebarCollapsed(saved === "true");
+      }
+    } catch {}
+  }, []);
+
+  const toggleSidebar = () => {
+    setSidebarCollapsed((prev) => {
+      const next = !prev;
+      try {
+        localStorage.setItem("koyla_admin_sidebar_collapsed", String(next));
+      } catch {}
+      return next;
+    });
+  };
 
   const isOthersActive = drawerOptions.some(opt => pathname.startsWith(opt.href));
 
   return (
-    <div className="flex h-screen overflow-hidden bg-background">
-        <AdminSidebar />
-        <div className="flex flex-1 flex-col overflow-hidden relative">
-          <TopNav />
+    <div className="flex h-screen overflow-hidden bg-[#161618] text-white selection:bg-orange-500 selection:text-black" suppressHydrationWarning>
+      <AdminSidebar collapsed={sidebarCollapsed} onToggle={toggleSidebar} />
+      <div className="flex flex-1 flex-col overflow-hidden relative min-w-0" suppressHydrationWarning>
+        <TopNav />
 
-        <main id="main-content" className="mobile-content-safe flex-1 overflow-y-auto lg:pb-0">
-          <div className="p-4 sm:p-6 lg:p-6">{children}</div>
+        <main id="main-content" className="mobile-content-safe flex-1 overflow-y-auto lg:pb-0" suppressHydrationWarning>
+          <div className="p-3 sm:p-5 lg:p-6" suppressHydrationWarning>{children}</div>
         </main>
 
         {/* Floating Mobile Bottom Navigation */}

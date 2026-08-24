@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import {
   Store,
   Plus,
@@ -428,124 +429,160 @@ For central commissary refills or support, contact HQ Operations.
         </div>
       </div>
 
-      {/* Franchise Outlets Matrix Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+      {/* Franchise Outlets Matrix Grid (Bigger, Higher Visibility Cards) */}
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-5">
         {filteredOutlets.map((outlet) => {
           const targetPercent = Math.min(100, Math.round((outlet.currentDaySales / outlet.dailyTargetSales) * 100)) || 0;
           const isFlaggedYield = outlet.status === "active" && outlet.spitEfficiency < 90;
-          const outletRoyalty = royalties.find((r) => r.outletId === outlet.id);
 
           return (
             <div
               key={outlet.id}
-              onClick={() => {
-                setDossierTab("credentials");
-                setSelectedDossierOutlet(outlet);
-              }}
               className={cn(
-                "group rounded-2xl bg-[#1f1f1f] border p-5 space-y-4 hover:border-orange-500 transition-all duration-200 cursor-pointer shadow-lg hover:shadow-orange-500/10 relative flex flex-col justify-between",
-                isFlaggedYield ? "border-amber-500/40" : "border-[#303030]"
+                "group rounded-3xl bg-[#1f1f1f] border p-5 sm:p-6 space-y-4 hover:border-orange-500 transition-all duration-300 shadow-xl hover:shadow-orange-500/10 relative flex flex-col justify-between",
+                isFlaggedYield ? "border-amber-500/50" : "border-[#303030]"
               )}
             >
               {/* Top Header & Status Badges */}
-              <div>
+              <div className="space-y-3.5">
                 <div className="flex items-start justify-between gap-3">
-                  <div className="min-w-0">
-                    <div className="flex items-center gap-2">
-                      <span className="font-mono text-[10px] font-black text-orange-400 bg-orange-500/10 border border-orange-500/30 px-2 py-0.5 rounded-md">
-                        {outlet.code}
-                      </span>
-                      <span className={cn(
-                        "text-[9px] font-black uppercase px-2 py-0.5 rounded-md border",
-                        outlet.status === "active"
-                          ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/30"
-                          : "bg-amber-500/10 text-amber-400 border-amber-500/30 animate-pulse"
-                      )}>
-                        {outlet.status === "active" ? "● Live & Billing" : "⏳ Onboarding (CAD)"}
-                      </span>
+                  <div className="flex items-center gap-3 min-w-0">
+                    <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-orange-500/20 via-amber-500/10 to-transparent border border-orange-500/30 text-orange-400 flex items-center justify-center shrink-0 shadow-inner">
+                      <Store className="w-6 h-6" />
                     </div>
+                    <div className="min-w-0">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className="font-mono text-xs font-black text-orange-400 bg-orange-500/10 border border-orange-500/30 px-2.5 py-0.5 rounded-lg">
+                          {outlet.code}
+                        </span>
+                        <span className={cn(
+                          "text-[10px] font-black uppercase px-2.5 py-0.5 rounded-lg border flex items-center gap-1",
+                          outlet.status === "active"
+                            ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/30"
+                            : "bg-amber-500/10 text-amber-400 border-amber-500/30 animate-pulse"
+                        )}>
+                          <span className={cn(
+                            "w-1.5 h-1.5 rounded-full",
+                            outlet.status === "active" ? "bg-emerald-400 animate-pulse" : "bg-amber-400"
+                          )} />
+                          <span>{outlet.status === "active" ? "Live & Billing" : "Pre-Launch"}</span>
+                        </span>
+                      </div>
 
-                    <h3 className="text-base font-black text-white group-hover:text-orange-400 transition-colors mt-1.5 truncate">
-                      {outlet.name}
-                    </h3>
-                    <p className="text-xs text-zinc-400 flex items-center gap-1 truncate mt-0.5">
-                      <MapPin className="w-3 h-3 text-orange-500 shrink-0" />
-                      <span>{outlet.area}, {outlet.city}</span>
-                    </p>
+                      <h3 className="text-lg sm:text-xl font-black text-white group-hover:text-orange-400 transition-colors mt-1 truncate">
+                        {outlet.name}
+                      </h3>
+                    </div>
                   </div>
 
                   <button
                     type="button"
-                    className="w-8 h-8 rounded-xl bg-[#161618] border border-[#303030] group-hover:bg-orange-600 group-hover:text-white text-zinc-400 flex items-center justify-center transition-colors shrink-0"
-                    title="Open 360° Operations Dossier & Credentials"
+                    onClick={() => {
+                      setDossierTab("credentials");
+                      setSelectedDossierOutlet(outlet);
+                    }}
+                    className="w-9 h-9 rounded-xl bg-[#161618] border border-[#303030] hover:bg-orange-600 hover:text-white text-zinc-400 flex items-center justify-center transition-colors shrink-0 cursor-pointer"
+                    title="Open 360° Operations Dossier"
                   >
                     <ArrowUpRight className="w-4 h-4" />
                   </button>
                 </div>
 
-                {/* Owner & Manager Info */}
-                <div className="mt-3.5 p-2.5 rounded-xl bg-[#161618] border border-[#303030] text-xs space-y-1">
+                <p className="text-xs text-zinc-400 flex items-center gap-1.5 truncate">
+                  <MapPin className="w-3.5 h-3.5 text-orange-500 shrink-0" />
+                  <span>{outlet.area}, {outlet.city} &middot; <strong className="text-zinc-300 font-normal">{outlet.territoryRadiusKm || 3.0} km Radius</strong></span>
+                </p>
+
+                {/* Franchisee Partner & Direct Login Chip */}
+                <div className="p-3 rounded-2xl bg-[#161618] border border-[#303030] text-xs space-y-1.5 shadow-inner">
                   <div className="flex justify-between items-center text-zinc-300">
-                    <span className="text-[10px] text-zinc-500 font-bold uppercase">Franchisee Partner:</span>
-                    <span className="font-bold">{outlet.ownerName}</span>
+                    <span className="text-[10px] text-zinc-500 font-bold uppercase tracking-wider">Franchisee Owner:</span>
+                    <span className="font-black text-white">{outlet.ownerName}</span>
                   </div>
-                  <div className="flex justify-between items-center text-zinc-400 text-[11px]">
-                    <span>Login Email:</span>
-                    <span className="font-mono text-orange-400 truncate max-w-[160px]">{outlet.loginEmail || outlet.ownerEmail}</span>
+                  <div className="flex justify-between items-center text-zinc-400 text-xs">
+                    <span className="text-[10px] text-zinc-500 font-bold uppercase tracking-wider">Login ID:</span>
+                    <span className="font-mono text-orange-400 font-bold truncate max-w-[170px]">{outlet.loginEmail || outlet.ownerEmail}</span>
                   </div>
                 </div>
 
-                {/* Live Sales & Daily Target Meter */}
-                <div className="mt-3.5 space-y-1.5">
+                {/* Big Live Sales & Target Progress */}
+                <div className="p-3.5 rounded-2xl bg-gradient-to-br from-[#161618] to-[#1a1a1c] border border-[#303030] space-y-2">
                   <div className="flex items-baseline justify-between">
                     <div>
-                      <span className="text-[10px] text-zinc-400 font-bold uppercase tracking-wider block">Today's Gross Sales</span>
-                      <span className="text-lg font-black text-emerald-400 font-mono">
+                      <span className="text-[10px] text-zinc-500 font-bold uppercase tracking-wider block">Today's Live Gross Sales</span>
+                      <span className="text-xl sm:text-2xl font-black text-emerald-400 font-mono tracking-tight">
                         ₹{outlet.currentDaySales.toLocaleString("en-IN")}
                       </span>
                     </div>
                     <div className="text-right">
-                      <span className="text-[10px] text-zinc-400 font-bold uppercase tracking-wider block">Target (₹{outlet.dailyTargetSales / 1000}k)</span>
-                      <span className="text-xs font-black text-white font-mono">{targetPercent}%</span>
+                      <span className="text-[10px] text-zinc-500 font-bold uppercase tracking-wider block">Daily Goal (₹{(outlet.dailyTargetSales / 1000).toFixed(0)}k)</span>
+                      <span className="text-sm font-black text-white font-mono">{targetPercent}%</span>
                     </div>
                   </div>
-                  <Progress value={targetPercent} className="h-1.5 bg-[#161618]" />
+                  <Progress value={targetPercent} className="h-2 bg-[#1f1f1f]" />
                 </div>
-              </div>
 
-              {/* Bottom KPIs: Wraps, Yield %, Spits, Royalty Status */}
-              <div className="pt-3 border-t border-[#303030] space-y-2">
+                {/* 3 High-Visibility Operational KPIs */}
                 <div className="grid grid-cols-3 gap-2 text-center text-xs font-mono">
-                  <div className="p-2 rounded-xl bg-[#161618] border border-[#303030]">
+                  <div className="p-2.5 rounded-2xl bg-[#161618] border border-[#303030] shadow-sm">
                     <span className="text-[9px] text-zinc-500 block uppercase font-sans font-bold">Wraps Sold</span>
-                    <span className="font-black text-white">{outlet.currentDayWraps}</span>
+                    <span className="text-sm sm:text-base font-black text-white">{outlet.currentDayWraps}</span>
                   </div>
-                  <div className="p-2 rounded-xl bg-[#161618] border border-[#303030]">
+                  <div className="p-2.5 rounded-2xl bg-[#161618] border border-[#303030] shadow-sm">
                     <span className="text-[9px] text-zinc-500 block uppercase font-sans font-bold">Meat Yield</span>
                     <span className={cn(
-                      "font-black",
+                      "text-sm sm:text-base font-black",
                       outlet.spitEfficiency >= 93 ? "text-emerald-400" : "text-amber-400"
                     )}>
                       {outlet.spitEfficiency}%
                     </span>
                   </div>
-                  <div className="p-2 rounded-xl bg-[#161618] border border-[#303030]">
-                    <span className="text-[9px] text-zinc-500 block uppercase font-sans font-bold">Spits</span>
-                    <span className="font-black text-orange-400">{outlet.activeSpits}/{outlet.totalSpits}</span>
+                  <div className="p-2.5 rounded-2xl bg-[#161618] border border-[#303030] shadow-sm">
+                    <span className="text-[9px] text-zinc-500 block uppercase font-sans font-bold">Live Spits</span>
+                    <span className="text-sm sm:text-base font-black text-orange-400">{outlet.activeSpits}/{outlet.totalSpits}</span>
                   </div>
                 </div>
+              </div>
 
-                {/* Footer Badges & Actions */}
-                <div className="flex items-center justify-between text-[11px] pt-1">
-                  <span className="text-[10px] font-bold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-md border border-emerald-500/20">
-                    🔑 Credentials Active
-                  </span>
+              {/* Action Buttons Row */}
+              <div className="pt-3 border-t border-[#303030] flex items-center gap-2">
+                <Link
+                  href="/pos"
+                  onClick={() => setSelectedOutletId(outlet.id)}
+                  className="flex-1"
+                >
+                  <Button
+                    type="button"
+                    className="w-full h-10 bg-gradient-to-r from-orange-600 to-amber-600 hover:opacity-95 text-white font-black text-xs uppercase tracking-wider rounded-xl gap-1.5 shadow-md shadow-orange-600/20 cursor-pointer"
+                  >
+                    <Flame className="w-3.5 h-3.5" />
+                    <span>Open POS</span>
+                  </Button>
+                </Link>
 
-                  <span className="text-orange-400 font-bold flex items-center gap-0.5 text-xs group-hover:translate-x-0.5 transition-transform">
-                    <span>360° Dossier</span>
-                    <ChevronRight className="w-3 h-3" />
-                  </span>
-                </div>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => {
+                    setDossierTab("credentials");
+                    setSelectedDossierOutlet(outlet);
+                  }}
+                  className="h-10 px-3 rounded-xl border-[#383838] bg-[#161618] text-xs font-bold text-zinc-300 hover:text-white hover:border-orange-500 cursor-pointer"
+                  title="View Credentials, KYC & Royalty Dossier"
+                >
+                  <Key className="w-3.5 h-3.5 text-orange-400" />
+                  <span className="hidden sm:inline">Dossier</span>
+                </Button>
+
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => copyWhatsAppPack(outlet)}
+                  className="h-10 px-3 rounded-xl border-[#383838] bg-[#161618] text-xs font-bold text-emerald-400 hover:bg-emerald-500/10 hover:border-emerald-500 cursor-pointer"
+                  title="Copy WhatsApp Access Pack"
+                >
+                  <Send className="w-3.5 h-3.5" />
+                </Button>
               </div>
             </div>
           );

@@ -162,60 +162,64 @@ export default function AdminDashboardPage() {
       {/* ── SUPER ADMIN DASHBOARD VIEW ──────────────────────────────────── */}
       {isSuperAdmin ? (
         <div className="space-y-6">
-          {/* Top 4 Network KPI Cards */}
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3.5">
-            <Card className="border-[#303030] bg-[#1f1f1f]">
-              <CardContent className="p-4 flex items-center gap-3.5">
-                <div className="w-11 h-11 rounded-xl bg-orange-500/10 border border-orange-500/30 flex items-center justify-center shrink-0">
-                  <Receipt className="w-5 h-5 text-orange-400" />
+          {/* Top 4 Network KPI Cards (Bigger & High-Contrast) */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+            <Card className="border-[#303030] bg-[#1f1f1f] shadow-xl hover:border-orange-500/50 transition-all rounded-3xl">
+              <CardContent className="p-5 flex items-center gap-4">
+                <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-orange-500/20 to-amber-500/10 border border-orange-500/30 flex items-center justify-center shrink-0 shadow-inner">
+                  <Receipt className="w-7 h-7 text-orange-400" />
                 </div>
-                <div>
-                  <span className="text-[10px] font-bold text-[#b8b8c5]/70 uppercase tracking-wider block">Network Gross Sales Today</span>
-                  <p className="text-xl font-black text-emerald-400 font-mono mt-0.5">
+                <div className="min-w-0">
+                  <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest block">Network Gross Sales</span>
+                  <p className="text-2xl sm:text-3xl font-black text-emerald-400 font-mono tracking-tight mt-0.5">
                     ₹{networkTotals.totalSalesToday.toLocaleString("en-IN")}
                   </p>
-                  <span className="text-[10px] text-[#b8b8c5]/60 block">{networkTotals.totalWrapsToday.toLocaleString()} Wraps Carved</span>
+                  <span className="text-xs text-zinc-300 font-semibold block mt-0.5">{networkTotals.totalWrapsToday.toLocaleString()} Wraps Carved Today</span>
                 </div>
               </CardContent>
             </Card>
 
-            <Card className="border-[#303030] bg-[#1f1f1f]">
-              <CardContent className="p-4 flex items-center gap-3.5">
-                <div className="w-11 h-11 rounded-xl bg-blue-500/10 border border-blue-500/30 flex items-center justify-center shrink-0">
-                  <Store className="w-5 h-5 text-blue-400" />
+            <Card className="border-[#303030] bg-[#1f1f1f] shadow-xl hover:border-blue-500/50 transition-all rounded-3xl">
+              <CardContent className="p-5 flex items-center gap-4">
+                <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-500/20 to-cyan-500/10 border border-blue-500/30 flex items-center justify-center shrink-0 shadow-inner">
+                  <Store className="w-7 h-7 text-blue-400" />
                 </div>
-                <div>
-                  <span className="text-[10px] font-bold text-[#b8b8c5]/70 uppercase tracking-wider block">Active Franchise Network</span>
-                  <p className="text-xl font-black text-white font-mono mt-0.5">{outlets.length} Live Hub</p>
-                  <span className="text-[10px] text-emerald-400 font-semibold block">Mohak City Branch (Active)</span>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card className="border-[#303030] bg-[#1f1f1f]">
-              <CardContent className="p-4 flex items-center gap-3.5">
-                <div className="w-11 h-11 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center shrink-0">
-                  <Flame className="w-5 h-5 text-amber-400" />
-                </div>
-                <div>
-                  <span className="text-[10px] font-bold text-[#b8b8c5]/70 uppercase tracking-wider block">Network Avg Spit Yield</span>
-                  <p className="text-xl font-black text-amber-400 font-mono mt-0.5">{networkTotals.avgSpitEfficiency}%</p>
-                  <span className="text-[10px] text-zinc-400 block">{networkTotals.activeSpitsCount} Live Spit Roasters</span>
+                <div className="min-w-0">
+                  <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest block">Franchise Outlets</span>
+                  <p className="text-2xl sm:text-3xl font-black text-white font-mono tracking-tight mt-0.5">
+                    {outlets.length} Branches
+                  </p>
+                  <span className="text-xs text-emerald-400 font-bold block mt-0.5">{outlets.filter(o => o.status === "active").length} Live & Billing · 1 Launching</span>
                 </div>
               </CardContent>
             </Card>
 
-            <Card className="border-[#303030] bg-[#1f1f1f]">
-              <CardContent className="p-4 flex items-center gap-3.5">
-                <div className="w-11 h-11 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center shrink-0">
-                  <DollarSign className="w-5 h-5 text-emerald-400" />
+            <Card className="border-[#303030] bg-[#1f1f1f] shadow-xl hover:border-amber-500/50 transition-all rounded-3xl">
+              <CardContent className="p-5 flex items-center gap-4">
+                <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-amber-500/20 to-orange-500/10 border border-amber-500/30 flex items-center justify-center shrink-0 shadow-inner">
+                  <Flame className="w-7 h-7 text-amber-400" />
                 </div>
-                <div>
-                  <span className="text-[10px] font-bold text-[#b8b8c5]/70 uppercase tracking-wider block">Monthly Royalty Invoiced</span>
-                  <p className="text-xl font-black text-white font-mono mt-0.5">
+                <div className="min-w-0">
+                  <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest block">Network Meat Yield</span>
+                  <p className="text-2xl sm:text-3xl font-black text-amber-400 font-mono tracking-tight mt-0.5">
+                    {networkTotals.avgSpitEfficiency}%
+                  </p>
+                  <span className="text-xs text-zinc-300 font-semibold block mt-0.5">{networkTotals.activeSpitsCount} Live Spits Roasting</span>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="border-[#303030] bg-[#1f1f1f] shadow-xl hover:border-emerald-500/50 transition-all rounded-3xl">
+              <CardContent className="p-5 flex items-center gap-4">
+                <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-emerald-500/20 to-teal-500/10 border border-emerald-500/30 flex items-center justify-center shrink-0 shadow-inner">
+                  <DollarSign className="w-7 h-7 text-emerald-400" />
+                </div>
+                <div className="min-w-0">
+                  <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest block">Monthly Royalty Invoiced</span>
+                  <p className="text-2xl sm:text-3xl font-black text-white font-mono tracking-tight mt-0.5">
                     ₹{(networkTotals.totalRoyaltyCollected / 100000).toFixed(2)}L
                   </p>
-                  <span className="text-[10px] text-zinc-400 block">Pending: ₹{networkTotals.totalRoyaltyPending.toLocaleString("en-IN")}</span>
+                  <span className="text-xs text-zinc-400 block mt-0.5">Pending: ₹{networkTotals.totalRoyaltyPending.toLocaleString("en-IN")}</span>
                 </div>
               </CardContent>
             </Card>
@@ -380,63 +384,63 @@ export default function AdminDashboardPage() {
       ) : (
         /* ── FRANCHISE STORE OVERVIEW (FULL CHARTS & PIE CHARTS) ─────────── */
         <div className="space-y-6">
-          {/* Top 4 Store KPI Cards */}
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3.5">
-            <Card className="border-[#303030] bg-[#1f1f1f]">
-              <CardContent className="p-4 flex items-center gap-3.5">
-                <div className="w-11 h-11 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center shrink-0">
-                  <Receipt className="w-5 h-5 text-emerald-400" />
+          {/* Top 4 Store KPI Cards (Bigger, Bolder & Glowing Accents) */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+            <Card className="border-[#303030] bg-[#1f1f1f] shadow-xl hover:border-emerald-500/50 transition-all rounded-3xl">
+              <CardContent className="p-5 flex items-center gap-4">
+                <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-emerald-500/20 to-teal-500/10 border border-emerald-500/30 flex items-center justify-center shrink-0 shadow-inner">
+                  <Receipt className="w-7 h-7 text-emerald-400" />
                 </div>
-                <div>
-                  <span className="text-[10px] font-bold text-[#b8b8c5]/70 uppercase tracking-wider block">Today's Store Sales</span>
-                  <p className="text-xl font-black text-emerald-400 font-mono mt-0.5">
+                <div className="min-w-0">
+                  <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest block">Today's Store Sales</span>
+                  <p className="text-2xl sm:text-3xl font-black text-emerald-400 font-mono tracking-tight mt-0.5">
                     ₹{outletTenderTotals.totalGrossRevenue.toLocaleString("en-IN")}
                   </p>
-                  <span className="text-[10px] text-zinc-400 block">Target: ₹{currentOutlet.dailyTargetSales.toLocaleString("en-IN")}</span>
+                  <span className="text-xs text-zinc-300 font-semibold block mt-0.5">Target: ₹{currentOutlet.dailyTargetSales.toLocaleString("en-IN")} ({Math.round((outletTenderTotals.totalGrossRevenue / currentOutlet.dailyTargetSales) * 100)}%)</span>
                 </div>
               </CardContent>
             </Card>
 
             <Card
               onClick={() => setShowDrawerBreakdown(!showDrawerBreakdown)}
-              className="border-[#303030] bg-[#1f1f1f] hover:border-emerald-500/50 transition-colors cursor-pointer"
+              className="border-[#303030] bg-[#1f1f1f] shadow-xl hover:border-orange-500/50 transition-all rounded-3xl cursor-pointer"
             >
-              <CardContent className="p-4 flex items-center gap-3.5">
-                <div className="w-11 h-11 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center shrink-0">
-                  <Banknote className="w-5 h-5 text-emerald-400" />
+              <CardContent className="p-5 flex items-center gap-4">
+                <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-orange-500/20 to-amber-500/10 border border-orange-500/30 flex items-center justify-center shrink-0 shadow-inner">
+                  <Banknote className="w-7 h-7 text-orange-400" />
                 </div>
-                <div>
-                  <span className="text-[10px] font-bold text-[#b8b8c5]/70 uppercase tracking-wider block">Cash in Drawer</span>
-                  <p className="text-xl font-black text-white font-mono mt-0.5">
+                <div className="min-w-0">
+                  <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest block">Cash in Drawer</span>
+                  <p className="text-2xl sm:text-3xl font-black text-white font-mono tracking-tight mt-0.5">
                     ₹{outletTenderTotals.expectedCashInDrawer.toLocaleString("en-IN")}
                   </p>
-                  <span className="text-[10px] text-orange-400 font-bold block">Float ₹{outletTenderTotals.openingCash.toLocaleString()} &middot; Breakdown</span>
+                  <span className="text-xs text-orange-400 font-bold block mt-0.5">Float ₹{outletTenderTotals.openingCash.toLocaleString()} &middot; Click to Audit</span>
                 </div>
               </CardContent>
             </Card>
 
-            <Card className="border-[#303030] bg-[#1f1f1f]">
-              <CardContent className="p-4 flex items-center gap-3.5">
-                <div className="w-11 h-11 rounded-xl bg-blue-500/10 border border-blue-500/30 flex items-center justify-center shrink-0">
-                  <ShoppingBag className="w-5 h-5 text-blue-400" />
+            <Card className="border-[#303030] bg-[#1f1f1f] shadow-xl hover:border-blue-500/50 transition-all rounded-3xl">
+              <CardContent className="p-5 flex items-center gap-4">
+                <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-500/20 to-indigo-500/10 border border-blue-500/30 flex items-center justify-center shrink-0 shadow-inner">
+                  <ShoppingBag className="w-7 h-7 text-blue-400" />
                 </div>
-                <div>
-                  <span className="text-[10px] font-bold text-[#b8b8c5]/70 uppercase tracking-wider block">Total Store Orders</span>
-                  <p className="text-xl font-black text-white font-mono mt-0.5">{outletTenderTotals.totalOrdersToday}</p>
-                  <span className="text-[10px] text-zinc-400 block">Avg Ticket: ₹{Math.round(outletTenderTotals.totalGrossRevenue / (outletTenderTotals.totalOrdersToday || 1))}</span>
+                <div className="min-w-0">
+                  <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest block">Total Store Orders</span>
+                  <p className="text-2xl sm:text-3xl font-black text-white font-mono tracking-tight mt-0.5">{outletTenderTotals.totalOrdersToday}</p>
+                  <span className="text-xs text-zinc-300 font-semibold block mt-0.5">Avg Ticket: ₹{Math.round(outletTenderTotals.totalGrossRevenue / (outletTenderTotals.totalOrdersToday || 1))}</span>
                 </div>
               </CardContent>
             </Card>
 
-            <Card className="border-[#303030] bg-[#1f1f1f]">
-              <CardContent className="p-4 flex items-center gap-3.5">
-                <div className="w-11 h-11 rounded-xl bg-orange-500/10 border border-orange-500/30 flex items-center justify-center shrink-0">
-                  <Flame className="w-5 h-5 text-orange-400" />
+            <Card className="border-[#303030] bg-[#1f1f1f] shadow-xl hover:border-amber-500/50 transition-all rounded-3xl">
+              <CardContent className="p-5 flex items-center gap-4">
+                <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-amber-500/20 to-orange-500/10 border border-amber-500/30 flex items-center justify-center shrink-0 shadow-inner">
+                  <Flame className="w-7 h-7 text-amber-400" />
                 </div>
-                <div>
-                  <span className="text-[10px] font-bold text-[#b8b8c5]/70 uppercase tracking-wider block">Spit Roasting Yield</span>
-                  <p className="text-xl font-black text-orange-400 font-mono mt-0.5">{currentOutlet.spitEfficiency}%</p>
-                  <span className="text-[10px] text-zinc-400 block">{currentOutlet.activeSpits} Roasters Live</span>
+                <div className="min-w-0">
+                  <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest block">Spit Roasting Yield</span>
+                  <p className="text-2xl sm:text-3xl font-black text-amber-400 font-mono tracking-tight mt-0.5">{currentOutlet.spitEfficiency}%</p>
+                  <span className="text-xs text-zinc-300 font-semibold block mt-0.5">{currentOutlet.activeSpits} Roasters on Fire</span>
                 </div>
               </CardContent>
             </Card>
