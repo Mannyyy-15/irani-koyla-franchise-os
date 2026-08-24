@@ -340,3 +340,39 @@ html, body {
   }
 }
 
+/* POS Thermal Receipt ESC/POS Print Isolation */
+@media print {
+  html, body {
+    background: #ffffff !important;
+    color: #000000 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+  body * {
+    visibility: hidden;
+  }
+  #thermal-print-receipt,
+  #thermal-print-receipt * {
+    visibility: visible;
+  }
+  #thermal-print-receipt {
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 78mm !important;
+    max-width: 80mm !important;
+    margin: 0 !important;
+    padding: 8px 4px !important;
+    background: #ffffff !important;
+    color: #000000 !important;
+    box-shadow: none !important;
+    border: none !important;
+    border-radius: 0 !important;
+    font-family: 'Courier New', Courier, monospace !important;
+  }
+  @page {
+    size: 80mm auto;
+    margin: 0mm;
+  }
+}
+

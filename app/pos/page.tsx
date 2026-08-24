@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import Link from "next/link";
 import {
   Flame,
@@ -29,11 +29,96 @@ import {
   Star,
   ChevronLeft,
   ChevronRight,
+  Volume2,
+  VolumeX,
+  Keyboard,
+  Zap,
 } from "lucide-react";
 import { useFranchise } from "@/lib/franchise-context";
 import { Button } from "@/components/ui/Button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/Dialog";
 import { cn } from "@/components/ui/cn";
+
+// Web Audio API Synthesizer (Instant, 0 asset latency, crisp haptic sound feedback)
+const playAudioEffect = (type: "tap" | "success" | "park" | "clear" | "mode", soundEnabled: boolean = true) => {
+  if (!soundEnabled || typeof window === "undefined") return;
+  try {
+    const AudioCtx = window.AudioContext || (window as any).webkitAudioContext;
+    if (!AudioCtx) return;
+    const ctx = new AudioCtx();
+
+    if (type === "tap") {
+      // Crisp mechanical pop
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = "sine";
+      osc.frequency.setValueAtTime(880, ctx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(320, ctx.currentTime + 0.035);
+      gain.gain.setValueAtTime(0.08, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.035);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start();
+      osc.stop(ctx.currentTime + 0.035);
+    } else if (type === "mode") {
+      // Subtle mode selection blip
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = "triangle";
+      osc.frequency.setValueAtTime(587.33, ctx.currentTime); // D5
+      osc.frequency.setValueAtTime(880, ctx.currentTime + 0.03); // A5
+      gain.gain.setValueAtTime(0.09, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.08);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start();
+      osc.stop(ctx.currentTime + 0.08);
+    } else if (type === "success") {
+      // Cash Register Register Dual Chime (Harmonized high triad C6 -> E6 -> G6)
+      const playTone = (freq: number, delay: number, dur: number) => {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = "triangle";
+        osc.frequency.setValueAtTime(freq, ctx.currentTime + delay);
+        gain.gain.setValueAtTime(0.14, ctx.currentTime + delay);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + delay + dur);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start(ctx.currentTime + delay);
+        osc.stop(ctx.currentTime + delay + dur);
+      };
+      playTone(1046.5, 0, 0.12);    // C6
+      playTone(1318.5, 0.07, 0.22); // E6
+      playTone(1567.98, 0.14, 0.35); // G6
+    } else if (type === "park") {
+      // Soft ascending park chime
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = "sine";
+      osc.frequency.setValueAtTime(523.25, ctx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(783.99, ctx.currentTime + 0.1);
+      gain.gain.setValueAtTime(0.1, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.1);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start();
+      osc.stop(ctx.currentTime + 0.1);
+    } else if (type === "clear") {
+      // Low dismissal sweep
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = "sine";
+      osc.frequency.setValueAtTime(400, ctx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(160, ctx.currentTime + 0.09);
+      gain.gain.setValueAtTime(0.08, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.09);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start();
+      osc.stop(ctx.currentTime + 0.09);
+    }
+  } catch {}
+};
 
 interface CartItem {
   id: string;
@@ -71,6 +156,7 @@ export default function PosBillingTerminal() {
 
   const [activeCategory, setActiveCategory] = useState<string>("Most Ordered");
   const [searchTerm, setSearchTerm] = useState("");
+  const [soundEnabled, setSoundEnabled] = useState<boolean>(true);
 
   // Category Scrolling Ref & Mouse Drag State
   const categoryScrollRef = useRef<HTMLDivElement>(null);
@@ -89,7 +175,6 @@ export default function PosBillingTerminal() {
     const el = categoryScrollRef.current;
     if (!el) return;
 
-    // Translate standard vertical mouse wheel into horizontal scroll
     const onWheel = (e: WheelEvent) => {
       if (Math.abs(e.deltaY) > 0) {
         e.preventDefault();
@@ -173,6 +258,7 @@ export default function PosBillingTerminal() {
   };
 
   const addToCart = (item: typeof activePosItems[0]) => {
+    playAudioEffect("tap", soundEnabled);
     const existingIndex = cart.findIndex((c) => c.id === item.id && c.selectedModifiers.length === 0);
     if (existingIndex > -1) {
       const updated = [...cart];
@@ -195,6 +281,7 @@ export default function PosBillingTerminal() {
   };
 
   const removeFromCart = (itemId: string) => {
+    playAudioEffect("tap", soundEnabled);
     const existingIndex = cart.findIndex((c) => c.id === itemId && c.selectedModifiers.length === 0);
     if (existingIndex > -1) {
       const updated = [...cart];
@@ -208,6 +295,7 @@ export default function PosBillingTerminal() {
   };
 
   const updateQuantity = (index: number, delta: number) => {
+    playAudioEffect("tap", soundEnabled);
     const updated = [...cart];
     const newQty = updated[index].quantity + delta;
     if (newQty <= 0) {
@@ -219,11 +307,13 @@ export default function PosBillingTerminal() {
   };
 
   const clearCart = () => {
+    playAudioEffect("clear", soundEnabled);
     setCart([]);
   };
 
   const handleParkBill = () => {
     if (cart.length === 0) return;
+    playAudioEffect("park", soundEnabled);
     const bill: ParkedBill = {
       id: `park-${Date.now()}`,
       customerName: customerToken || "Order",
@@ -236,6 +326,7 @@ export default function PosBillingTerminal() {
   };
 
   const handleRecallBill = (bill: ParkedBill) => {
+    playAudioEffect("park", soundEnabled);
     setCart(bill.cart);
     setCustomerToken(bill.customerName);
     setParkedBills(parkedBills.filter((b) => b.id !== bill.id));
@@ -265,8 +356,8 @@ export default function PosBillingTerminal() {
   const splitDigitalVal = parseFloat(splitDigital) || 0;
   const splitRemaining = grandTotal - splitCashVal - splitDigitalVal;
 
-  const handlePunchOrder = (e: React.FormEvent) => {
-    e.preventDefault();
+  const handlePunchOrder = (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
     if (cart.length === 0) return;
 
     if (paymentMode === "Split Payment" && Math.abs(splitRemaining) > 1) {
@@ -305,6 +396,7 @@ export default function PosBillingTerminal() {
       setTimeout(() => setOfflineQueuedToast(false), 4000);
     }
 
+    playAudioEffect("success", soundEnabled);
     addLiveOrder(orderPayload);
     setCompletedOrder({
       ...orderPayload,
@@ -317,6 +409,95 @@ export default function PosBillingTerminal() {
     setCart([]);
     setCustomerToken(`Counter Order #${Math.floor(10 + Math.random() * 80)}`);
   };
+
+  // Direct One-Click Thermal ESC/POS Print
+  const handleDirectPrint = () => {
+    playAudioEffect("tap", soundEnabled);
+    if (typeof window !== "undefined") {
+      window.print();
+    }
+  };
+
+  // Global Keyboard Shortcuts (F1-F4, Enter, Esc, P)
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      const isInput = e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement;
+
+      // Function Keys: F1 (Cash), F2 (UPI), F3 (Card), F4 (Split)
+      if (e.key === "F1") {
+        e.preventDefault();
+        setPaymentMode("Cash");
+        playAudioEffect("mode", soundEnabled);
+        return;
+      }
+      if (e.key === "F2") {
+        e.preventDefault();
+        setPaymentMode("GPay / UPI");
+        playAudioEffect("mode", soundEnabled);
+        return;
+      }
+      if (e.key === "F3") {
+        e.preventDefault();
+        setPaymentMode("Card / POS");
+        playAudioEffect("mode", soundEnabled);
+        return;
+      }
+      if (e.key === "F4") {
+        e.preventDefault();
+        setPaymentMode("Split Payment");
+        playAudioEffect("mode", soundEnabled);
+        return;
+      }
+
+      // Escape: Close modals or clear cart
+      if (e.key === "Escape") {
+        if (showKotModal) {
+          setShowKotModal(false);
+          return;
+        }
+        if (showParkedModal) {
+          setShowParkedModal(false);
+          return;
+        }
+        if (showUpiQrModal) {
+          setShowUpiQrModal(false);
+          return;
+        }
+        if (cart.length > 0) {
+          clearCart();
+          return;
+        }
+      }
+
+      // 'P' or 'p' to park bill or open parked bills modal
+      if ((e.key === "p" || e.key === "P") && !isInput) {
+        e.preventDefault();
+        if (cart.length > 0) {
+          handleParkBill();
+        } else if (parkedBills.length > 0) {
+          setShowParkedModal(true);
+        }
+        return;
+      }
+
+      // Enter: Instant Punch Order or Print Slip
+      if (e.key === "Enter") {
+        if (showKotModal) {
+          e.preventDefault();
+          handleDirectPrint();
+          return;
+        }
+        if (!isInput && cart.length > 0) {
+          e.preventDefault();
+          handlePunchOrder();
+          return;
+        }
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [cart, paymentMode, showKotModal, showParkedModal, showUpiQrModal, parkedBills, soundEnabled, grandTotal, splitRemaining]);
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-12 gap-3 lg:gap-4 relative items-start pb-6">
@@ -332,10 +513,10 @@ export default function PosBillingTerminal() {
       )}
 
       {/* LEFT COLUMN: Big Touch Visual Menu */}
-      <div className="lg:col-span-7 xl:col-span-8 space-y-3 min-w-0">
-        {/* Category Filters Bar & Fast Search */}
+      <div className="lg:col-span-7 xl:col-span-8 space-y-2.5 min-w-0">
+        {/* Category Filters Bar & Fast Search + Sound & Hotkeys Bar */}
         <div className="flex flex-col sm:flex-row items-center gap-2.5">
-          <div className="relative w-full sm:w-64 xl:w-72 shrink-0">
+          <div className="relative w-full sm:w-60 xl:w-68 shrink-0">
             <Search className="w-4 h-4 text-zinc-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
             <input
               type="text"
@@ -415,6 +596,39 @@ export default function PosBillingTerminal() {
             >
               <ChevronRight className="w-3.5 h-3.5" />
             </button>
+
+            {/* Sound Toggle Button */}
+            <button
+              type="button"
+              onClick={() => setSoundEnabled(!soundEnabled)}
+              className={cn(
+                "h-8 px-2.5 rounded-xl border text-xs font-bold flex items-center gap-1 shrink-0 transition-colors cursor-pointer",
+                soundEnabled
+                  ? "bg-orange-500/10 border-orange-500/30 text-orange-400 hover:bg-orange-500/20"
+                  : "bg-[#1f1f1f] border-[#303030] text-zinc-500 hover:text-zinc-300"
+              )}
+              title={soundEnabled ? "POS Sound Enabled (Click to Mute)" : "POS Sound Muted (Click to Enable)"}
+            >
+              {soundEnabled ? <Volume2 className="w-3.5 h-3.5" /> : <VolumeX className="w-3.5 h-3.5" />}
+              <span className="hidden md:inline text-[10px]">{soundEnabled ? "Sound ON" : "Muted"}</span>
+            </button>
+          </div>
+        </div>
+
+        {/* Fast Cashier Keyboard Hotkeys Bar */}
+        <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-xl bg-[#161618] border border-[#303030] text-[10px] font-mono text-zinc-400 justify-between select-none">
+          <div className="flex items-center gap-1.5 font-bold">
+            <Keyboard className="w-3.5 h-3.5 text-orange-500" />
+            <span className="text-zinc-300 uppercase tracking-wider text-[9px]">Fast Register Hotkeys:</span>
+          </div>
+          <div className="flex items-center gap-2 flex-wrap text-[10px]">
+            <span className="bg-[#1f1f1f] px-1.5 py-0.5 rounded border border-[#383838] text-zinc-300"><strong className="text-orange-400">F1</strong> Cash</span>
+            <span className="bg-[#1f1f1f] px-1.5 py-0.5 rounded border border-[#383838] text-zinc-300"><strong className="text-orange-400">F2</strong> UPI</span>
+            <span className="bg-[#1f1f1f] px-1.5 py-0.5 rounded border border-[#383838] text-zinc-300"><strong className="text-orange-400">F3</strong> Card</span>
+            <span className="bg-[#1f1f1f] px-1.5 py-0.5 rounded border border-[#383838] text-zinc-300"><strong className="text-orange-400">F4</strong> Split</span>
+            <span className="bg-[#1f1f1f] px-1.5 py-0.5 rounded border border-[#383838] text-zinc-300"><strong className="text-emerald-400">Enter</strong> Punch/Print</span>
+            <span className="bg-[#1f1f1f] px-1.5 py-0.5 rounded border border-[#383838] text-zinc-300"><strong className="text-amber-400">P</strong> Park</span>
+            <span className="bg-[#1f1f1f] px-1.5 py-0.5 rounded border border-[#383838] text-zinc-300"><strong className="text-rose-400">Esc</strong> Clear</span>
           </div>
         </div>
 
@@ -793,14 +1007,17 @@ export default function PosBillingTerminal() {
       {showKotModal && completedOrder && (
         <Dialog open={true} onOpenChange={setShowKotModal}>
           <DialogContent className="max-w-sm bg-transparent border-0 text-zinc-900 p-0 shadow-none overflow-visible">
-            {/* Realistic Thermal Paper Receipt Container */}
-            <div className="bg-[#fcfbf7] rounded-xl shadow-[0_25px_50px_-12px_rgba(0,0,0,0.85)] border border-zinc-300/80 p-6 font-mono text-xs text-zinc-900 relative overflow-hidden">
+            {/* Realistic Thermal Paper Receipt Container with Print ID */}
+            <div
+              id="thermal-print-receipt"
+              className="bg-[#fcfbf7] rounded-xl shadow-[0_25px_50px_-12px_rgba(0,0,0,0.85)] border border-zinc-300/80 p-6 font-mono text-xs text-zinc-900 relative overflow-hidden"
+            >
               {/* Paper Jagged Top Tear Effect */}
-              <div className="absolute top-0 left-0 right-0 h-2 bg-[radial-gradient(circle,_transparent_3px,_#fcfbf7_3px)] bg-[length:10px_10px] -mt-1" />
+              <div className="absolute top-0 left-0 right-0 h-2 bg-[radial-gradient(circle,_transparent_3px,_#fcfbf7_3px)] bg-[length:10px_10px] -mt-1 print:hidden" />
 
               {/* Receipt Header */}
               <div className="text-center pb-3 border-b-2 border-dashed border-zinc-400 space-y-1">
-                <div className="w-10 h-10 rounded-xl bg-orange-500/10 border border-orange-500/30 text-orange-600 flex items-center justify-center mx-auto mb-1">
+                <div className="w-10 h-10 rounded-xl bg-orange-500/10 border border-orange-500/30 text-orange-600 flex items-center justify-center mx-auto mb-1 print:hidden">
                   <Flame className="w-6 h-6" />
                 </div>
                 <h3 className="text-base font-black tracking-tight text-zinc-950">
@@ -915,27 +1132,32 @@ export default function PosBillingTerminal() {
               </div>
 
               {/* Paper Jagged Bottom Tear Effect */}
-              <div className="absolute bottom-0 left-0 right-0 h-2 bg-[radial-gradient(circle,_transparent_3px,_#fcfbf7_3px)] bg-[length:10px_10px] -mb-1" />
+              <div className="absolute bottom-0 left-0 right-0 h-2 bg-[radial-gradient(circle,_transparent_3px,_#fcfbf7_3px)] bg-[length:10px_10px] -mb-1 print:hidden" />
             </div>
 
             {/* Action Buttons */}
-            <div className="flex gap-2.5 pt-3">
-              <Button
-                type="button"
-                onClick={() => window.print()}
-                className="flex-1 bg-zinc-800 hover:bg-zinc-700 text-white font-black text-xs uppercase h-11 rounded-2xl gap-2 shadow-lg cursor-pointer"
-              >
-                <Printer className="w-4 h-4" />
-                <span>Print Slip</span>
-              </Button>
+            <div className="space-y-2 pt-3">
+              <div className="flex gap-2.5">
+                <Button
+                  type="button"
+                  onClick={handleDirectPrint}
+                  className="flex-1 bg-zinc-900 hover:bg-zinc-800 text-white font-black text-xs uppercase h-11 rounded-2xl gap-2 shadow-lg cursor-pointer"
+                >
+                  <Printer className="w-4 h-4 text-orange-400" />
+                  <span>1-Click Thermal Print (80mm/58mm)</span>
+                </Button>
 
-              <Button
-                type="button"
-                onClick={() => setShowKotModal(false)}
-                className="flex-1 bg-gradient-to-r from-orange-600 to-amber-600 hover:opacity-95 text-white font-black text-xs uppercase h-11 rounded-2xl shadow-lg shadow-orange-600/30 cursor-pointer"
-              >
-                Done & Next (1-Tap)
-              </Button>
+                <Button
+                  type="button"
+                  onClick={() => setShowKotModal(false)}
+                  className="flex-1 bg-gradient-to-r from-orange-600 to-amber-600 hover:opacity-95 text-white font-black text-xs uppercase h-11 rounded-2xl shadow-lg shadow-orange-600/30 cursor-pointer"
+                >
+                  Done & Next (1-Tap)
+                </Button>
+              </div>
+              <p className="text-[10px] text-center text-zinc-400 font-mono">
+                Press <strong className="text-white">Enter</strong> to Print Slip &bull; <strong className="text-white">Esc</strong> to dismiss
+              </p>
             </div>
           </DialogContent>
         </Dialog>
