@@ -319,7 +319,7 @@ export default function PosBillingTerminal() {
   };
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-5 relative pb-8">
+    <div className="h-full lg:h-[calc(100vh-5.5rem)] grid grid-cols-1 lg:grid-cols-12 gap-3 lg:gap-4 overflow-hidden relative">
       {/* Offline Toast Notification */}
       {offlineQueuedToast && (
         <div className="fixed bottom-6 right-6 z-50 p-4 rounded-2xl bg-amber-950/90 border border-amber-500/50 text-amber-200 text-xs font-bold shadow-2xl flex items-center gap-3">
@@ -331,18 +331,18 @@ export default function PosBillingTerminal() {
         </div>
       )}
 
-      {/* LEFT COLUMN: Big Touch Visual Menu */}
-      <div className="lg:col-span-7 xl:col-span-8 space-y-4">
+      {/* LEFT COLUMN: Big Touch Visual Menu (Internal Scrollable Grid) */}
+      <div className="lg:col-span-7 xl:col-span-8 flex flex-col h-full overflow-hidden min-h-0 space-y-3">
         {/* Category Filters Bar & Fast Search */}
-        <div className="flex flex-col sm:flex-row items-center gap-3">
-          <div className="relative w-full sm:w-72 shrink-0">
+        <div className="shrink-0 flex flex-col sm:flex-row items-center gap-2.5">
+          <div className="relative w-full sm:w-64 xl:w-72 shrink-0">
             <Search className="w-4 h-4 text-zinc-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
             <input
               type="text"
               placeholder="Search shawarma, combo, chai…"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full h-11 pl-10 pr-4 rounded-2xl bg-[#1f1f1f] border border-[#303030] text-sm text-white placeholder-zinc-500 focus:outline-none focus:border-orange-500 transition-colors font-medium shadow-inner"
+              className="w-full h-10 pl-9 pr-3 rounded-2xl bg-[#1f1f1f] border border-[#303030] text-xs sm:text-sm text-white placeholder-zinc-500 focus:outline-none focus:border-orange-500 transition-colors font-medium shadow-inner"
             />
             {searchTerm && (
               <button
@@ -350,31 +350,29 @@ export default function PosBillingTerminal() {
                 onClick={() => setSearchTerm("")}
                 className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-white cursor-pointer"
               >
-                <X className="w-4 h-4" />
+                <X className="w-3.5 h-3.5" />
               </button>
             )}
           </div>
 
-          {/* Smooth Scrollable Touch Category Pills with Scroll Buttons & Zero Visible Scrollbars */}
+          {/* Smooth Scrollable Touch Category Pills */}
           <div className="relative flex items-center gap-1.5 w-full sm:flex-1 min-w-0">
-            {/* Scroll Left Button */}
             <button
               type="button"
               onClick={() => scrollCategories("left")}
-              className="hidden sm:flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#1f1f1f] border border-[#303030] text-zinc-400 hover:text-white hover:border-orange-500 transition-colors shadow-md cursor-pointer"
+              className="hidden sm:flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-[#1f1f1f] border border-[#303030] text-zinc-400 hover:text-white hover:border-orange-500 transition-colors shadow-md cursor-pointer"
               title="Scroll Left"
             >
-              <ChevronLeft className="w-4 h-4" />
+              <ChevronLeft className="w-3.5 h-3.5" />
             </button>
 
-            {/* Scrollable Container with Mouse Wheel, Drag-to-Scroll & Touch Pan Support */}
             <div
               ref={categoryScrollRef}
               onMouseDown={handleMouseDown}
               onMouseLeave={handleMouseLeaveOrUp}
               onMouseUp={handleMouseLeaveOrUp}
               onMouseMove={handleMouseMove}
-              className="flex items-center gap-2 overflow-x-auto overflow-y-hidden pb-1 sm:pb-0 no-scrollbar scrollbar-none w-full select-none cursor-grab active:cursor-grabbing touch-pan-x"
+              className="flex items-center gap-1.5 overflow-x-auto overflow-y-hidden pb-0.5 no-scrollbar scrollbar-none w-full select-none cursor-grab active:cursor-grabbing touch-pan-x"
             >
               {categories.map((cat) => {
                 const count = activePosItems.filter((i) => {
@@ -390,16 +388,16 @@ export default function PosBillingTerminal() {
                     type="button"
                     onClick={() => setActiveCategory(cat.name)}
                     className={cn(
-                      "px-4 py-2.5 rounded-2xl text-xs sm:text-sm font-black whitespace-nowrap transition-all cursor-pointer flex items-center gap-2 shadow-sm shrink-0 select-none",
+                      "px-3.5 py-2 rounded-2xl text-xs font-black whitespace-nowrap transition-all cursor-pointer flex items-center gap-1.5 shadow-sm shrink-0 select-none",
                       isActive
-                        ? "bg-gradient-to-r from-orange-600 to-amber-600 text-white shadow-lg shadow-orange-600/30 scale-[1.02]"
+                        ? "bg-gradient-to-r from-orange-600 to-amber-600 text-white shadow-md shadow-orange-600/30 scale-[1.02]"
                         : "bg-[#1f1f1f] text-zinc-300 border border-[#303030] hover:border-orange-500/50 hover:text-white"
                     )}
                   >
-                    <span className="text-base">{cat.icon}</span>
+                    <span>{cat.icon}</span>
                     <span>{cat.name}</span>
                     <span className={cn(
-                      "text-[10px] px-1.5 py-0.5 rounded-full font-mono font-bold",
+                      "text-[9px] px-1.5 py-0.5 rounded-full font-mono font-bold",
                       isActive ? "bg-black/30 text-white" : "bg-[#161618] text-zinc-400"
                     )}>
                       {count}
@@ -409,117 +407,121 @@ export default function PosBillingTerminal() {
               })}
             </div>
 
-            {/* Scroll Right Button */}
             <button
               type="button"
               onClick={() => scrollCategories("right")}
-              className="hidden sm:flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#1f1f1f] border border-[#303030] text-zinc-400 hover:text-white hover:border-orange-500 transition-colors shadow-md cursor-pointer"
+              className="hidden sm:flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-[#1f1f1f] border border-[#303030] text-zinc-400 hover:text-white hover:border-orange-500 transition-colors shadow-md cursor-pointer"
               title="Scroll Right"
             >
-              <ChevronRight className="w-4 h-4" />
+              <ChevronRight className="w-3.5 h-3.5" />
             </button>
           </div>
         </div>
 
-        {/* Big Food Cards Grid (Ultra-Clean, Large Photos, Zero Extra Clutter Pills) */}
-        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-3.5 sm:gap-4">
-          {filteredMenuItems.map((item) => {
-            const inCartQty = getItemCartQuantity(item.id);
+        {/* Big Food Cards Grid with Dedicated Internal Scroll Area */}
+        <div className="flex-1 min-h-0 overflow-y-auto pr-1 pb-2 no-scrollbar scrollbar-none">
+          <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-3.5">
+            {filteredMenuItems.map((item) => {
+              const inCartQty = getItemCartQuantity(item.id);
 
-            return (
-              <div
-                key={item.id}
-                onClick={() => addToCart(item)}
-                className={cn(
-                  "group relative rounded-3xl bg-[#1f1f1f] border overflow-hidden transition-all duration-200 cursor-pointer shadow-md hover:shadow-2xl flex flex-col justify-between select-none",
-                  inCartQty > 0
-                    ? "border-orange-500 bg-[#25201d] ring-1 ring-orange-500/50 shadow-orange-600/20"
-                    : "border-[#303030] hover:border-orange-500/80"
-                )}
-              >
-                {/* Big Full-Bleed Clear Food Photo (Zero overlay pills blocking the food) */}
-                <div className="relative h-44 sm:h-48 w-full overflow-hidden bg-[#161618]">
-                  <img
-                    src={item.image}
-                    alt={item.name}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                  />
-
-                  {/* Quantity In-Basket Float Tag */}
-                  {inCartQty > 0 && (
-                    <div className="absolute top-3 right-3 z-10 flex items-center gap-1.5 bg-orange-600 text-white font-black text-xs px-3 py-1.5 rounded-xl shadow-2xl border border-orange-400/50 animate-in fade-in">
-                      <Check className="w-3.5 h-3.5 stroke-[3]" />
-                      <span>{inCartQty} in Basket</span>
-                    </div>
+              return (
+                <div
+                  key={item.id}
+                  onClick={() => addToCart(item)}
+                  className={cn(
+                    "group relative rounded-3xl bg-[#1f1f1f] border overflow-hidden transition-all duration-200 cursor-pointer shadow-md hover:shadow-2xl flex flex-col justify-between select-none",
+                    inCartQty > 0
+                      ? "border-orange-500 bg-[#25201d] ring-1 ring-orange-500/50 shadow-orange-600/20"
+                      : "border-[#303030] hover:border-orange-500/80"
                   )}
-                </div>
+                >
+                  {/* Big Full-Bleed Clear Food Photo */}
+                  <div className="relative h-36 sm:h-40 w-full overflow-hidden bg-[#161618]">
+                    <img
+                      src={item.image}
+                      alt={item.name}
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).src = "https://images.unsplash.com/photo-1529006557810-274b9b2fc783?auto=format&fit=crop&w=600&q=80";
+                      }}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                    />
 
-                {/* Card Body with Large Title & Price */}
-                <div className="p-4 flex flex-col justify-between flex-1 space-y-3">
-                  <h3 className="text-sm sm:text-base font-black text-white group-hover:text-orange-400 transition-colors leading-snug line-clamp-2">
-                    {item.name}
-                  </h3>
-
-                  <div className="flex items-center justify-between pt-2 border-t border-[#303030]">
-                    <div className="flex flex-col">
-                      <span className="font-mono text-lg sm:text-xl font-black text-orange-400">
-                        ₹{item.price}
-                      </span>
-                    </div>
-
-                    {/* Quick + / - Controls or 1-Tap Add */}
-                    {inCartQty > 0 ? (
-                      <div
-                        className="flex items-center gap-1 bg-[#161618] p-1 rounded-2xl border border-orange-500/50 shadow-sm"
-                        onClick={(e) => e.stopPropagation()}
-                      >
-                        <button
-                          type="button"
-                          onClick={() => removeFromCart(item.id)}
-                          className="w-8 h-8 rounded-xl bg-[#1f1f1f] hover:bg-rose-500/20 text-white hover:text-rose-400 text-sm font-bold flex items-center justify-center transition-colors cursor-pointer"
-                        >
-                          -
-                        </button>
-                        <span className="font-mono text-xs sm:text-sm font-black text-white px-1.5 text-center">
-                          {inCartQty}
-                        </span>
-                        <button
-                          type="button"
-                          onClick={() => addToCart(item)}
-                          className="w-8 h-8 rounded-xl bg-orange-600 hover:bg-orange-500 text-white text-sm font-bold flex items-center justify-center transition-colors cursor-pointer shadow-md"
-                        >
-                          +
-                        </button>
+                    {/* Quantity In-Basket Float Tag */}
+                    {inCartQty > 0 && (
+                      <div className="absolute top-2.5 right-2.5 z-10 flex items-center gap-1 bg-orange-600 text-white font-black text-[11px] px-2.5 py-1 rounded-xl shadow-2xl border border-orange-400/50 animate-in fade-in">
+                        <Check className="w-3 h-3 stroke-[3]" />
+                        <span>{inCartQty} in Basket</span>
                       </div>
-                    ) : (
-                      <button
-                        type="button"
-                        className="h-9 px-4 rounded-2xl bg-orange-600/20 text-orange-400 group-hover:bg-orange-600 group-hover:text-white flex items-center gap-1.5 font-black text-xs uppercase tracking-wider transition-colors shadow-sm cursor-pointer"
-                      >
-                        <Plus className="w-4 h-4 stroke-[3]" />
-                        <span>Add</span>
-                      </button>
                     )}
                   </div>
+
+                  {/* Card Body with Large Title & Price */}
+                  <div className="p-3 sm:p-3.5 flex flex-col justify-between flex-1 space-y-2.5">
+                    <h3 className="text-xs sm:text-sm font-black text-white group-hover:text-orange-400 transition-colors leading-snug line-clamp-2">
+                      {item.name}
+                    </h3>
+
+                    <div className="flex items-center justify-between pt-2 border-t border-[#303030]">
+                      <div className="flex flex-col">
+                        <span className="font-mono text-base sm:text-lg font-black text-orange-400">
+                          ₹{item.price}
+                        </span>
+                      </div>
+
+                      {/* Quick + / - Controls or 1-Tap Add */}
+                      {inCartQty > 0 ? (
+                        <div
+                          className="flex items-center gap-1 bg-[#161618] p-1 rounded-xl border border-orange-500/50 shadow-sm"
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          <button
+                            type="button"
+                            onClick={() => removeFromCart(item.id)}
+                            className="w-7 h-7 rounded-lg bg-[#1f1f1f] hover:bg-rose-500/20 text-white hover:text-rose-400 text-xs font-bold flex items-center justify-center transition-colors cursor-pointer"
+                          >
+                            -
+                          </button>
+                          <span className="font-mono text-xs font-black text-white px-1 text-center">
+                            {inCartQty}
+                          </span>
+                          <button
+                            type="button"
+                            onClick={() => addToCart(item)}
+                            className="w-7 h-7 rounded-lg bg-orange-600 hover:bg-orange-500 text-white text-xs font-bold flex items-center justify-center transition-colors cursor-pointer shadow-md"
+                          >
+                            +
+                          </button>
+                        </div>
+                      ) : (
+                        <button
+                          type="button"
+                          className="h-8 px-3 rounded-xl bg-orange-600/20 text-orange-400 group-hover:bg-orange-600 group-hover:text-white flex items-center gap-1 font-black text-xs uppercase tracking-wider transition-colors shadow-sm cursor-pointer"
+                        >
+                          <Plus className="w-3.5 h-3.5 stroke-[3]" />
+                          <span>Add</span>
+                        </button>
+                      )}
+                    </div>
+                  </div>
                 </div>
-              </div>
-            );
-          })}
+              );
+            })}
+          </div>
         </div>
       </div>
 
-      {/* RIGHT COLUMN: Ultra-Clean Counter Billing Register */}
-      <div className="lg:col-span-5 xl:col-span-4">
-        <form onSubmit={handlePunchOrder} className="rounded-3xl bg-[#1f1f1f] border border-[#303030] p-4 sm:p-5 space-y-4 shadow-2xl sticky top-4">
+      {/* RIGHT COLUMN: Ultra-Clean Counter Billing Register (Locked Viewport Height) */}
+      <div className="lg:col-span-5 xl:col-span-4 h-full flex flex-col min-h-0 overflow-hidden">
+        <form onSubmit={handlePunchOrder} className="h-full flex flex-col justify-between overflow-hidden rounded-3xl bg-[#1f1f1f] border border-[#303030] p-3.5 sm:p-4 shadow-2xl space-y-2.5">
           {/* Header Bar */}
-          <div className="flex items-center justify-between border-b border-[#303030] pb-3">
-            <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-xl bg-orange-500/10 border border-orange-500/30 text-orange-400 flex items-center justify-center font-bold">
-                <ShoppingBag className="w-4 h-4" />
+          <div className="shrink-0 flex items-center justify-between border-b border-[#303030] pb-2.5">
+            <div className="flex items-center gap-2">
+              <div className="w-7 h-7 rounded-xl bg-orange-500/10 border border-orange-500/30 text-orange-400 flex items-center justify-center font-bold">
+                <ShoppingBag className="w-3.5 h-3.5" />
               </div>
               <div>
-                <span className="text-sm font-black text-white block leading-none">Register Basket</span>
-                <span className="text-[11px] text-zinc-400 font-mono mt-0.5 block font-bold">{customerToken}</span>
+                <span className="text-xs sm:text-sm font-black text-white block leading-none">Register Basket</span>
+                <span className="text-[10px] text-zinc-400 font-mono mt-0.5 block font-bold">{customerToken}</span>
               </div>
             </div>
 
@@ -529,9 +531,9 @@ export default function PosBillingTerminal() {
                 <button
                   type="button"
                   onClick={() => setShowParkedModal(true)}
-                  className="px-2.5 py-1 rounded-xl bg-orange-500/10 border border-orange-500/30 text-orange-400 text-[11px] font-bold flex items-center gap-1 cursor-pointer hover:bg-orange-500/20"
+                  className="px-2 py-1 rounded-xl bg-orange-500/10 border border-orange-500/30 text-orange-400 text-[10px] font-bold flex items-center gap-1 cursor-pointer hover:bg-orange-500/20"
                 >
-                  <PlayCircle className="w-3.5 h-3.5" />
+                  <PlayCircle className="w-3 h-3" />
                   <span>Recall ({parkedBills.length})</span>
                 </button>
               )}
@@ -541,81 +543,81 @@ export default function PosBillingTerminal() {
                   <button
                     type="button"
                     onClick={handleParkBill}
-                    className="px-2.5 py-1 rounded-xl bg-[#161618] border border-[#303030] text-zinc-300 hover:text-white text-[11px] font-bold flex items-center gap-1 cursor-pointer"
+                    className="px-2 py-1 rounded-xl bg-[#161618] border border-[#303030] text-zinc-300 hover:text-white text-[10px] font-bold flex items-center gap-1 cursor-pointer"
                     title="Park bill to serve next customer"
                   >
-                    <PauseCircle className="w-3.5 h-3.5 text-orange-400" />
+                    <PauseCircle className="w-3 h-3 text-orange-400" />
                     <span>Park</span>
                   </button>
                   <button
                     type="button"
                     onClick={clearCart}
-                    className="p-1.5 rounded-xl bg-[#161618] border border-[#303030] text-zinc-500 hover:text-rose-400 cursor-pointer transition-colors"
+                    className="p-1 rounded-xl bg-[#161618] border border-[#303030] text-zinc-500 hover:text-rose-400 cursor-pointer transition-colors"
                     title="Clear Cart"
                   >
-                    <Trash2 className="w-4 h-4" />
+                    <Trash2 className="w-3.5 h-3.5" />
                   </button>
                 </>
               )}
             </div>
           </div>
 
-          {/* Cart Items List - Generous height for multiple items without cramped scrolling */}
-          <div className="space-y-2.5 max-h-[420px] 2xl:max-h-[520px] overflow-y-auto pr-1 no-scrollbar scrollbar-none">
+          {/* Cart Items Scroll Area - Flexible Height that takes all remaining space */}
+          <div className="flex-1 min-h-0 overflow-y-auto py-1 space-y-2 pr-1 no-scrollbar scrollbar-none">
             {cart.length === 0 ? (
-              <div className="py-12 text-center text-xs text-zinc-500 font-semibold space-y-2.5">
-                <div className="w-12 h-12 rounded-2xl bg-[#161618] border border-[#303030] flex items-center justify-center mx-auto text-zinc-600">
-                  <ShoppingBag className="w-6 h-6" />
+              <div className="h-full min-h-[140px] flex flex-col items-center justify-center text-center text-xs text-zinc-500 font-semibold space-y-2">
+                <div className="w-10 h-10 rounded-2xl bg-[#161618] border border-[#303030] flex items-center justify-center text-zinc-600">
+                  <ShoppingBag className="w-5 h-5" />
                 </div>
-                <span className="text-sm text-zinc-400 font-bold block">Basket is empty</span>
-                <span className="text-[11px] text-zinc-500 block">Tap food cards on the left to add items to the order.</span>
+                <span className="text-xs text-zinc-400 font-bold block">Basket is empty</span>
+                <span className="text-[10px] text-zinc-500 block max-w-[200px]">Tap food cards on the left to add items.</span>
               </div>
             ) : (
               cart.map((item, idx) => (
-                <div key={idx} className="p-3.5 rounded-2xl bg-[#161618] border border-[#303030] flex items-center justify-between gap-3 hover:border-[#3d3d3d] transition-colors">
+                <div key={idx} className="p-2.5 rounded-2xl bg-[#161618] border border-[#303030] flex items-center justify-between gap-2.5 hover:border-[#3d3d3d] transition-colors">
                   {/* Item Thumbnail & Name */}
-                  <div className="flex items-center gap-3 min-w-0 flex-1">
+                  <div className="flex items-center gap-2.5 min-w-0 flex-1">
                     <img
                       src={item.image}
                       alt={item.name}
                       onError={(e) => {
                         (e.target as HTMLImageElement).src = "https://images.unsplash.com/photo-1529006557810-274b9b2fc783?auto=format&fit=crop&w=300&q=80";
                       }}
-                      className="w-12 h-12 rounded-xl object-cover border border-[#303030] shrink-0 bg-[#252525]"
+                      className="w-10 h-10 rounded-xl object-cover border border-[#303030] shrink-0 bg-[#252525]"
                     />
                     <div className="min-w-0 flex-1">
-                      <span className="text-xs sm:text-sm font-black text-white block truncate leading-tight">
+                      <span className="text-xs font-black text-white block truncate leading-tight">
                         {item.name}
                       </span>
-                      <span className="text-[11px] text-orange-400 font-mono font-bold mt-0.5 block">
+                      <span className="text-[10px] text-orange-400 font-mono font-bold block mt-0.5">
                         ₹{item.price} each
                       </span>
                     </div>
                   </div>
 
                   {/* Quantity Stepper & Line Price */}
-                  <div className="flex items-center gap-2.5 shrink-0">
-                    <div className="flex items-center gap-1 bg-[#1f1f1f] p-1 rounded-xl border border-[#303030]">
+                  <div className="flex items-center gap-2 shrink-0">
+                    <div className="flex items-center gap-0.5 bg-[#1f1f1f] p-0.5 rounded-xl border border-[#303030]">
                       <button
                         type="button"
                         onClick={() => updateQuantity(idx, -1)}
-                        className="w-8 h-8 rounded-lg bg-[#161618] text-white text-xs font-bold flex items-center justify-center hover:bg-rose-500/20 hover:text-rose-400 transition-colors cursor-pointer"
+                        className="w-6 h-6 rounded-lg bg-[#161618] text-white text-xs font-bold flex items-center justify-center hover:bg-rose-500/20 hover:text-rose-400 transition-colors cursor-pointer"
                       >
                         -
                       </button>
-                      <span className="font-mono text-xs sm:text-sm font-black text-white w-6 text-center">
+                      <span className="font-mono text-xs font-black text-white w-5 text-center">
                         {item.quantity}
                       </span>
                       <button
                         type="button"
                         onClick={() => updateQuantity(idx, 1)}
-                        className="w-8 h-8 rounded-lg bg-orange-600 text-white text-xs font-bold flex items-center justify-center hover:bg-orange-500 transition-colors cursor-pointer shadow-sm"
+                        className="w-6 h-6 rounded-lg bg-orange-600 text-white text-xs font-bold flex items-center justify-center hover:bg-orange-500 transition-colors cursor-pointer shadow-sm"
                       >
                         +
                       </button>
                     </div>
 
-                    <span className="font-mono text-sm font-black text-white w-14 text-right">
+                    <span className="font-mono text-xs sm:text-sm font-black text-white w-12 text-right">
                       ₹{(item.price * item.quantity).toFixed(0)}
                     </span>
                   </div>
@@ -624,208 +626,168 @@ export default function PosBillingTerminal() {
             )}
           </div>
 
-          {/* Clean Bill Breakdown */}
-          <div className="p-3.5 rounded-2xl bg-[#161618] border border-[#303030] space-y-1.5 text-xs font-mono">
-            <div className="flex justify-between text-zinc-400 font-medium">
-              <span>Items Subtotal:</span>
-              <span>₹{subtotal.toFixed(2)}</span>
-            </div>
-            <div className="flex justify-between text-zinc-400 font-medium">
-              <span>Restaurant GST (5%):</span>
-              <span>₹{gstAmount.toFixed(2)}</span>
-            </div>
-            <div className="flex justify-between pt-2 border-t border-[#303030] font-black text-lg sm:text-xl text-orange-400">
-              <span className="font-sans">Total Payable:</span>
-              <span>₹{grandTotal.toFixed(2)}</span>
-            </div>
-          </div>
-
-          {/* Payment Tender Tabs */}
-          <div className="space-y-2">
-            <span className="text-[10px] font-extrabold uppercase tracking-widest text-zinc-400 block">
-              Select Payment Method
-            </span>
-            <div className="grid grid-cols-4 gap-1.5">
-              {[
-                { mode: "Cash", label: "Cash", icon: Banknote },
-                { mode: "GPay / UPI", label: "UPI QR", icon: Smartphone },
-                { mode: "Card / POS", label: "Card", icon: CreditCard },
-                { mode: "Split Payment", label: "Split", icon: Split },
-              ].map((pm) => (
-                <button
-                  key={pm.mode}
-                  type="button"
-                  onClick={() => setPaymentMode(pm.mode as any)}
-                  className={cn(
-                    "py-2.5 px-1 rounded-2xl text-xs font-black border flex flex-col items-center justify-center gap-1 transition-all cursor-pointer",
-                    paymentMode === pm.mode
-                      ? "bg-gradient-to-br from-orange-600/30 to-amber-600/30 border-orange-500 text-orange-300 shadow-md scale-[1.02]"
-                      : "bg-[#161618] border-[#303030] text-zinc-400 hover:border-orange-500/40 hover:text-white"
-                  )}
-                >
-                  <pm.icon className="w-4 h-4 shrink-0" />
-                  <span>{pm.label}</span>
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Cash Tender & Change Due Calculator */}
-          {paymentMode === "Cash" && (
-            <div className="p-3.5 rounded-2xl bg-[#161618] border border-[#303030] space-y-3">
-              <div className="flex items-center justify-between text-xs">
-                <span className="text-zinc-300 font-bold flex items-center gap-1.5">
-                  <Banknote className="w-4 h-4 text-orange-400" />
-                  <span>Quick Cash Tender:</span>
-                </span>
-                <button
-                  type="button"
-                  onClick={() => setCashTendered(grandTotal.toString())}
-                  className="px-2.5 py-1 rounded-xl bg-[#1f1f1f] border border-[#383838] text-[11px] font-bold text-zinc-300 hover:text-white hover:border-orange-500 transition-colors cursor-pointer"
-                >
-                  Exact (₹{grandTotal})
-                </button>
+          {/* Bottom Fixed Area: Bill Breakdown + Payment Tabs + Cash + Punch Order */}
+          <div className="shrink-0 space-y-2 pt-2 border-t border-[#303030]">
+            {/* Clean Bill Breakdown */}
+            <div className="p-2.5 rounded-2xl bg-[#161618] border border-[#303030] space-y-1 text-xs font-mono">
+              <div className="flex justify-between text-zinc-400 font-medium text-[11px]">
+                <span>Items Subtotal:</span>
+                <span>₹{subtotal.toFixed(2)}</span>
               </div>
+              <div className="flex justify-between text-zinc-400 font-medium text-[11px]">
+                <span>Restaurant GST (5%):</span>
+                <span>₹{gstAmount.toFixed(2)}</span>
+              </div>
+              <div className="flex justify-between pt-1 border-t border-[#303030] font-black text-base sm:text-lg text-orange-400">
+                <span className="font-sans text-xs sm:text-sm">Total Payable:</span>
+                <span>₹{grandTotal.toFixed(2)}</span>
+              </div>
+            </div>
 
-              {/* 1-Tap Cash Currency Pills */}
-              <div className="grid grid-cols-4 gap-1.5">
-                {[100, 200, 500, 1000].map((amt) => (
+            {/* Payment Tender Tabs */}
+            <div className="space-y-1.5">
+              <div className="grid grid-cols-4 gap-1">
+                {[
+                  { mode: "Cash", label: "Cash", icon: Banknote },
+                  { mode: "GPay / UPI", label: "UPI", icon: Smartphone },
+                  { mode: "Card / POS", label: "Card", icon: CreditCard },
+                  { mode: "Split Payment", label: "Split", icon: Split },
+                ].map((pm) => (
                   <button
-                    key={amt}
+                    key={pm.mode}
                     type="button"
-                    onClick={() => setCashTendered(amt.toString())}
+                    onClick={() => setPaymentMode(pm.mode as any)}
                     className={cn(
-                      "py-2 rounded-xl border text-xs font-mono font-black transition-all cursor-pointer text-center",
-                      cashTendered === amt.toString()
-                        ? "bg-orange-600 text-white border-orange-500 shadow-md"
-                        : "bg-[#1f1f1f] border-[#303030] text-zinc-300 hover:bg-[#252525] hover:text-white hover:border-[#404040]"
+                      "py-2 px-1 rounded-xl text-[11px] font-black border flex flex-col items-center justify-center gap-0.5 transition-all cursor-pointer",
+                      paymentMode === pm.mode
+                        ? "bg-gradient-to-br from-orange-600/30 to-amber-600/30 border-orange-500 text-orange-300 shadow-sm scale-[1.02]"
+                        : "bg-[#161618] border-[#303030] text-zinc-400 hover:border-orange-500/40 hover:text-white"
                     )}
                   >
-                    ₹{amt}
+                    <pm.icon className="w-3.5 h-3.5 shrink-0" />
+                    <span>{pm.label}</span>
                   </button>
                 ))}
               </div>
-
-              {/* Custom Cash Received Input & Change Due Display */}
-              <div className="grid grid-cols-2 gap-2.5 pt-2 border-t border-[#303030] items-center">
-                <div>
-                  <span className="text-[10px] text-zinc-400 font-bold uppercase tracking-wider block mb-1">
-                    Cash Received (₹)
-                  </span>
-                  <input
-                    type="number"
-                    value={cashTendered}
-                    onChange={(e) => setCashTendered(e.target.value)}
-                    className="w-full h-11 px-3 rounded-xl bg-[#1f1f1f] border border-[#383838] text-base font-mono font-black text-white focus:outline-none focus:border-orange-500 transition-colors"
-                  />
-                </div>
-
-                <div className="p-2.5 rounded-xl bg-[#1f1f1f] border border-[#303030] text-right">
-                  <span className="text-[10px] text-zinc-400 font-bold uppercase tracking-wider block">
-                    Change to Return
-                  </span>
-                  <span className={cn(
-                    "text-xl sm:text-2xl font-black font-mono block",
-                    changeDue > 0 ? "text-orange-400" : "text-zinc-500"
-                  )}>
-                    ₹{changeDue.toFixed(2)}
-                  </span>
-                </div>
-              </div>
             </div>
-          )}
 
-          {/* Split-Tender Multi-Pay Interface */}
-          {paymentMode === "Split Payment" && (
-            <div className="p-3.5 rounded-2xl bg-[#161618] border border-orange-500/40 space-y-3">
-              <div className="flex items-center justify-between text-xs border-b border-[#303030] pb-2">
-                <span className="font-bold text-orange-400 flex items-center gap-1.5">
-                  <Split className="w-3.5 h-3.5" />
-                  <span>Split Tender Multi-Payment</span>
-                </span>
-                <span className="text-[10px] font-mono text-zinc-400 font-bold">
-                  Total: ₹{grandTotal.toFixed(2)}
-                </span>
-              </div>
-
-              <div className="grid grid-cols-2 gap-2">
-                {/* Cash Portion */}
-                <div>
-                  <label className="block text-[10px] font-bold text-emerald-400 mb-1">1. Cash (₹)</label>
-                  <input
-                    type="number"
-                    value={splitCash}
-                    onChange={(e) => setSplitCash(e.target.value)}
-                    className="w-full h-9 px-2.5 rounded-xl bg-[#1f1f1f] border border-emerald-500/40 text-xs font-mono font-bold text-white focus:outline-none focus:border-emerald-500"
-                    placeholder="e.g. 200"
-                  />
-                </div>
-
-                {/* Digital Portion */}
-                <div>
-                  <div className="flex items-center justify-between mb-1">
-                    <label className="text-[10px] font-bold text-blue-400">2. Digital (₹)</label>
-                    <select
-                      value={splitDigitalType}
-                      onChange={(e) => setSplitDigitalType(e.target.value as any)}
-                      className="text-[9px] bg-[#1f1f1f] border border-blue-500/30 text-blue-300 rounded px-1"
+            {/* Cash Tender & Change Due Calculator */}
+            {paymentMode === "Cash" && (
+              <div className="p-2.5 rounded-2xl bg-[#161618] border border-[#303030] space-y-2">
+                {/* 1-Tap Cash Currency Pills */}
+                <div className="grid grid-cols-4 gap-1">
+                  {[100, 200, 500, 1000].map((amt) => (
+                    <button
+                      key={amt}
+                      type="button"
+                      onClick={() => setCashTendered(amt.toString())}
+                      className={cn(
+                        "py-1.5 rounded-xl border text-xs font-mono font-black transition-all cursor-pointer text-center",
+                        cashTendered === amt.toString()
+                          ? "bg-orange-600 text-white border-orange-500 shadow-sm"
+                          : "bg-[#1f1f1f] border-[#303030] text-zinc-300 hover:bg-[#252525] hover:text-white"
+                      )}
                     >
-                      <option value="GPay / UPI">UPI</option>
-                      <option value="Card / POS">Card</option>
-                    </select>
+                      ₹{amt}
+                    </button>
+                  ))}
+                </div>
+
+                {/* Custom Cash Received Input & Change Due Display */}
+                <div className="grid grid-cols-2 gap-2 pt-1 border-t border-[#303030] items-center">
+                  <div>
+                    <span className="text-[9px] text-zinc-400 font-bold uppercase tracking-wider block mb-0.5">
+                      Cash Received (₹)
+                    </span>
+                    <input
+                      type="number"
+                      value={cashTendered}
+                      onChange={(e) => setCashTendered(e.target.value)}
+                      className="w-full h-9 px-2.5 rounded-xl bg-[#1f1f1f] border border-[#383838] text-sm font-mono font-black text-white focus:outline-none focus:border-orange-500 transition-colors"
+                    />
                   </div>
-                  <input
-                    type="number"
-                    value={splitDigital}
-                    onChange={(e) => setSplitDigital(e.target.value)}
-                    className="w-full h-9 px-2.5 rounded-xl bg-[#1f1f1f] border border-blue-500/40 text-xs font-mono font-bold text-white focus:outline-none focus:border-blue-500"
-                    placeholder="Remainder"
-                  />
+
+                  <div className="p-2 rounded-xl bg-[#1f1f1f] border border-[#303030] text-right">
+                    <span className="text-[9px] text-zinc-400 font-bold uppercase tracking-wider block">
+                      Change Due
+                    </span>
+                    <span className={cn(
+                      "text-base sm:text-lg font-black font-mono block",
+                      changeDue > 0 ? "text-orange-400" : "text-zinc-500"
+                    )}>
+                      ₹{changeDue.toFixed(2)}
+                    </span>
+                  </div>
                 </div>
               </div>
+            )}
 
-              {/* Split Balance Validator */}
-              <div className="flex items-center justify-between text-[11px] pt-1 font-mono">
-                <span className="text-zinc-400">Tendered: ₹{(splitCashVal + splitDigitalVal).toFixed(2)}</span>
-                {Math.abs(splitRemaining) <= 0.01 ? (
-                  <span className="text-emerald-400 font-bold flex items-center gap-1">
-                    <CheckCircle2 className="w-3 h-3" /> Settled
-                  </span>
-                ) : (
-                  <span className="text-rose-400 font-bold flex items-center gap-1">
-                    <AlertCircle className="w-3 h-3" /> Due: ₹{splitRemaining.toFixed(2)}
-                  </span>
-                )}
+            {/* Split-Tender Multi-Pay Interface */}
+            {paymentMode === "Split Payment" && (
+              <div className="p-2.5 rounded-2xl bg-[#161618] border border-orange-500/40 space-y-2">
+                <div className="grid grid-cols-2 gap-2">
+                  <div>
+                    <label className="block text-[9px] font-bold text-orange-400 mb-0.5">1. Cash (₹)</label>
+                    <input
+                      type="number"
+                      value={splitCash}
+                      onChange={(e) => setSplitCash(e.target.value)}
+                      className="w-full h-8 px-2 rounded-xl bg-[#1f1f1f] border border-orange-500/40 text-xs font-mono font-bold text-white focus:outline-none focus:border-orange-500"
+                      placeholder="e.g. 200"
+                    />
+                  </div>
+
+                  <div>
+                    <div className="flex items-center justify-between mb-0.5">
+                      <label className="text-[9px] font-bold text-blue-400">2. Digital (₹)</label>
+                      <select
+                        value={splitDigitalType}
+                        onChange={(e) => setSplitDigitalType(e.target.value as any)}
+                        className="text-[8px] bg-[#1f1f1f] border border-blue-500/30 text-blue-300 rounded px-1"
+                      >
+                        <option value="GPay / UPI">UPI</option>
+                        <option value="Card / POS">Card</option>
+                      </select>
+                    </div>
+                    <input
+                      type="number"
+                      value={splitDigital}
+                      onChange={(e) => setSplitDigital(e.target.value)}
+                      className="w-full h-8 px-2 rounded-xl bg-[#1f1f1f] border border-blue-500/40 text-xs font-mono font-bold text-white focus:outline-none focus:border-blue-500"
+                      placeholder="Remainder"
+                    />
+                  </div>
+                </div>
               </div>
-            </div>
-          )}
+            )}
 
-          {/* Dynamic UPI Trigger */}
-          {paymentMode === "GPay / UPI" && (
-            <div className="p-3.5 rounded-2xl bg-blue-950/20 border border-blue-500/30 flex items-center justify-between text-xs">
-              <div>
-                <span className="text-blue-400 font-bold block">Dynamic Settlement QR</span>
-                <span className="text-[10px] text-zinc-400 font-mono">irani.koyla.mohak@hdfcbank</span>
+            {/* Dynamic UPI Trigger */}
+            {paymentMode === "GPay / UPI" && (
+              <div className="p-2.5 rounded-2xl bg-blue-950/20 border border-blue-500/30 flex items-center justify-between text-xs">
+                <div>
+                  <span className="text-blue-400 font-bold block text-[11px]">Dynamic UPI QR</span>
+                  <span className="text-[9px] text-zinc-400 font-mono">irani.koyla.mohak@hdfcbank</span>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setShowUpiQrModal(true)}
+                  className="px-2.5 py-1 rounded-xl bg-blue-500/20 text-blue-300 font-bold text-xs border border-blue-500/40 cursor-pointer hover:bg-blue-500/30"
+                >
+                  Scan QR
+                </button>
               </div>
-              <button
-                type="button"
-                onClick={() => setShowUpiQrModal(true)}
-                className="px-3 py-1.5 rounded-xl bg-blue-500/20 text-blue-300 font-bold text-xs border border-blue-500/40 cursor-pointer hover:bg-blue-500/30"
-              >
-                Scan UPI QR
-              </button>
-            </div>
-          )}
+            )}
 
-          {/* Main Punch & Print Button */}
-          <Button
-            type="submit"
-            disabled={cart.length === 0}
-            className="w-full h-14 bg-gradient-to-r from-orange-600 via-orange-500 to-amber-600 hover:opacity-95 text-white font-black text-sm uppercase tracking-wider rounded-2xl shadow-xl shadow-orange-600/30 gap-2 cursor-pointer transition-all disabled:opacity-40"
-          >
-            <Printer className="w-5 h-5" />
-            <span>Punch Order & Print KOT</span>
-          </Button>
+            {/* Main Punch & Print Button */}
+            <Button
+              type="submit"
+              disabled={cart.length === 0}
+              className="w-full h-12 bg-gradient-to-r from-orange-600 via-orange-500 to-amber-600 hover:opacity-95 text-white font-black text-xs sm:text-sm uppercase tracking-wider rounded-2xl shadow-xl shadow-orange-600/30 gap-2 cursor-pointer transition-all disabled:opacity-40"
+            >
+              <Printer className="w-4 h-4" />
+              <span>Punch Order & Print KOT</span>
+            </Button>
+          </div>
         </form>
       </div>
 
