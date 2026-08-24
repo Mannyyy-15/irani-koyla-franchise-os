@@ -353,55 +353,65 @@ export default function AdminDashboardPage() {
               </CardContent>
             </Card>
 
-            <Card className="border-[#303030] bg-[#1f1f1f]">
+            <Card className="border-[#303030] bg-[#1f1f1f] shadow-xl rounded-3xl">
               <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-bold text-white flex items-center gap-2">
-                  <UtensilsCrossed className="w-4 h-4 text-orange-500" />
-                  <span>Category Revenue Share</span>
+                <CardTitle className="text-sm font-bold text-white flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <UtensilsCrossed className="w-4 h-4 text-orange-500" />
+                    <span>Category Revenue Share</span>
+                  </div>
+                  <span className="text-xs text-orange-400 font-mono font-bold">4 Main Categories</span>
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="h-36 w-full">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <PieChart>
-                      <Pie data={MENU_SHARE_DATA} cx="50%" cy="50%" innerRadius={38} outerRadius={55} paddingAngle={4} dataKey="value">
-                        {MENU_SHARE_DATA.map((entry, index) => (
-                          <Cell key={`cell-${index}`} fill={entry.color} />
-                        ))}
-                      </Pie>
-                      <Tooltip
-                        contentStyle={{
-                          backgroundColor: "#161618",
-                          borderColor: "#383838",
-                          borderRadius: "12px",
-                          fontSize: "12px",
-                          color: "#ffffff",
-                          boxShadow: "0 8px 32px rgba(0,0,0,0.5)",
-                        }}
-                        itemStyle={{
-                          color: "#ffffff",
-                          fontWeight: 700,
-                        }}
-                        labelStyle={{
-                          color: "#f97316",
-                          fontWeight: 700,
-                          marginBottom: "4px",
-                        }}
-                        formatter={(val: any) => [`${val}%`, "Share"]}
-                      />
-                    </PieChart>
-                  </ResponsiveContainer>
-                </div>
-                <div className="space-y-1.5 pt-2 border-t border-[#303030]">
-                  {MENU_SHARE_DATA.map((item) => (
-                    <div key={item.name} className="flex items-center justify-between text-xs">
-                      <div className="flex items-center gap-1.5">
-                        <span className="h-2 w-2 rounded-full shrink-0" style={{ backgroundColor: item.color }} />
-                        <span className="text-zinc-300 text-[11px] truncate max-w-[140px]">{item.name}</span>
+                <div className="flex flex-col sm:flex-row items-center gap-4 pt-1">
+                  {/* Left: Bigger Pie Chart */}
+                  <div className="h-44 w-full sm:w-[46%] shrink-0">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <PieChart>
+                        <Pie data={MENU_SHARE_DATA} cx="50%" cy="50%" innerRadius={44} outerRadius={68} paddingAngle={4} dataKey="value">
+                          {MENU_SHARE_DATA.map((entry, index) => (
+                            <Cell key={`cell-${index}`} fill={entry.color} />
+                          ))}
+                        </Pie>
+                        <Tooltip
+                          contentStyle={{
+                            backgroundColor: "#161618",
+                            borderColor: "#383838",
+                            borderRadius: "12px",
+                            fontSize: "12px",
+                            color: "#ffffff",
+                            boxShadow: "0 8px 32px rgba(0,0,0,0.5)",
+                          }}
+                          itemStyle={{
+                            color: "#ffffff",
+                            fontWeight: 700,
+                          }}
+                          labelStyle={{
+                            color: "#f97316",
+                            fontWeight: 700,
+                            marginBottom: "4px",
+                          }}
+                          formatter={(val: any) => [`${val}%`, "Share"]}
+                        />
+                      </PieChart>
+                    </ResponsiveContainer>
+                  </div>
+
+                  {/* Right: Clean Aligned Breakdown */}
+                  <div className="w-full sm:w-[54%] space-y-2">
+                    {MENU_SHARE_DATA.map((item) => (
+                      <div key={item.name} className="p-2.5 rounded-xl bg-[#161618] border border-[#303030] flex items-center justify-between gap-2 shadow-sm">
+                        <div className="flex items-center gap-2 min-w-0">
+                          <span className="h-2.5 w-2.5 rounded-full shrink-0" style={{ backgroundColor: item.color }} />
+                          <span className="text-zinc-300 text-xs font-semibold truncate">{item.name}</span>
+                        </div>
+                        <span className="font-mono font-black text-white text-xs bg-[#1f1f1f] px-2 py-0.5 rounded-lg border border-[#383838] shrink-0">
+                          {item.value}%
+                        </span>
                       </div>
-                      <span className="font-mono font-bold text-white text-[11px]">{item.value}%</span>
-                    </div>
-                  ))}
+                    ))}
+                  </div>
                 </div>
               </CardContent>
             </Card>
@@ -551,65 +561,71 @@ export default function AdminDashboardPage() {
             </Card>
 
             {/* Sales Channel Mix Pie Chart */}
-            <Card className="border-[#303030] bg-[#1f1f1f]">
+            <Card className="border-[#303030] bg-[#1f1f1f] shadow-xl rounded-3xl">
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm font-bold text-white flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <PieIcon className="w-4 h-4 text-orange-500" />
                     <span>Channel Revenue Share</span>
                   </div>
-                  <span className="text-[11px] text-zinc-400 font-mono">{outletTenderTotals.totalOrdersToday} Orders</span>
+                  <span className="text-xs text-orange-400 font-mono font-bold">{outletTenderTotals.totalOrdersToday} Orders Today</span>
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="h-40 w-full">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <PieChart>
-                      <Pie data={channelChartData} cx="50%" cy="50%" innerRadius={42} outerRadius={62} paddingAngle={4} dataKey="value">
-                        {channelChartData.map((entry, index) => (
-                           <Cell key={`cell-${index}`} fill={entry.color} />
-                        ))}
-                      </Pie>
-                      <Tooltip
-                        contentStyle={{
-                          backgroundColor: "#161618",
-                          borderColor: "#383838",
-                          borderRadius: "12px",
-                          fontSize: "12px",
-                          color: "#ffffff",
-                          boxShadow: "0 8px 32px rgba(0,0,0,0.5)",
-                        }}
-                        itemStyle={{
-                          color: "#ffffff",
-                          fontWeight: 700,
-                        }}
-                        labelStyle={{
-                          color: "#f97316",
-                          fontWeight: 700,
-                          marginBottom: "4px",
-                        }}
-                        formatter={(val: any) => [`₹${Number(val).toLocaleString("en-IN")}`, "Revenue"]}
-                      />
-                    </PieChart>
-                  </ResponsiveContainer>
-                </div>
+                <div className="flex flex-col sm:flex-row items-center gap-4 pt-1">
+                  {/* Left: Bigger Pie Chart */}
+                  <div className="h-44 w-full sm:w-[46%] shrink-0">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <PieChart>
+                        <Pie data={channelChartData} cx="50%" cy="50%" innerRadius={44} outerRadius={68} paddingAngle={4} dataKey="value">
+                          {channelChartData.map((entry, index) => (
+                             <Cell key={`cell-${index}`} fill={entry.color} />
+                          ))}
+                        </Pie>
+                        <Tooltip
+                          contentStyle={{
+                            backgroundColor: "#161618",
+                            borderColor: "#383838",
+                            borderRadius: "12px",
+                            fontSize: "12px",
+                            color: "#ffffff",
+                            boxShadow: "0 8px 32px rgba(0,0,0,0.5)",
+                          }}
+                          itemStyle={{
+                            color: "#ffffff",
+                            fontWeight: 700,
+                          }}
+                          labelStyle={{
+                            color: "#f97316",
+                            fontWeight: 700,
+                            marginBottom: "4px",
+                          }}
+                          formatter={(val: any) => [`₹${Number(val).toLocaleString("en-IN")}`, "Revenue"]}
+                        />
+                      </PieChart>
+                    </ResponsiveContainer>
+                  </div>
 
-                <div className="space-y-1.5 pt-2 border-t border-[#303030]">
-                  {channelChartData.map((item) => {
-                    const percent = Math.round((item.value / totalChannelRevenue) * 100) || 0;
-                    return (
-                      <div key={item.name} className="flex items-center justify-between text-xs">
-                        <div className="flex items-center gap-1.5">
-                          <span className="h-2 w-2 rounded-full shrink-0" style={{ backgroundColor: item.color }} />
-                          <span className="text-zinc-300 text-[11px]">{item.name}</span>
+                  {/* Right: Clean Aligned Breakdown Cards */}
+                  <div className="w-full sm:w-[54%] space-y-2">
+                    {channelChartData.map((item) => {
+                      const percent = Math.round((item.value / totalChannelRevenue) * 100) || 0;
+                      return (
+                        <div key={item.name} className="p-2.5 rounded-xl bg-[#161618] border border-[#303030] flex items-center justify-between gap-2 shadow-sm">
+                          <div className="flex items-center gap-2 min-w-0">
+                            <span className="h-2.5 w-2.5 rounded-full shrink-0" style={{ backgroundColor: item.color }} />
+                            <span className="text-zinc-200 text-xs font-semibold truncate">{item.name}</span>
+                          </div>
+                          <div className="flex items-center gap-2 font-mono shrink-0">
+                            <span className="text-white font-black text-xs">₹{item.value.toLocaleString()}</span>
+                            <span className="text-[10px] font-bold text-orange-400 bg-orange-500/10 px-1.5 py-0.5 rounded border border-orange-500/20">
+                              {percent}%
+                            </span>
+                          </div>
                         </div>
-                        <div className="flex items-center gap-2 font-mono">
-                          <span className="text-white font-bold text-[11px]">₹{item.value.toLocaleString()}</span>
-                          <span className="text-zinc-500 text-[10px]">({percent}%)</span>
-                        </div>
-                      </div>
-                    );
-                  })}
+                      );
+                    })}
+                  </div>
                 </div>
               </CardContent>
             </Card>
