@@ -60,26 +60,32 @@ const superAdminNav = [
 
 const franchiseNav = [
   {
-    label: "STORE TERMINAL",
+    label: "STORE PULSE",
     items: [
       { name: "Store Overview", href: "/admin", icon: LayoutDashboard },
-      { name: "Counter POS Terminal", href: "/pos", icon: Flame },
+      { name: "Counter POS Register", href: "/pos", icon: Receipt },
     ],
   },
   {
-    label: "OPERATIONS",
+    label: "KITCHEN & STOCK",
     items: [
-      { name: "Shifts & Cash Drawer", href: "/admin/sales", icon: Receipt },
-      { name: "Spit Meat Yield", href: "/admin/yield", icon: Flame },
-      { name: "Menu & 86 List", href: "/admin/menu", icon: UtensilsCrossed },
-      { name: "FSSAI & Hygiene Logs", href: "/admin/compliance", icon: ShieldCheck },
+      { name: "Spit & Meat Yield", href: "/admin/yield", icon: Flame },
+      { name: "Order Raw Materials", href: "/admin/supply-chain", icon: Truck },
+      { name: "Menu & 86 Items", href: "/admin/menu", icon: UtensilsCrossed },
     ],
   },
   {
-    label: "FINANCE",
+    label: "FINANCE & AUDIT",
     items: [
-      { name: "Store Royalty Statements", href: "/admin/royalties", icon: WalletCards },
-      { name: "Store Settings", href: "/admin/settings", icon: Settings },
+      { name: "P&L & Royalty Invoices", href: "/admin/royalties", icon: WalletCards },
+      { name: "Shifts & Cash Audit", href: "/admin/sales", icon: FilePieChart },
+    ],
+  },
+  {
+    label: "STANDARDS & SETUP",
+    items: [
+      { name: "SOPs & Food Hygiene", href: "/admin/compliance", icon: ShieldCheck },
+      { name: "Aggregator Connectors", href: "/admin/integrations", icon: Settings },
     ],
   },
 ];
