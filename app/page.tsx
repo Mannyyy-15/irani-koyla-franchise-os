@@ -11,8 +11,8 @@ export default function Home() {
   }, [router]);
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[#141416]">
-      <div className="w-8 h-8 border-2 border-amber-500 border-t-transparent rounded-full animate-spin" />
+    <div className="min-h-screen flex items-center justify-center bg-[#141416]" suppressHydrationWarning>
+      <div className="w-8 h-8 border-2 border-amber-500 border-t-transparent rounded-full animate-spin" suppressHydrationWarning />
     </div>
   );
 }

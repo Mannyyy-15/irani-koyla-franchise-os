@@ -4,16 +4,20 @@ import { useEffect, useState } from "react";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 
 export function AppPreloader() {
+  const [mounted, setMounted] = useState(false);
   const [loading, setLoading] = useState(true);
   const reduceMotion = useReducedMotion();
 
   useEffect(() => {
+    setMounted(true);
     // Show preloader once on app open only, not on route changes
     const timer = setTimeout(() => {
       setLoading(false);
     }, 450);
     return () => clearTimeout(timer);
   }, []);
+
+  if (!mounted) return null;
 
   return (
     <AnimatePresence>
@@ -25,10 +29,11 @@ export function AppPreloader() {
           exit={{ opacity: 0 }}
           transition={{ duration: reduceMotion ? 0 : 0.2, ease: "easeOut" }}
           className="fixed inset-0 z-[99999] flex select-none flex-col items-center justify-center bg-app"
+          suppressHydrationWarning
         >
-          <div className="flex flex-col items-center gap-7">
+          <div className="flex flex-col items-center gap-7" suppressHydrationWarning>
             {/* Logo mark */}
-            <div className="flex h-12 w-12 items-center justify-center rounded-xl border border-amber-500/30 bg-amber-500/10">
+            <div className="flex h-12 w-12 items-center justify-center rounded-xl border border-amber-500/30 bg-amber-500/10" suppressHydrationWarning>
               <span className="text-lg font-black text-amber-500">IK</span>
             </div>
 
@@ -38,7 +43,7 @@ export function AppPreloader() {
             </span>
 
             {/* Progress line */}
-            <div className="h-[3px] w-40 overflow-hidden rounded-full bg-elevated">
+            <div className="h-[3px] w-40 overflow-hidden rounded-full bg-elevated" suppressHydrationWarning>
               {reduceMotion ? (
                 <div className="h-full w-1/3 rounded-full bg-accent-solid" />
               ) : (
