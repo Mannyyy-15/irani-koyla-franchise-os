@@ -282,7 +282,23 @@ export default function MeatYieldPage() {
                     ))}
                   </Pie>
                   <Tooltip
-                    contentStyle={{ backgroundColor: "#1f1f1f", borderColor: "#303030", borderRadius: "12px", fontSize: "12px" }}
+                    contentStyle={{
+                      backgroundColor: "#161618",
+                      borderColor: "#383838",
+                      borderRadius: "12px",
+                      fontSize: "12px",
+                      color: "#ffffff",
+                      boxShadow: "0 8px 32px rgba(0,0,0,0.5)",
+                    }}
+                    itemStyle={{
+                      color: "#ffffff",
+                      fontWeight: 700,
+                    }}
+                    labelStyle={{
+                      color: "#f97316",
+                      fontWeight: 700,
+                      marginBottom: "4px",
+                    }}
                     formatter={(val: any) => [`${val} units`, "Produced"]}
                   />
                 </PieChart>

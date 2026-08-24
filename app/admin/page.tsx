@@ -329,10 +329,20 @@ export default function AdminDashboardPage() {
                       <Tooltip
                         contentStyle={{
                           backgroundColor: "#161618",
-                          borderColor: "#303030",
+                          borderColor: "#383838",
                           borderRadius: "12px",
                           fontSize: "12px",
-                          color: "#fff",
+                          color: "#ffffff",
+                          boxShadow: "0 8px 32px rgba(0,0,0,0.5)",
+                        }}
+                        itemStyle={{
+                          color: "#ffffff",
+                          fontWeight: 700,
+                        }}
+                        labelStyle={{
+                          color: "#f97316",
+                          fontWeight: 700,
+                          marginBottom: "4px",
                         }}
                         formatter={(val: any) => [`₹${Number(val).toLocaleString("en-IN")}`, "Gross Sales"]}
                       />
@@ -360,7 +370,23 @@ export default function AdminDashboardPage() {
                         ))}
                       </Pie>
                       <Tooltip
-                        contentStyle={{ backgroundColor: "#161618", borderColor: "#303030", borderRadius: "12px", fontSize: "12px" }}
+                        contentStyle={{
+                          backgroundColor: "#161618",
+                          borderColor: "#383838",
+                          borderRadius: "12px",
+                          fontSize: "12px",
+                          color: "#ffffff",
+                          boxShadow: "0 8px 32px rgba(0,0,0,0.5)",
+                        }}
+                        itemStyle={{
+                          color: "#ffffff",
+                          fontWeight: 700,
+                        }}
+                        labelStyle={{
+                          color: "#f97316",
+                          fontWeight: 700,
+                          marginBottom: "4px",
+                        }}
                         formatter={(val: any) => [`${val}%`, "Share"]}
                       />
                     </PieChart>
@@ -500,10 +526,20 @@ export default function AdminDashboardPage() {
                       <Tooltip
                         contentStyle={{
                           backgroundColor: "#161618",
-                          borderColor: "#303030",
+                          borderColor: "#383838",
                           borderRadius: "12px",
                           fontSize: "12px",
-                          color: "#fff",
+                          color: "#ffffff",
+                          boxShadow: "0 8px 32px rgba(0,0,0,0.5)",
+                        }}
+                        itemStyle={{
+                          color: "#ffffff",
+                          fontWeight: 700,
+                        }}
+                        labelStyle={{
+                          color: "#f97316",
+                          fontWeight: 700,
+                          marginBottom: "4px",
                         }}
                         formatter={(val: any) => [`₹${Number(val).toLocaleString("en-IN")}`, "Gross Sales"]}
                       />
@@ -531,11 +567,27 @@ export default function AdminDashboardPage() {
                     <PieChart>
                       <Pie data={channelChartData} cx="50%" cy="50%" innerRadius={42} outerRadius={62} paddingAngle={4} dataKey="value">
                         {channelChartData.map((entry, index) => (
-                          <Cell key={`cell-${index}`} fill={entry.color} />
+                           <Cell key={`cell-${index}`} fill={entry.color} />
                         ))}
                       </Pie>
                       <Tooltip
-                        contentStyle={{ backgroundColor: "#161618", borderColor: "#303030", borderRadius: "12px", fontSize: "12px" }}
+                        contentStyle={{
+                          backgroundColor: "#161618",
+                          borderColor: "#383838",
+                          borderRadius: "12px",
+                          fontSize: "12px",
+                          color: "#ffffff",
+                          boxShadow: "0 8px 32px rgba(0,0,0,0.5)",
+                        }}
+                        itemStyle={{
+                          color: "#ffffff",
+                          fontWeight: 700,
+                        }}
+                        labelStyle={{
+                          color: "#f97316",
+                          fontWeight: 700,
+                          marginBottom: "4px",
+                        }}
                         formatter={(val: any) => [`₹${Number(val).toLocaleString("en-IN")}`, "Revenue"]}
                       />
                     </PieChart>
