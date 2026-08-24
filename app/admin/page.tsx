@@ -599,57 +599,124 @@ export default function AdminDashboardPage() {
             </Card>
           </div>
 
-          {/* ── SPIT GAUGES & LIVE COUNTER STREAM ───────────────────────── */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
+          {/* ── SPIT GAUGES & LIVE COUNTER STREAM (12-Col Grid) ─────────── */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
             {/* Live Spit Roaster Gauges */}
-            <Card className="border-[#303030] bg-[#1f1f1f]">
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-bold text-white flex items-center gap-2">
-                  <Flame className="w-4 h-4 text-orange-500" />
-                  <span>Live Spit Roasters & Yield</span>
+            <Card className="lg:col-span-5 border-[#303030] bg-[#1f1f1f] shadow-xl rounded-3xl flex flex-col justify-between">
+              <CardHeader className="pb-3 border-b border-[#2a2a2c]">
+                <CardTitle className="text-sm font-bold text-white flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Flame className="w-4 h-4 text-orange-500" />
+                    <span>Live Spit Roasters & Meat Yield</span>
+                  </div>
+                  <span className="text-[10px] font-mono font-bold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20">
+                    2 Spits on Fire
+                  </span>
                 </CardTitle>
               </CardHeader>
-              <CardContent className="space-y-3.5">
-                <div className="p-3.5 rounded-xl bg-[#161618] border border-[#303030] space-y-2">
+              <CardContent className="p-4 space-y-4">
+                {/* Spit #1: Chicken */}
+                <div className="p-4 rounded-2xl bg-[#161618] border border-[#303030] space-y-3 shadow-sm hover:border-emerald-500/30 transition-all">
+                  {/* Top Bar: Spit Name & Yield Badge */}
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                      <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                      <span className="text-xs font-bold text-white">Chicken Spit #1 (Marinated)</span>
+                      <div className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse shadow-sm shadow-emerald-400/50" />
+                      <div>
+                        <span className="text-xs font-black text-white block">Chicken Spit #1 (Marinated)</span>
+                        <span className="text-[10px] text-zinc-400 font-mono">Roasting at 185°C · Live Firing</span>
+                      </div>
                     </div>
-                    <span className="text-[10px] font-mono text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20">
-                      94.2% Yield
-                    </span>
+                    <div className="text-right">
+                      <span className="text-xs font-mono font-black text-emerald-400 bg-emerald-500/10 px-2.5 py-1 rounded-lg border border-emerald-500/20 block">
+                        94.2% Yield
+                      </span>
+                      <span className="text-[9px] text-zinc-500 font-medium">+2.2% above target</span>
+                    </div>
                   </div>
-                  <div className="flex justify-between text-[11px] text-zinc-400 font-mono">
-                    <span>Mounted: 28.0 kg</span>
-                    <span>Carved: 19.5 kg</span>
-                    <span>Remaining: 8.5 kg</span>
+
+                  {/* Progress Bar & Real-time balance */}
+                  <div className="space-y-1.5 pt-1">
+                    <div className="flex justify-between text-[11px] font-mono font-bold">
+                      <span className="text-orange-400">19.5 kg Carved (70%)</span>
+                      <span className="text-zinc-400">8.5 kg Left (30%)</span>
+                    </div>
+                    <div className="h-2 w-full bg-[#242426] rounded-full overflow-hidden p-0.5 border border-[#383838]">
+                      <div className="h-full bg-gradient-to-r from-orange-500 to-amber-400 rounded-full transition-all duration-500" style={{ width: "70%" }} />
+                    </div>
                   </div>
-                  <Progress value={70} className="h-1.5 bg-[#1f1f1f]" />
+
+                  {/* 3 Metric Breakdown Boxes */}
+                  <div className="grid grid-cols-3 gap-2 pt-1">
+                    <div className="p-2 rounded-xl bg-[#1f1f1f] border border-[#2e2e30] text-center">
+                      <span className="text-[9px] font-bold text-zinc-400 uppercase tracking-wider block">Mounted</span>
+                      <span className="text-xs font-mono font-black text-white">28.0 kg</span>
+                    </div>
+                    <div className="p-2 rounded-xl bg-[#1f1f1f] border border-[#2e2e30] text-center">
+                      <span className="text-[9px] font-bold text-orange-400 uppercase tracking-wider block">Carved</span>
+                      <span className="text-xs font-mono font-black text-orange-400">19.5 kg</span>
+                      <span className="text-[9px] text-zinc-500 block font-mono">~130 wraps</span>
+                    </div>
+                    <div className="p-2 rounded-xl bg-[#1f1f1f] border border-[#2e2e30] text-center">
+                      <span className="text-[9px] font-bold text-emerald-400 uppercase tracking-wider block">Remaining</span>
+                      <span className="text-xs font-mono font-black text-emerald-400">8.5 kg</span>
+                      <span className="text-[9px] text-zinc-500 block font-mono">~56 wraps</span>
+                    </div>
+                  </div>
                 </div>
 
-                <div className="p-3.5 rounded-xl bg-[#161618] border border-[#303030] space-y-2">
+                {/* Spit #2: Mutton */}
+                <div className="p-4 rounded-2xl bg-[#161618] border border-[#303030] space-y-3 shadow-sm hover:border-amber-500/30 transition-all">
+                  {/* Top Bar: Spit Name & Yield Badge */}
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                      <div className="w-2 h-2 rounded-full bg-amber-400 animate-pulse" />
-                      <span className="text-xs font-bold text-white">Mutton Spit #2 (Charcoal)</span>
+                      <div className="w-2.5 h-2.5 rounded-full bg-amber-400 animate-pulse shadow-sm shadow-amber-400/50" />
+                      <div>
+                        <span className="text-xs font-black text-white block">Mutton Spit #2 (Charcoal Koyla)</span>
+                        <span className="text-[10px] text-zinc-400 font-mono">Roasting at 195°C · Live Firing</span>
+                      </div>
                     </div>
-                    <span className="text-[10px] font-mono text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded-full border border-amber-500/20">
-                      92.8% Yield
-                    </span>
+                    <div className="text-right">
+                      <span className="text-xs font-mono font-black text-amber-400 bg-amber-500/10 px-2.5 py-1 rounded-lg border border-amber-500/20 block">
+                        92.8% Yield
+                      </span>
+                      <span className="text-[9px] text-zinc-500 font-medium">Target 92.0% Met</span>
+                    </div>
                   </div>
-                  <div className="flex justify-between text-[11px] text-zinc-400 font-mono">
-                    <span>Mounted: 18.0 kg</span>
-                    <span>Carved: 11.2 kg</span>
-                    <span>Remaining: 6.8 kg</span>
+
+                  {/* Progress Bar & Real-time balance */}
+                  <div className="space-y-1.5 pt-1">
+                    <div className="flex justify-between text-[11px] font-mono font-bold">
+                      <span className="text-amber-400">11.2 kg Carved (62%)</span>
+                      <span className="text-zinc-400">6.8 kg Left (38%)</span>
+                    </div>
+                    <div className="h-2 w-full bg-[#242426] rounded-full overflow-hidden p-0.5 border border-[#383838]">
+                      <div className="h-full bg-gradient-to-r from-amber-500 to-yellow-400 rounded-full transition-all duration-500" style={{ width: "62%" }} />
+                    </div>
                   </div>
-                  <Progress value={62} className="h-1.5 bg-[#1f1f1f]" />
+
+                  {/* 3 Metric Breakdown Boxes */}
+                  <div className="grid grid-cols-3 gap-2 pt-1">
+                    <div className="p-2 rounded-xl bg-[#1f1f1f] border border-[#2e2e30] text-center">
+                      <span className="text-[9px] font-bold text-zinc-400 uppercase tracking-wider block">Mounted</span>
+                      <span className="text-xs font-mono font-black text-white">18.0 kg</span>
+                    </div>
+                    <div className="p-2 rounded-xl bg-[#1f1f1f] border border-[#2e2e30] text-center">
+                      <span className="text-[9px] font-bold text-amber-400 uppercase tracking-wider block">Carved</span>
+                      <span className="text-xs font-mono font-black text-amber-400">11.2 kg</span>
+                      <span className="text-[9px] text-zinc-500 block font-mono">~74 wraps</span>
+                    </div>
+                    <div className="p-2 rounded-xl bg-[#1f1f1f] border border-[#2e2e30] text-center">
+                      <span className="text-[9px] font-bold text-emerald-400 uppercase tracking-wider block">Remaining</span>
+                      <span className="text-xs font-mono font-black text-emerald-400">6.8 kg</span>
+                      <span className="text-[9px] text-zinc-500 block font-mono">~45 wraps</span>
+                    </div>
+                  </div>
                 </div>
               </CardContent>
             </Card>
 
             {/* Live Punched Counter Orders */}
-            <Card className="lg:col-span-2 border-[#303030] bg-[#1f1f1f]">
+            <Card className="lg:col-span-7 border-[#303030] bg-[#1f1f1f] shadow-xl rounded-3xl flex flex-col justify-between">
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm font-bold text-white flex items-center gap-2">
                   <Receipt className="w-4 h-4 text-orange-500" />
