@@ -139,7 +139,7 @@ export default function PosTopNav({
 
   return (
     <>
-      <header className="z-30 mx-3 mt-3 sm:mx-4 sm:mt-3 lg:mx-5 lg:mt-3 flex h-14 sm:h-16 shrink-0 items-center justify-between gap-3 rounded-2xl bg-[#1f1f1f] border border-[#303030] px-3 sm:px-4 shadow-xl">
+      <header className="z-30 mx-3 mt-3 sm:mx-4 sm:mt-3 lg:mx-5 lg:mt-3 flex h-14 sm:h-16 shrink-0 items-center justify-between gap-3 rounded-2xl bg-[#1f1f1f] border border-[#303030] px-3 sm:px-4 shadow-xl" suppressHydrationWarning>
         <div className="flex items-center gap-2 sm:gap-3">
           {/* Mobile Menu Button */}
           {onMenuClick && (

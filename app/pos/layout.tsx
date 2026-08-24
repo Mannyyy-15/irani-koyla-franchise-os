@@ -28,7 +28,7 @@ export default function PosLayout({ children }: { children: React.ReactNode }) {
   };
 
   return (
-    <div className="flex h-screen overflow-hidden bg-[#161618] text-white selection:bg-orange-500 selection:text-black">
+    <div className="flex h-screen overflow-hidden bg-[#161618] text-white selection:bg-orange-500 selection:text-black" suppressHydrationWarning>
       {/* Desktop Floating Curved Sidebar (Collapsible) */}
       <PosSidebar collapsed={sidebarCollapsed} onToggle={toggleSidebar} />
 
@@ -39,7 +39,7 @@ export default function PosLayout({ children }: { children: React.ReactNode }) {
       />
 
       {/* Main Right Section (TopNav + Scrollable Content) */}
-      <div className="flex flex-1 flex-col overflow-hidden relative min-w-0">
+      <div className="flex flex-1 flex-col overflow-hidden relative min-w-0" suppressHydrationWarning>
         <PosTopNav
           onMenuClick={() => setMobileMenuOpen(true)}
           sidebarCollapsed={sidebarCollapsed}
@@ -49,8 +49,9 @@ export default function PosLayout({ children }: { children: React.ReactNode }) {
         <main
           id="pos-main-content"
           className="mobile-content-safe flex-1 overflow-y-auto"
+          suppressHydrationWarning
         >
-          <div className="p-3 sm:p-4 lg:p-5">{children}</div>
+          <div className="p-3 sm:p-4 lg:p-5" suppressHydrationWarning>{children}</div>
         </main>
       </div>
     </div>

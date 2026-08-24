@@ -72,15 +72,21 @@ function PosSidebarBody({
   };
 
   return (
-    <div className={cn(
-      "flex h-full w-full flex-col bg-[#1f1f1f] rounded-2xl border border-[#303030] shadow-2xl overflow-hidden transition-all duration-300",
-      collapsed ? "items-center" : ""
-    )}>
+    <div
+      className={cn(
+        "flex h-full w-full flex-col bg-[#1f1f1f] rounded-2xl border border-[#303030] shadow-2xl overflow-hidden transition-all duration-300",
+        collapsed ? "items-center" : ""
+      )}
+      suppressHydrationWarning
+    >
       {/* Brand Header & Collapse Toggle */}
-      <div className={cn(
-        "flex h-16 shrink-0 items-center border-b border-[#303030] px-3 transition-all",
-        collapsed ? "justify-center w-full" : "justify-between w-full px-4"
-      )}>
+      <div
+        className={cn(
+          "flex h-16 shrink-0 items-center border-b border-[#303030] px-3 transition-all",
+          collapsed ? "justify-center w-full" : "justify-between w-full px-4"
+        )}
+        suppressHydrationWarning
+      >
         <Link href="/pos" className="flex items-center gap-2.5 min-w-0" onClick={onNavigate}>
           <div className="relative w-10 h-10 rounded-xl bg-gradient-to-br from-orange-500 via-amber-600 to-rose-700 flex items-center justify-center shadow-[0_0_20px_rgba(249,115,22,0.35)] shrink-0">
             <Flame className="w-5 h-5 text-white animate-pulse" />
@@ -190,23 +196,27 @@ function PosSidebarBody({
       </nav>
 
       {/* Cashier Footer Profile */}
-      <div className={cn(
-        "shrink-0 border-t border-[#303030] bg-[#161618] w-full",
-        collapsed ? "p-2 flex flex-col items-center" : "p-3"
-      )}>
+      <div
+        className={cn(
+          "shrink-0 border-t border-[#303030] bg-[#161618] w-full",
+          collapsed ? "p-2 flex flex-col items-center" : "p-3"
+        )}
+        suppressHydrationWarning
+      >
         {collapsed ? (
           <button
             type="button"
             onClick={handleLogout}
             title="Sign Out (Imran S.)"
             className="w-10 h-10 rounded-xl bg-gradient-to-br from-orange-500 to-amber-600 text-white font-black text-xs flex items-center justify-center hover:opacity-90 transition-opacity cursor-pointer"
+            suppressHydrationWarning
           >
             IS
           </button>
         ) : (
-          <div className="flex items-center justify-between p-2 rounded-xl bg-[#1f1f1f] border border-[#303030]">
-            <div className="flex items-center gap-2.5 min-w-0">
-              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-orange-500 to-amber-600 text-white font-black text-xs flex items-center justify-center shrink-0">
+          <div className="flex items-center justify-between p-2 rounded-xl bg-[#1f1f1f] border border-[#303030]" suppressHydrationWarning>
+            <div className="flex items-center gap-2.5 min-w-0" suppressHydrationWarning>
+              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-orange-500 to-amber-600 text-white font-black text-xs flex items-center justify-center shrink-0" suppressHydrationWarning>
                 IS
               </div>
               <div className="min-w-0">

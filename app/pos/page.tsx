@@ -500,7 +500,7 @@ export default function PosBillingTerminal() {
   }, [cart, paymentMode, showKotModal, showParkedModal, showUpiQrModal, parkedBills, soundEnabled, grandTotal, splitRemaining]);
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-12 gap-3 lg:gap-4 relative items-start pb-6">
+    <div className="grid grid-cols-1 lg:grid-cols-12 gap-3 lg:gap-4 relative items-start pb-6" suppressHydrationWarning>
       {/* Offline Toast Notification */}
       {offlineQueuedToast && (
         <div className="fixed bottom-6 right-6 z-50 p-4 rounded-2xl bg-amber-950/90 border border-amber-500/50 text-amber-200 text-xs font-bold shadow-2xl flex items-center gap-3">
