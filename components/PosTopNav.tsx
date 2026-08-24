@@ -16,8 +16,6 @@ import {
   WifiOff,
   PlusCircle,
   ArrowDownCircle,
-  PanelLeftClose,
-  PanelLeftOpen,
 } from "lucide-react";
 import { useFranchise } from "@/lib/franchise-context";
 import { Button } from "@/components/ui/Button";
@@ -152,28 +150,6 @@ export default function PosTopNav({
               aria-label="Open menu"
             >
               <Menu className="h-5 w-5" />
-            </button>
-          )}
-
-          {/* Desktop/Tablet Sidebar Toggle Button */}
-          {onToggleSidebar && (
-            <button
-              type="button"
-              onClick={onToggleSidebar}
-              className="hidden lg:inline-flex h-9 px-2.5 items-center gap-1.5 rounded-xl bg-[#161618] border border-[#303030] hover:border-orange-500 text-xs font-bold text-zinc-300 hover:text-white cursor-pointer transition-colors"
-              title={sidebarCollapsed ? "Expand Sidebar" : "Collapse Sidebar for Full POS Screen"}
-            >
-              {sidebarCollapsed ? (
-                <>
-                  <PanelLeftOpen className="h-4 w-4 text-orange-400" />
-                  <span className="text-[11px]">Expand Menu</span>
-                </>
-              ) : (
-                <>
-                  <PanelLeftClose className="h-4 w-4 text-zinc-400" />
-                  <span className="text-[11px]">Wider Screen</span>
-                </>
-              )}
             </button>
           )}
 
