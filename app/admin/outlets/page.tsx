@@ -290,18 +290,18 @@ For central commissary refills or support, contact HQ Operations.
       )}
 
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <p className="text-[10px] font-bold text-orange-500 uppercase tracking-widest leading-none mb-1.5 flex items-center gap-1.5">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-1">
+        <div className="space-y-1.5">
+          <p className="text-[11px] font-black text-orange-500 uppercase tracking-widest leading-none flex items-center gap-2">
             <Store className="w-3.5 h-3.5" />
             <span>{isSuperAdmin ? "Brand HQ Franchise Network" : "Store Profile"}</span>
           </p>
-          <h1 className="text-2xl sm:text-3xl font-black text-white tracking-tight">
+          <h1 className="text-2xl sm:text-3xl font-black text-white tracking-tight pt-0.5">
             {isSuperAdmin ? "Franchise Hubs & Provisioning Center" : activeOutlet?.name || "Bandra West (Flagship)"}
           </h1>
-          <p className="text-xs sm:text-sm text-[#b8b8c5]/70 mt-0.5">
+          <p className="text-xs sm:text-sm text-zinc-400 leading-relaxed max-w-2xl pt-1">
             {isSuperAdmin
-              ? "Onboard new partners, provision custom credentials, manage magic login links, and audit live sales."
+              ? "Onboard new partners, provision custom credentials, manage magic login links, and audit live sales across all franchise hubs."
               : `Branch Code: ${activeOutlet?.code || "IK-MUM-01"} · ${activeOutlet?.address}`}
           </p>
         </div>

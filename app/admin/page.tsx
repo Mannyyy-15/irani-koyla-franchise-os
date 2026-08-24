@@ -109,9 +109,9 @@ export default function AdminDashboardPage() {
   return (
     <div className="space-y-6">
       {/* ── TOP HEADER AREA ────────────────────────────────────────────── */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <p className="text-[10px] font-bold text-orange-500 uppercase tracking-widest leading-none mb-1.5 flex items-center gap-1.5">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-1">
+        <div className="space-y-1.5">
+          <p className="text-[11px] font-black text-orange-500 uppercase tracking-widest leading-none flex items-center gap-2">
             <Store className="w-3.5 h-3.5" />
             <span>
               {isSuperAdmin
@@ -119,13 +119,13 @@ export default function AdminDashboardPage() {
                 : `${currentOutlet.name} • ${currentOutlet.code}`}
             </span>
           </p>
-          <h1 className="text-2xl sm:text-3xl font-black text-white tracking-tight">
+          <h1 className="text-2xl sm:text-3xl font-black text-white tracking-tight pt-0.5">
             {isSuperAdmin ? "Network Executive Command Center" : "Store Overview & Live Analytics"}
           </h1>
-          <p className="text-xs sm:text-sm text-[#b8b8c5]/70 mt-0.5">
+          <p className="text-xs sm:text-sm text-zinc-400 leading-relaxed max-w-2xl pt-1">
             {isSuperAdmin
-              ? `Real-time multi-unit performance across ${outlets.length} franchise locations.`
-              : `Real-time store sales curve, channel mix, spit roasting efficiency, and counter orders.`}
+              ? `Real-time multi-unit performance, sales velocity, spit yield benchmarks, and live counter stream across ${outlets.length} franchise locations.`
+              : `Real-time store sales curve, tender channel mix, spit roasting yield efficiency, and counter orders.`}
           </p>
         </div>
 
@@ -301,20 +301,21 @@ export default function AdminDashboardPage() {
             </div>
           </div>
 
-          {/* Hourly Sales Trend & Product Mix */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
-            <Card className="lg:col-span-2 border-[#303030] bg-[#1f1f1f]">
+          {/* Hourly Sales Trend & Product Mix (Optimized 12-col Grid) */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
+            {/* Sales Velocity Area Chart */}
+            <Card className="lg:col-span-7 border-[#303030] bg-[#1f1f1f] shadow-xl rounded-3xl">
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm font-bold text-white flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <TrendingUp className="w-4 h-4 text-orange-500" />
                     <span>Hourly Network Velocity Curve (Today)</span>
                   </div>
-                  <span className="text-xs text-zinc-400 font-mono">Peak 08:00 PM - 11:30 PM</span>
+                  <span className="text-xs text-orange-400 font-mono font-bold">Network Peak: 9 PM - 11 PM</span>
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="h-56 w-full">
+                <div className="h-60 w-full">
                   <ResponsiveContainer width="100%" height="100%">
                     <AreaChart data={HQ_HOURLY_SALES}>
                       <defs>
@@ -353,7 +354,7 @@ export default function AdminDashboardPage() {
               </CardContent>
             </Card>
 
-            <Card className="border-[#303030] bg-[#1f1f1f] shadow-xl rounded-3xl">
+            <Card className="lg:col-span-5 border-[#303030] bg-[#1f1f1f] shadow-xl rounded-3xl flex flex-col justify-between">
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm font-bold text-white flex items-center justify-between">
                   <div className="flex items-center gap-2">
@@ -363,10 +364,10 @@ export default function AdminDashboardPage() {
                   <span className="text-xs text-orange-400 font-mono font-bold">4 Main Categories</span>
                 </CardTitle>
               </CardHeader>
-              <CardContent>
-                <div className="flex flex-col sm:flex-row items-center gap-4 pt-1">
+              <CardContent className="flex-1 flex flex-col justify-center">
+                <div className="flex flex-col sm:flex-row items-center gap-4 py-1">
                   {/* Left: Bigger Pie Chart */}
-                  <div className="h-44 w-full sm:w-[46%] shrink-0">
+                  <div className="h-44 w-full sm:w-[48%] shrink-0">
                     <ResponsiveContainer width="100%" height="100%">
                       <PieChart>
                         <Pie data={MENU_SHARE_DATA} cx="50%" cy="50%" innerRadius={44} outerRadius={68} paddingAngle={4} dataKey="value">
@@ -399,7 +400,7 @@ export default function AdminDashboardPage() {
                   </div>
 
                   {/* Right: Clean Aligned Breakdown */}
-                  <div className="w-full sm:w-[54%] space-y-2">
+                  <div className="w-full sm:w-[52%] space-y-2">
                     {MENU_SHARE_DATA.map((item) => (
                       <div key={item.name} className="p-2.5 rounded-xl bg-[#161618] border border-[#303030] flex items-center justify-between gap-2 shadow-sm">
                         <div className="flex items-center gap-2 min-w-0">
@@ -507,10 +508,10 @@ export default function AdminDashboardPage() {
             </div>
           )}
 
-          {/* ── CHARTS & GRAPHS SECTION ─────────────────────────────────── */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
+          {/* ── CHARTS & GRAPHS SECTION (Optimized 12-col Grid) ─────────── */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
             {/* Store Hourly Sales Velocity Area Chart */}
-            <Card className="lg:col-span-2 border-[#303030] bg-[#1f1f1f]">
+            <Card className="lg:col-span-7 border-[#303030] bg-[#1f1f1f] shadow-xl rounded-3xl">
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm font-bold text-white flex items-center justify-between">
                   <div className="flex items-center gap-2">
@@ -561,7 +562,7 @@ export default function AdminDashboardPage() {
             </Card>
 
             {/* Sales Channel Mix Pie Chart */}
-            <Card className="border-[#303030] bg-[#1f1f1f] shadow-xl rounded-3xl">
+            <Card className="lg:col-span-5 border-[#303030] bg-[#1f1f1f] shadow-xl rounded-3xl flex flex-col justify-between">
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm font-bold text-white flex items-center justify-between">
                   <div className="flex items-center gap-2">
@@ -571,10 +572,10 @@ export default function AdminDashboardPage() {
                   <span className="text-xs text-orange-400 font-mono font-bold">{outletTenderTotals.totalOrdersToday} Orders Today</span>
                 </CardTitle>
               </CardHeader>
-              <CardContent>
-                <div className="flex flex-col sm:flex-row items-center gap-4 pt-1">
+              <CardContent className="flex-1 flex flex-col justify-center">
+                <div className="flex flex-col sm:flex-row items-center gap-4 py-1">
                   {/* Left: Bigger Pie Chart */}
-                  <div className="h-44 w-full sm:w-[46%] shrink-0">
+                  <div className="h-44 w-full sm:w-[48%] shrink-0">
                     <ResponsiveContainer width="100%" height="100%">
                       <PieChart>
                         <Pie data={channelChartData} cx="50%" cy="50%" innerRadius={44} outerRadius={68} paddingAngle={4} dataKey="value">
@@ -607,7 +608,7 @@ export default function AdminDashboardPage() {
                   </div>
 
                   {/* Right: Clean Aligned Breakdown Cards */}
-                  <div className="w-full sm:w-[54%] space-y-2">
+                  <div className="w-full sm:w-[52%] space-y-2">
                     {channelChartData.map((item) => {
                       const percent = Math.round((item.value / totalChannelRevenue) * 100) || 0;
                       return (
