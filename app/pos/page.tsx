@@ -218,17 +218,6 @@ export default function PosBillingTerminal() {
     setCart(updated);
   };
 
-  const toggleModifier = (index: number, modifier: string) => {
-    const updated = [...cart];
-    const exists = updated[index].selectedModifiers.includes(modifier);
-    if (exists) {
-      updated[index].selectedModifiers = updated[index].selectedModifiers.filter((m) => m !== modifier);
-    } else {
-      updated[index].selectedModifiers.push(modifier);
-    }
-    setCart(updated);
-  };
-
   const clearCart = () => {
     setCart([]);
   };
@@ -254,14 +243,7 @@ export default function PosBillingTerminal() {
   };
 
   // Calculations
-  const subtotal = cart.reduce((sum, item) => {
-    let itemPrice = item.price;
-    item.selectedModifiers.forEach((m) => {
-      const match = m.match(/\+₹(\d+)/);
-      if (match) itemPrice += parseInt(match[1]);
-    });
-    return sum + itemPrice * item.quantity;
-  }, 0);
+  const subtotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
 
   const gstAmount = Math.round(subtotal * 0.05); // 5% GST
   const grandTotal = subtotal + gstAmount;
@@ -299,7 +281,7 @@ export default function PosBillingTerminal() {
       orderNumber: orderNum,
       time: timeNow,
       items: cart.map((c) => ({
-        name: `${c.name}${c.selectedModifiers.length > 0 ? ` (${c.selectedModifiers.join(", ")})` : ""}`,
+        name: c.name,
         quantity: c.quantity,
         price: c.price,
       })),
@@ -578,88 +560,65 @@ export default function PosBillingTerminal() {
             </div>
           </div>
 
-          {/* Cart Items Scroll Area */}
-          <div className="space-y-2.5 max-h-56 sm:max-h-64 overflow-y-auto pr-1">
+          {/* Cart Items List - Generous height for multiple items without cramped scrolling */}
+          <div className="space-y-2.5 max-h-[420px] 2xl:max-h-[520px] overflow-y-auto pr-1 no-scrollbar scrollbar-none">
             {cart.length === 0 ? (
-              <div className="py-10 text-center text-xs text-zinc-500 font-semibold space-y-2">
+              <div className="py-12 text-center text-xs text-zinc-500 font-semibold space-y-2.5">
                 <div className="w-12 h-12 rounded-2xl bg-[#161618] border border-[#303030] flex items-center justify-center mx-auto text-zinc-600">
                   <ShoppingBag className="w-6 h-6" />
                 </div>
                 <span className="text-sm text-zinc-400 font-bold block">Basket is empty</span>
-                <span className="text-[11px] text-zinc-500 block">Tap food cards from the menu on the left to add items.</span>
+                <span className="text-[11px] text-zinc-500 block">Tap food cards on the left to add items to the order.</span>
               </div>
             ) : (
               cart.map((item, idx) => (
-                <div key={idx} className="p-3 rounded-2xl bg-[#161618] border border-[#303030] space-y-2">
-                  <div className="flex items-center justify-between gap-3">
-                    {/* Item Thumbnail & Name */}
-                    <div className="flex items-center gap-3 min-w-0">
-                      <img
-                        src={item.image}
-                        alt={item.name}
-                        className="w-12 h-12 rounded-xl object-cover border border-[#303030] shrink-0"
-                      />
-                      <div className="min-w-0">
-                        <span className="text-xs sm:text-sm font-black text-white block truncate leading-tight">
-                          {item.name}
-                        </span>
-                        <span className="text-[11px] text-orange-400 font-mono font-bold">
-                          ₹{item.price} each
-                        </span>
-                      </div>
-                    </div>
-
-                    {/* Big Touch + / - and Line Total */}
-                    <div className="flex items-center gap-2.5 shrink-0">
-                      <div className="flex items-center gap-1 bg-[#1f1f1f] p-1 rounded-xl border border-[#303030]">
-                        <button
-                          type="button"
-                          onClick={() => updateQuantity(idx, -1)}
-                          className="w-7 h-7 rounded-lg bg-[#161618] text-white text-xs font-bold flex items-center justify-center hover:bg-rose-500/20 hover:text-rose-400 transition-colors cursor-pointer"
-                        >
-                          -
-                        </button>
-                        <span className="font-mono text-xs sm:text-sm font-black text-white w-6 text-center">
-                          {item.quantity}
-                        </span>
-                        <button
-                          type="button"
-                          onClick={() => updateQuantity(idx, 1)}
-                          className="w-7 h-7 rounded-lg bg-orange-600 text-white text-xs font-bold flex items-center justify-center hover:bg-orange-500 transition-colors cursor-pointer shadow-sm"
-                        >
-                          +
-                        </button>
-                      </div>
-
-                      <span className="font-mono text-sm font-black text-white w-14 text-right">
-                        ₹{(item.price * item.quantity).toFixed(0)}
+                <div key={idx} className="p-3.5 rounded-2xl bg-[#161618] border border-[#303030] flex items-center justify-between gap-3 hover:border-[#3d3d3d] transition-colors">
+                  {/* Item Thumbnail & Name */}
+                  <div className="flex items-center gap-3 min-w-0 flex-1">
+                    <img
+                      src={item.image}
+                      alt={item.name}
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).src = "https://images.unsplash.com/photo-1529006557810-274b9b2fc783?auto=format&fit=crop&w=300&q=80";
+                      }}
+                      className="w-12 h-12 rounded-xl object-cover border border-[#303030] shrink-0 bg-[#252525]"
+                    />
+                    <div className="min-w-0 flex-1">
+                      <span className="text-xs sm:text-sm font-black text-white block truncate leading-tight">
+                        {item.name}
+                      </span>
+                      <span className="text-[11px] text-orange-400 font-mono font-bold mt-0.5 block">
+                        ₹{item.price} each
                       </span>
                     </div>
                   </div>
 
-                  {/* Modifiers Chips if Wrap */}
-                  {item.category.includes("Wraps") && (
-                    <div className="flex flex-wrap gap-1.5 pt-2 border-t border-[#303030]/80">
-                      {["Extra Garlic Toum (+₹20)", "Spicy Peri-Peri (+₹15)", "No Pickles"].map((mod) => {
-                        const active = item.selectedModifiers.includes(mod);
-                        return (
-                          <button
-                            key={mod}
-                            type="button"
-                            onClick={() => toggleModifier(idx, mod)}
-                            className={cn(
-                              "text-[10px] px-2.5 py-1 rounded-lg transition-all cursor-pointer font-bold",
-                              active
-                                ? "bg-orange-500/20 text-orange-300 border border-orange-500/40"
-                                : "bg-[#1f1f1f] text-zinc-400 border border-[#303030] hover:text-zinc-200"
-                            )}
-                          >
-                            {mod}
-                          </button>
-                        );
-                      })}
+                  {/* Quantity Stepper & Line Price */}
+                  <div className="flex items-center gap-2.5 shrink-0">
+                    <div className="flex items-center gap-1 bg-[#1f1f1f] p-1 rounded-xl border border-[#303030]">
+                      <button
+                        type="button"
+                        onClick={() => updateQuantity(idx, -1)}
+                        className="w-8 h-8 rounded-lg bg-[#161618] text-white text-xs font-bold flex items-center justify-center hover:bg-rose-500/20 hover:text-rose-400 transition-colors cursor-pointer"
+                      >
+                        -
+                      </button>
+                      <span className="font-mono text-xs sm:text-sm font-black text-white w-6 text-center">
+                        {item.quantity}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => updateQuantity(idx, 1)}
+                        className="w-8 h-8 rounded-lg bg-orange-600 text-white text-xs font-bold flex items-center justify-center hover:bg-orange-500 transition-colors cursor-pointer shadow-sm"
+                      >
+                        +
+                      </button>
                     </div>
-                  )}
+
+                    <span className="font-mono text-sm font-black text-white w-14 text-right">
+                      ₹{(item.price * item.quantity).toFixed(0)}
+                    </span>
+                  </div>
                 </div>
               ))
             )}
