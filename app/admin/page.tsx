@@ -433,15 +433,12 @@ export default function AdminDashboardPage() {
                   <p className="text-2xl sm:text-3xl font-black text-emerald-400 font-mono tracking-tight mt-0.5">
                     ₹{outletTenderTotals.totalGrossRevenue.toLocaleString("en-IN")}
                   </p>
-                  <span className="text-xs text-zinc-300 font-semibold block mt-0.5">Target: ₹{currentOutlet.dailyTargetSales.toLocaleString("en-IN")} ({Math.round((outletTenderTotals.totalGrossRevenue / currentOutlet.dailyTargetSales) * 100)}%)</span>
+                  <span className="text-xs text-emerald-400/80 font-semibold block mt-0.5">Live Gross Revenue</span>
                 </div>
               </CardContent>
             </Card>
 
-            <Card
-              onClick={() => setShowDrawerBreakdown(!showDrawerBreakdown)}
-              className="border-[#303030] bg-[#1f1f1f] shadow-xl hover:border-orange-500/50 transition-all rounded-3xl cursor-pointer"
-            >
+            <Card className="border-[#303030] bg-[#1f1f1f] shadow-xl hover:border-orange-500/50 transition-all rounded-3xl">
               <CardContent className="p-5 flex items-center gap-4">
                 <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-orange-500/20 to-amber-500/10 border border-orange-500/30 flex items-center justify-center shrink-0 shadow-inner">
                   <Banknote className="w-7 h-7 text-orange-400" />
@@ -451,7 +448,7 @@ export default function AdminDashboardPage() {
                   <p className="text-2xl sm:text-3xl font-black text-white font-mono tracking-tight mt-0.5">
                     ₹{outletTenderTotals.expectedCashInDrawer.toLocaleString("en-IN")}
                   </p>
-                  <span className="text-xs text-orange-400 font-bold block mt-0.5">Float ₹{outletTenderTotals.openingCash.toLocaleString()} &middot; Click to Audit</span>
+                  <span className="text-xs text-zinc-400 font-semibold block mt-0.5">Physical Counter Register</span>
                 </div>
               </CardContent>
             </Card>
