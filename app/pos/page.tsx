@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import {
   Flame,
@@ -27,6 +27,8 @@ import {
   AlertCircle,
   Check,
   Star,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
 import { useFranchise } from "@/lib/franchise-context";
 import { Button } from "@/components/ui/Button";
@@ -69,6 +71,54 @@ export default function PosBillingTerminal() {
 
   const [activeCategory, setActiveCategory] = useState<string>("Most Ordered");
   const [searchTerm, setSearchTerm] = useState("");
+
+  // Category Scrolling Ref & Mouse Drag State
+  const categoryScrollRef = useRef<HTMLDivElement>(null);
+  const [isDragging, setIsDragging] = useState(false);
+  const [startX, setStartX] = useState(0);
+  const [scrollLeftPos, setScrollLeftPos] = useState(0);
+
+  const scrollCategories = (direction: "left" | "right") => {
+    if (categoryScrollRef.current) {
+      const scrollAmt = direction === "left" ? -240 : 240;
+      categoryScrollRef.current.scrollBy({ left: scrollAmt, behavior: "smooth" });
+    }
+  };
+
+  useEffect(() => {
+    const el = categoryScrollRef.current;
+    if (!el) return;
+
+    // Translate standard vertical mouse wheel into horizontal scroll
+    const onWheel = (e: WheelEvent) => {
+      if (Math.abs(e.deltaY) > 0) {
+        e.preventDefault();
+        el.scrollLeft += e.deltaY * 1.2;
+      }
+    };
+
+    el.addEventListener("wheel", onWheel, { passive: false });
+    return () => el.removeEventListener("wheel", onWheel);
+  }, []);
+
+  const handleMouseDown = (e: React.MouseEvent) => {
+    if (!categoryScrollRef.current) return;
+    setIsDragging(true);
+    setStartX(e.pageX - categoryScrollRef.current.offsetLeft);
+    setScrollLeftPos(categoryScrollRef.current.scrollLeft);
+  };
+
+  const handleMouseLeaveOrUp = () => {
+    setIsDragging(false);
+  };
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (!isDragging || !categoryScrollRef.current) return;
+    e.preventDefault();
+    const x = e.pageX - categoryScrollRef.current.offsetLeft;
+    const walk = (x - startX) * 1.5;
+    categoryScrollRef.current.scrollLeft = scrollLeftPos - walk;
+  };
 
   // Cart & Order State
   const [cart, setCart] = useState<CartItem[]>([]);
@@ -316,45 +366,76 @@ export default function PosBillingTerminal() {
               <button
                 type="button"
                 onClick={() => setSearchTerm("")}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-white"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-white cursor-pointer"
               >
                 <X className="w-4 h-4" />
               </button>
             )}
           </div>
 
-          {/* Clean Touch Category Pills (Zero Scrollbar Visible) */}
-          <div className="flex items-center gap-2 w-full sm:flex-1 overflow-x-auto pb-1 sm:pb-0 no-scrollbar scrollbar-none">
-            {categories.map((cat) => {
-              const count = activePosItems.filter((i) => {
-                if (cat.name === "All Items") return true;
-                if (cat.name === "Most Ordered") return ["pos-01", "pos-02", "pos-03", "pos-05", "pos-07"].includes(i.id) || i.popularRank <= 4;
-                return i.category === cat.name;
-              }).length;
-              const isActive = activeCategory === cat.name;
+          {/* Smooth Scrollable Touch Category Pills with Scroll Buttons & Zero Visible Scrollbars */}
+          <div className="relative flex items-center gap-1.5 w-full sm:flex-1 min-w-0">
+            {/* Scroll Left Button */}
+            <button
+              type="button"
+              onClick={() => scrollCategories("left")}
+              className="hidden sm:flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#1f1f1f] border border-[#303030] text-zinc-400 hover:text-white hover:border-orange-500 transition-colors shadow-md cursor-pointer"
+              title="Scroll Left"
+            >
+              <ChevronLeft className="w-4 h-4" />
+            </button>
 
-              return (
-                <button
-                  key={cat.name}
-                  onClick={() => setActiveCategory(cat.name)}
-                  className={cn(
-                    "px-4 py-2.5 rounded-2xl text-xs sm:text-sm font-black whitespace-nowrap transition-all cursor-pointer flex items-center gap-2 shadow-sm shrink-0 select-none",
-                    isActive
-                      ? "bg-gradient-to-r from-orange-600 to-amber-600 text-white shadow-lg shadow-orange-600/30 scale-[1.02]"
-                      : "bg-[#1f1f1f] text-zinc-300 border border-[#303030] hover:border-orange-500/50 hover:text-white"
-                  )}
-                >
-                  <span className="text-base">{cat.icon}</span>
-                  <span>{cat.name}</span>
-                  <span className={cn(
-                    "text-[10px] px-1.5 py-0.5 rounded-full font-mono font-bold",
-                    isActive ? "bg-black/30 text-white" : "bg-[#161618] text-zinc-400"
-                  )}>
-                    {count}
-                  </span>
-                </button>
-              );
-            })}
+            {/* Scrollable Container with Mouse Wheel, Drag-to-Scroll & Touch Pan Support */}
+            <div
+              ref={categoryScrollRef}
+              onMouseDown={handleMouseDown}
+              onMouseLeave={handleMouseLeaveOrUp}
+              onMouseUp={handleMouseLeaveOrUp}
+              onMouseMove={handleMouseMove}
+              className="flex items-center gap-2 overflow-x-auto overflow-y-hidden pb-1 sm:pb-0 no-scrollbar scrollbar-none w-full select-none cursor-grab active:cursor-grabbing touch-pan-x"
+            >
+              {categories.map((cat) => {
+                const count = activePosItems.filter((i) => {
+                  if (cat.name === "All Items") return true;
+                  if (cat.name === "Most Ordered") return ["pos-01", "pos-02", "pos-03", "pos-05", "pos-07"].includes(i.id) || i.popularRank <= 4;
+                  return i.category === cat.name;
+                }).length;
+                const isActive = activeCategory === cat.name;
+
+                return (
+                  <button
+                    key={cat.name}
+                    type="button"
+                    onClick={() => setActiveCategory(cat.name)}
+                    className={cn(
+                      "px-4 py-2.5 rounded-2xl text-xs sm:text-sm font-black whitespace-nowrap transition-all cursor-pointer flex items-center gap-2 shadow-sm shrink-0 select-none",
+                      isActive
+                        ? "bg-gradient-to-r from-orange-600 to-amber-600 text-white shadow-lg shadow-orange-600/30 scale-[1.02]"
+                        : "bg-[#1f1f1f] text-zinc-300 border border-[#303030] hover:border-orange-500/50 hover:text-white"
+                    )}
+                  >
+                    <span className="text-base">{cat.icon}</span>
+                    <span>{cat.name}</span>
+                    <span className={cn(
+                      "text-[10px] px-1.5 py-0.5 rounded-full font-mono font-bold",
+                      isActive ? "bg-black/30 text-white" : "bg-[#161618] text-zinc-400"
+                    )}>
+                      {count}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Scroll Right Button */}
+            <button
+              type="button"
+              onClick={() => scrollCategories("right")}
+              className="hidden sm:flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#1f1f1f] border border-[#303030] text-zinc-400 hover:text-white hover:border-orange-500 transition-colors shadow-md cursor-pointer"
+              title="Scroll Right"
+            >
+              <ChevronRight className="w-4 h-4" />
+            </button>
           </div>
         </div>
 
@@ -920,7 +1001,7 @@ export default function PosBillingTerminal() {
               <Button
                 type="button"
                 onClick={() => window.print()}
-                className="flex-1 bg-zinc-800 hover:bg-zinc-700 text-white font-black text-xs uppercase h-11 rounded-2xl gap-2 shadow-lg"
+                className="flex-1 bg-zinc-800 hover:bg-zinc-700 text-white font-black text-xs uppercase h-11 rounded-2xl gap-2 shadow-lg cursor-pointer"
               >
                 <Printer className="w-4 h-4" />
                 <span>Print Slip</span>
@@ -929,7 +1010,7 @@ export default function PosBillingTerminal() {
               <Button
                 type="button"
                 onClick={() => setShowKotModal(false)}
-                className="flex-1 bg-gradient-to-r from-orange-600 to-amber-600 hover:opacity-95 text-white font-black text-xs uppercase h-11 rounded-2xl shadow-lg shadow-orange-600/30"
+                className="flex-1 bg-gradient-to-r from-orange-600 to-amber-600 hover:opacity-95 text-white font-black text-xs uppercase h-11 rounded-2xl shadow-lg shadow-orange-600/30 cursor-pointer"
               >
                 Done & Next (1-Tap)
               </Button>
@@ -967,7 +1048,7 @@ export default function PosBillingTerminal() {
             <Button
               type="button"
               onClick={() => setShowUpiQrModal(false)}
-              className="w-full bg-blue-600 hover:bg-blue-500 text-white font-black text-xs uppercase rounded-xl"
+              className="w-full bg-blue-600 hover:bg-blue-500 text-white font-black text-xs uppercase rounded-xl cursor-pointer"
             >
               Payment Received
             </Button>
@@ -1002,7 +1083,7 @@ export default function PosBillingTerminal() {
                   <Button
                     size="sm"
                     onClick={() => handleRecallBill(bill)}
-                    className="bg-orange-600 hover:bg-orange-500 text-white font-bold text-xs"
+                    className="bg-orange-600 hover:bg-orange-500 text-white font-bold text-xs cursor-pointer"
                   >
                     Resume Bill
                   </Button>
