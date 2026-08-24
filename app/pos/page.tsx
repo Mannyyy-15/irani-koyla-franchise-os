@@ -711,18 +711,18 @@ export default function PosBillingTerminal() {
             </div>
           </div>
 
-          {/* Cash Tender & High-Visibility Change Return */}
+          {/* Cash Tender & Change Due Calculator */}
           {paymentMode === "Cash" && (
-            <div className="p-3.5 rounded-2xl bg-gradient-to-br from-emerald-950/40 via-[#161618] to-emerald-950/20 border border-emerald-500/40 space-y-3">
+            <div className="p-3.5 rounded-2xl bg-[#161618] border border-[#303030] space-y-3">
               <div className="flex items-center justify-between text-xs">
-                <span className="text-emerald-400 font-extrabold flex items-center gap-1">
-                  <Banknote className="w-3.5 h-3.5" />
+                <span className="text-zinc-300 font-bold flex items-center gap-1.5">
+                  <Banknote className="w-4 h-4 text-orange-400" />
                   <span>Quick Cash Tender:</span>
                 </span>
                 <button
                   type="button"
                   onClick={() => setCashTendered(grandTotal.toString())}
-                  className="px-2 py-0.5 rounded-lg bg-emerald-500/20 border border-emerald-500/40 text-[10px] font-bold text-emerald-300 hover:bg-emerald-500/30 cursor-pointer"
+                  className="px-2.5 py-1 rounded-xl bg-[#1f1f1f] border border-[#383838] text-[11px] font-bold text-zinc-300 hover:text-white hover:border-orange-500 transition-colors cursor-pointer"
                 >
                   Exact (₹{grandTotal})
                 </button>
@@ -736,10 +736,10 @@ export default function PosBillingTerminal() {
                     type="button"
                     onClick={() => setCashTendered(amt.toString())}
                     className={cn(
-                      "py-1.5 rounded-xl border text-xs font-mono font-black transition-all cursor-pointer text-center",
+                      "py-2 rounded-xl border text-xs font-mono font-black transition-all cursor-pointer text-center",
                       cashTendered === amt.toString()
-                        ? "bg-emerald-500 text-black border-emerald-400 shadow-md"
-                        : "bg-[#161618] border-emerald-500/30 text-emerald-300 hover:bg-emerald-500/20"
+                        ? "bg-orange-600 text-white border-orange-500 shadow-md"
+                        : "bg-[#1f1f1f] border-[#303030] text-zinc-300 hover:bg-[#252525] hover:text-white hover:border-[#404040]"
                     )}
                   >
                     ₹{amt}
@@ -747,8 +747,8 @@ export default function PosBillingTerminal() {
                 ))}
               </div>
 
-              {/* Custom Cash Received Input & Massive Change Due Display */}
-              <div className="grid grid-cols-2 gap-3 pt-1 border-t border-emerald-500/20 items-center">
+              {/* Custom Cash Received Input & Change Due Display */}
+              <div className="grid grid-cols-2 gap-2.5 pt-2 border-t border-[#303030] items-center">
                 <div>
                   <span className="text-[10px] text-zinc-400 font-bold uppercase tracking-wider block mb-1">
                     Cash Received (₹)
@@ -757,15 +757,18 @@ export default function PosBillingTerminal() {
                     type="number"
                     value={cashTendered}
                     onChange={(e) => setCashTendered(e.target.value)}
-                    className="w-full h-11 px-3 rounded-xl bg-[#161618] border border-emerald-500/50 text-base font-mono font-black text-white focus:outline-none focus:border-emerald-400"
+                    className="w-full h-11 px-3 rounded-xl bg-[#1f1f1f] border border-[#383838] text-base font-mono font-black text-white focus:outline-none focus:border-orange-500 transition-colors"
                   />
                 </div>
 
-                <div className="p-2.5 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-right">
-                  <span className="text-[10px] text-emerald-300/80 font-bold uppercase tracking-wider block">
+                <div className="p-2.5 rounded-xl bg-[#1f1f1f] border border-[#303030] text-right">
+                  <span className="text-[10px] text-zinc-400 font-bold uppercase tracking-wider block">
                     Change to Return
                   </span>
-                  <span className="text-xl sm:text-2xl font-black text-emerald-400 font-mono block">
+                  <span className={cn(
+                    "text-xl sm:text-2xl font-black font-mono block",
+                    changeDue > 0 ? "text-orange-400" : "text-zinc-500"
+                  )}>
                     ₹{changeDue.toFixed(2)}
                   </span>
                 </div>

@@ -209,7 +209,7 @@ export default function PosTopNav({
               : "bg-[#161618] border-[#303030] text-zinc-300"
           )}>
             <span className="text-[10px] text-zinc-400 uppercase tracking-wider font-bold">Drawer Cash:</span>
-            <span className="font-mono font-black text-emerald-400">
+            <span className="font-mono font-black text-white">
               ₹{outletTenderTotals.expectedCashInDrawer.toLocaleString("en-IN")}
             </span>
             {isExcessCash && (
@@ -226,8 +226,8 @@ export default function PosTopNav({
           {/* Online / Offline Resilience Indicator */}
           <div className="flex items-center gap-1">
             {isOnline ? (
-              <span className="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-400 bg-emerald-500/10 px-2 py-1 rounded-xl border border-emerald-500/20">
-                <Wifi className="w-3 h-3" />
+              <span className="inline-flex items-center gap-1 text-[10px] font-bold text-zinc-400 bg-[#161618] px-2 py-1 rounded-xl border border-[#303030]">
+                <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
                 <span>Live</span>
               </span>
             ) : (
