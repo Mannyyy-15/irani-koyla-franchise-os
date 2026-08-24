@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useState, useEffect } from "react";
 import {
   ShoppingBag,
   Clock,
@@ -13,8 +12,10 @@ import {
   Store,
   Layers,
   LogOut,
-  X,
-  UserCheck,
+  ChevronLeft,
+  ChevronRight,
+  PanelLeftClose,
+  PanelLeftOpen,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/components/ui/cn";
@@ -47,7 +48,15 @@ const posNavigationSections = [
   },
 ] as const;
 
-function PosSidebarBody({ onNavigate }: { onNavigate?: () => void }) {
+function PosSidebarBody({
+  collapsed = false,
+  onToggle,
+  onNavigate,
+}: {
+  collapsed?: boolean;
+  onToggle?: () => void;
+  onNavigate?: () => void;
+}) {
   const pathname = usePathname();
   const router = useRouter();
   const { activeOutlet, outlets, liveOrders } = useFranchise();
@@ -63,36 +72,76 @@ function PosSidebarBody({ onNavigate }: { onNavigate?: () => void }) {
   };
 
   return (
-    <div className="flex h-full w-full flex-col bg-white dark:bg-[#1f1f1f] lg:rounded-[20px] dark:border dark:border-[#303030] shadow-[0_2px_16px_rgba(0,0,0,0.07)] dark:shadow-none overflow-hidden">
-      {/* Brand Header */}
-      <div className="flex h-16 shrink-0 items-center justify-between px-5 border-b border-[#f0f0f2] dark:border-[#303030]">
-        <Link href="/pos" className="flex items-center gap-3" onClick={onNavigate}>
-          <div className="relative w-10 h-10 rounded-xl bg-gradient-to-br from-amber-500 via-orange-600 to-amber-700 flex items-center justify-center shadow-[0_0_20px_rgba(245,158,11,0.35)]">
+    <div className={cn(
+      "flex h-full w-full flex-col bg-[#1f1f1f] rounded-2xl border border-[#303030] shadow-2xl overflow-hidden transition-all duration-300",
+      collapsed ? "items-center" : ""
+    )}>
+      {/* Brand Header & Collapse Toggle */}
+      <div className={cn(
+        "flex h-16 shrink-0 items-center border-b border-[#303030] px-3 transition-all",
+        collapsed ? "justify-center w-full" : "justify-between w-full px-4"
+      )}>
+        <Link href="/pos" className="flex items-center gap-2.5 min-w-0" onClick={onNavigate}>
+          <div className="relative w-10 h-10 rounded-xl bg-gradient-to-br from-orange-500 via-amber-600 to-rose-700 flex items-center justify-center shadow-[0_0_20px_rgba(249,115,22,0.35)] shrink-0">
             <Flame className="w-5 h-5 text-white animate-pulse" />
           </div>
-          <div className="flex flex-col leading-none">
-            <span className="text-sm font-black text-slate-900 dark:text-white tracking-tight flex items-center gap-1.5">
-              Irani Koyla
-              <span className="text-[10px] bg-amber-500/20 text-amber-400 font-bold px-1.5 py-0.5 rounded border border-amber-500/30">
-                POS
+          {!collapsed && (
+            <div className="flex flex-col leading-none min-w-0">
+              <span className="text-sm font-black text-white tracking-tight flex items-center gap-1.5 truncate">
+                Irani Koyla
+                <span className="text-[10px] bg-orange-500/20 text-orange-400 font-bold px-1.5 py-0.5 rounded border border-orange-500/30">
+                  POS
+                </span>
               </span>
-            </span>
-            <span className="text-[10px] font-semibold text-slate-500 dark:text-zinc-400 uppercase tracking-widest mt-0.5">
-              Counter Register #01
-            </span>
-          </div>
-        </Link>
-      </div>
-
-      {/* Navigation Sections */}
-      <nav className="flex flex-1 flex-col overflow-y-auto px-3 py-3" aria-label="POS navigation">
-        {posNavigationSections.map((section, sectionIndex) => (
-          <div key={section.label} className={cn("space-y-1", sectionIndex > 0 && "mt-5")}>
-            <div className="px-3 py-1">
-              <span className="text-[10px] font-extrabold tracking-wider text-slate-500 dark:text-zinc-500 uppercase">
-                {section.label}
+              <span className="text-[10px] font-semibold text-zinc-400 uppercase tracking-widest mt-0.5 truncate">
+                Counter #01
               </span>
             </div>
+          )}
+        </Link>
+
+        {/* Toggle Button for Desktop */}
+        {onToggle && !collapsed && (
+          <button
+            type="button"
+            onClick={onToggle}
+            className="p-1.5 rounded-xl bg-[#161618] border border-[#303030] text-zinc-400 hover:text-white hover:border-orange-500 transition-all cursor-pointer shrink-0"
+            title="Collapse Sidebar for Wider POS Screen"
+          >
+            <PanelLeftClose className="w-4 h-4 text-zinc-400" />
+          </button>
+        )}
+      </div>
+
+      {/* When Collapsed: Quick Expand Button at Top */}
+      {collapsed && onToggle && (
+        <div className="pt-2 pb-1">
+          <button
+            type="button"
+            onClick={onToggle}
+            className="p-2 rounded-xl bg-[#161618] border border-[#303030] text-zinc-400 hover:text-orange-400 hover:border-orange-500 transition-all cursor-pointer shadow-md"
+            title="Expand Sidebar"
+          >
+            <PanelLeftOpen className="w-4 h-4 text-orange-400" />
+          </button>
+        </div>
+      )}
+
+      {/* Navigation Sections */}
+      <nav className={cn(
+        "flex flex-1 flex-col overflow-y-auto py-3 w-full scrollbar-none",
+        collapsed ? "px-2 items-center" : "px-3"
+      )} aria-label="POS navigation">
+        {posNavigationSections.map((section, sectionIndex) => (
+          <div key={section.label} className={cn("w-full space-y-1", sectionIndex > 0 && "mt-4")}>
+            {!collapsed && (
+              <div className="px-3 py-1">
+                <span className="text-[10px] font-extrabold tracking-wider text-zinc-500 uppercase">
+                  {section.label}
+                </span>
+              </div>
+            )}
+
             {section.items.map((item) => {
               const isActive = item.exact ? pathname === item.href : pathname.startsWith(item.href);
               const badgeValue = (item as any).badgeKey === "orders" ? totalOrdersCount : null;
@@ -102,27 +151,36 @@ function PosSidebarBody({ onNavigate }: { onNavigate?: () => void }) {
                   key={item.name}
                   href={item.href}
                   onClick={onNavigate}
+                  title={collapsed ? item.name : undefined}
                   className={cn(
-                    "group flex items-center justify-between rounded-xl px-3 py-2.5 text-xs font-bold transition-all",
+                    "group flex items-center rounded-xl text-xs font-bold transition-all cursor-pointer",
+                    collapsed
+                      ? "justify-center p-2.5 my-1"
+                      : "justify-between px-3 py-2.5",
                     isActive
-                      ? "bg-amber-600 text-white shadow-[0_2px_12px_rgba(217,119,6,0.35)] dark:bg-amber-600 dark:text-white"
-                      : "text-slate-600 dark:text-zinc-400 hover:bg-slate-100 dark:hover:bg-[#303030] hover:text-slate-900 dark:hover:text-white"
+                      ? "bg-orange-600 text-white shadow-[0_2px_12px_rgba(249,115,22,0.35)]"
+                      : "text-zinc-400 hover:bg-[#161618] hover:text-white hover:border-[#303030]"
                   )}
                 >
-                  <div className="flex items-center gap-3">
+                  <div className={cn("flex items-center", collapsed ? "justify-center" : "gap-3")}>
                     <item.icon
                       className={cn(
-                        "h-4 w-4 shrink-0 transition-transform group-hover:scale-110",
-                        isActive ? "text-white" : "text-slate-500 dark:text-zinc-500 group-hover:text-amber-500"
+                        "shrink-0 transition-transform group-hover:scale-110",
+                        collapsed ? "h-5 w-5" : "h-4 w-4",
+                        isActive ? "text-white" : "text-zinc-400 group-hover:text-orange-400"
                       )}
                     />
-                    <span>{item.name}</span>
+                    {!collapsed && <span>{item.name}</span>}
                   </div>
 
-                  {badgeValue !== null && (
-                    <span className="px-1.5 py-0.2 rounded-full text-[9px] font-mono font-black bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+                  {!collapsed && badgeValue !== null && (
+                    <span className="px-1.5 py-0.5 rounded-full text-[9px] font-mono font-black bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
                       {badgeValue}
                     </span>
+                  )}
+
+                  {collapsed && badgeValue !== null && badgeValue > 0 && (
+                    <span className="absolute top-1 right-1 w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
                   )}
                 </Link>
               );
@@ -132,41 +190,64 @@ function PosSidebarBody({ onNavigate }: { onNavigate?: () => void }) {
       </nav>
 
       {/* Cashier Footer Profile */}
-      <div className="shrink-0 p-3 border-t border-[#f0f0f2] dark:border-[#303030] bg-slate-50/50 dark:bg-[#161618]/50">
-        <div className="flex items-center justify-between p-2 rounded-xl bg-white dark:bg-[#1f1f1f] border border-slate-200/80 dark:border-[#303030]">
-          <div className="flex items-center gap-2.5 min-w-0">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-amber-500 to-orange-600 text-white font-black text-xs flex items-center justify-center shrink-0">
-              IS
-            </div>
-            <div className="min-w-0">
-              <span className="text-xs font-bold text-slate-900 dark:text-white truncate block leading-tight">
-                Imran S.
-              </span>
-              <span className="text-[10px] text-emerald-400 font-semibold truncate block leading-tight flex items-center gap-1">
-                <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                Active Cashier
-              </span>
-            </div>
-          </div>
-
+      <div className={cn(
+        "shrink-0 border-t border-[#303030] bg-[#161618] w-full",
+        collapsed ? "p-2 flex flex-col items-center" : "p-3"
+      )}>
+        {collapsed ? (
           <button
             type="button"
             onClick={handleLogout}
-            title="Sign Out"
-            className="p-1.5 rounded-lg text-slate-500 dark:text-zinc-400 hover:text-rose-500 hover:bg-slate-100 dark:hover:bg-[#303030] transition-colors cursor-pointer"
+            title="Sign Out (Imran S.)"
+            className="w-10 h-10 rounded-xl bg-gradient-to-br from-orange-500 to-amber-600 text-white font-black text-xs flex items-center justify-center hover:opacity-90 transition-opacity cursor-pointer"
           >
-            <LogOut className="w-4 h-4" />
+            IS
           </button>
-        </div>
+        ) : (
+          <div className="flex items-center justify-between p-2 rounded-xl bg-[#1f1f1f] border border-[#303030]">
+            <div className="flex items-center gap-2.5 min-w-0">
+              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-orange-500 to-amber-600 text-white font-black text-xs flex items-center justify-center shrink-0">
+                IS
+              </div>
+              <div className="min-w-0">
+                <span className="text-xs font-bold text-white truncate block leading-tight">
+                  Imran S.
+                </span>
+                <span className="text-[10px] text-emerald-400 font-semibold truncate block leading-tight flex items-center gap-1">
+                  <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                  Active Cashier
+                </span>
+              </div>
+            </div>
+
+            <button
+              type="button"
+              onClick={handleLogout}
+              title="Sign Out"
+              className="p-1.5 rounded-lg text-zinc-400 hover:text-rose-400 hover:bg-[#161618] transition-colors cursor-pointer"
+            >
+              <LogOut className="w-4 h-4" />
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );
 }
 
-export default function PosSidebar() {
+export default function PosSidebar({
+  collapsed = false,
+  onToggle,
+}: {
+  collapsed?: boolean;
+  onToggle?: () => void;
+}) {
   return (
-    <aside className="hidden lg:flex w-64 shrink-0 flex-col pl-4 py-4 z-20">
-      <PosSidebarBody />
+    <aside className={cn(
+      "hidden lg:flex shrink-0 flex-col pl-3 py-3 z-20 transition-all duration-300",
+      collapsed ? "w-20" : "w-64"
+    )}>
+      <PosSidebarBody collapsed={collapsed} onToggle={onToggle} />
     </aside>
   );
 }
@@ -187,7 +268,7 @@ export function PosMobileSidebar({
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={onClose}
-            className="fixed inset-0 bg-black/70 backdrop-blur-sm"
+            className="fixed inset-0 bg-black/80 backdrop-blur-sm"
           />
           <motion.div
             initial={{ x: "-100%" }}
