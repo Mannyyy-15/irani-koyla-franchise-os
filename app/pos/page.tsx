@@ -388,9 +388,11 @@ export default function PosBillingTerminal() {
 
     const orderNum = `IK-${Math.floor(1000 + Math.random() * 9000)}`;
     const timeNow = new Date().toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", hour12: true });
+    const todayStr = new Date().toISOString().split("T")[0];
 
     const orderPayload = {
       orderNumber: orderNum,
+      date: todayStr,
       time: timeNow,
       items: cart.map((c) => ({
         name: c.name,

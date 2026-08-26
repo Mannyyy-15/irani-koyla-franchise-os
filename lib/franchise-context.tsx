@@ -122,7 +122,7 @@ interface FranchiseContextType {
   updateRoyaltyStatus: (id: string, status: RoyaltyStatement["status"], disputeReason?: string) => void;
   updateCompliance: (data: Omit<ComplianceChecklist, "id" | "date" | "overallScore" | "status">) => void;
   addOutlet: (outlet: Omit<Outlet, "id" | "code" | "currentDaySales" | "currentDayWraps" | "spitEfficiency">) => void;
-  addLiveOrder: (order: Omit<LiveOrder, "id" | "time" | "orderNumber">) => void;
+  addLiveOrder: (order: Omit<LiveOrder, "id" | "time" | "orderNumber" | "date"> & { date?: string }) => void;
   addPettyCashExpense: (expense: Omit<PettyCashExpense, "id" | "timestamp">) => void;
   performSafeDrop: (drop: Omit<SafeDrop, "id" | "timestamp">) => void;
   dispatchShipment: (data: Omit<CentralShipment, "id">) => void;
@@ -477,15 +477,17 @@ export function FranchiseProvider({ children }: { children: React.ReactNode }) {
     } catch {}
   };
 
-  const addLiveOrder = (orderData: Omit<LiveOrder, "id" | "time" | "orderNumber">) => {
+  const addLiveOrder = (orderData: Omit<LiveOrder, "id" | "time" | "orderNumber" | "date"> & { date?: string }) => {
     const orderId = `ord-${Date.now()}`;
     const orderNum = `IK-${Math.floor(1000 + Math.random() * 9000)}`;
     const timeNow = new Date().toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", hour12: true });
+    const todayStr = new Date().toISOString().split("T")[0];
     
     const newOrder: LiveOrder = {
       ...orderData,
       id: orderId,
       orderNumber: orderNum,
+      date: orderData.date || todayStr,
       time: timeNow,
     };
 

@@ -34,7 +34,6 @@ const posNavigationSections = [
     label: "STORE HUB",
     items: [
       { name: "Store Management", href: "/admin", icon: Store, exact: false },
-      { name: "Switch Workspace", href: "/select-portal", icon: Layers, exact: false },
     ],
   },
 ] as const;

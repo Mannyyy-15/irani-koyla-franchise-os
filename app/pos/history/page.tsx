@@ -6,17 +6,19 @@ import {
   Search,
   Printer,
   X,
-  FileText,
-  CreditCard,
-  ShoppingBag,
   Clock,
-  Filter,
+  Calendar,
+  Store,
   CheckCircle2,
   AlertTriangle,
   Flame,
   User,
   ArrowRight,
   TrendingUp,
+  Banknote,
+  Smartphone,
+  CreditCard,
+  Layers,
 } from "lucide-react";
 import { useFranchise } from "@/lib/franchise-context";
 import { Button } from "@/components/ui/Button";
@@ -25,26 +27,66 @@ import { cn } from "@/components/ui/cn";
 import { LiveOrder } from "@/lib/mock-data";
 
 export default function PosOrderHistoryPage() {
-  const { liveOrders, activeOutlet } = useFranchise();
+  const { liveOrders, activeOutlet, outlets } = useFranchise();
+
+  // Filter States
   const [search, setSearch] = useState("");
   const [channelFilter, setChannelFilter] = useState("all");
   const [paymentFilter, setPaymentFilter] = useState("all");
+  const [outletFilter, setOutletFilter] = useState<string>("all");
+
+  // Date Filter States
+  const todayStr = "2026-08-26"; // Current session date
+  const yesterdayStr = "2026-08-25";
+  const [dateFilterMode, setDateFilterMode] = useState<"today" | "yesterday" | "7days" | "all" | "custom">("today");
+  const [customDate, setCustomDate] = useState<string>(todayStr);
 
   const [selectedReceipt, setSelectedReceipt] = useState<LiveOrder | null>(null);
-  const [voidOrder, setVoidOrder] = useState<LiveOrder | null>(null);
-  const [voidReason, setVoidReason] = useState("");
 
+  // Filter Logic
   const filteredOrders = liveOrders.filter((ord) => {
+    // Search Filter
     const matchesSearch =
       ord.orderNumber.toLowerCase().includes(search.toLowerCase()) ||
       (ord.customerName && ord.customerName.toLowerCase().includes(search.toLowerCase())) ||
       ord.items.some((i) => i.name.toLowerCase().includes(search.toLowerCase()));
+
+    // Channel & Payment Filter
     const matchesChannel = channelFilter === "all" || ord.channel === channelFilter;
     const matchesPayment = paymentFilter === "all" || ord.paymentMethod === paymentFilter;
-    return matchesSearch && matchesChannel && matchesPayment;
+
+    // Account / Outlet Filter
+    const targetOutlet = outletFilter === "all" ? null : outletFilter;
+    const matchesOutlet = !targetOutlet || (ord.outletId || "bandra-west") === targetOutlet;
+
+    // Date Filter
+    let matchesDate = true;
+    const orderDate = ord.date || todayStr;
+
+    if (dateFilterMode === "today") {
+      matchesDate = orderDate === todayStr;
+    } else if (dateFilterMode === "yesterday") {
+      matchesDate = orderDate === yesterdayStr;
+    } else if (dateFilterMode === "custom") {
+      matchesDate = orderDate === customDate;
+    } else if (dateFilterMode === "7days") {
+      // Any date within last 7 days
+      matchesDate = true;
+    } else if (dateFilterMode === "all") {
+      matchesDate = true;
+    }
+
+    return matchesSearch && matchesChannel && matchesPayment && matchesOutlet && matchesDate;
   });
 
+  // Calculate Metrics for Current Filter
   const totalSales = filteredOrders.reduce((sum, o) => sum + o.totalAmount, 0);
+  const cashSales = filteredOrders
+    .filter((o) => o.paymentMethod === "Cash")
+    .reduce((sum, o) => sum + o.totalAmount, 0);
+  const digitalSales = filteredOrders
+    .filter((o) => o.paymentMethod === "GPay / UPI" || o.paymentMethod === "Card / POS")
+    .reduce((sum, o) => sum + o.totalAmount, 0);
 
   const handlePrint = () => {
     if (typeof window !== "undefined") {
@@ -54,32 +96,109 @@ export default function PosOrderHistoryPage() {
 
   return (
     <div className="space-y-5">
-      {/* Top Header & Fast Register Summary */}
-      <div className="p-5 rounded-3xl bg-[#1a1a1c] border border-[#2e2e30] flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-sm">
-        <div>
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-xl bg-orange-500/20 border border-orange-500/40 flex items-center justify-center text-orange-400">
-              <Receipt className="w-4 h-4" />
+      {/* ── TOP HEADER & SUMMARY METRICS ─────────────────────────────────── */}
+      <div className="p-5 sm:p-6 rounded-3xl bg-[#1a1a1c] border border-[#2e2e30] space-y-4 shadow-sm">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div>
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 rounded-xl bg-orange-500/20 border border-orange-500/40 flex items-center justify-center text-orange-400">
+                <Receipt className="w-4 h-4" />
+              </div>
+              <span className="text-xs font-black text-orange-400 uppercase tracking-wider">
+                Orders & Receipts Audit
+              </span>
             </div>
-            <span className="text-xs font-black text-orange-400 uppercase tracking-wider">
-              Orders & Receipts Ledger
-            </span>
+            <h1 className="text-2xl font-black text-white tracking-tight mt-1">
+              Historical Orders & Thermal Receipts
+            </h1>
+            <p className="text-xs text-zinc-400 mt-0.5">
+              Select any past day, branch account, or payment tender to audit records and reprint bills.
+            </p>
           </div>
-          <h1 className="text-2xl font-black text-white tracking-tight mt-1">
-            Live Tickets, Cash Ledger & Reprints
-          </h1>
-          <p className="text-xs text-zinc-400 mt-0.5">
-            {activeOutlet?.name || "Bandra West Flagship"} · Real-time tickets recorded today
-          </p>
+
+          {/* Quick Metrics Cards */}
+          <div className="grid grid-cols-3 gap-2.5">
+            <div className="p-3 rounded-2xl bg-[#141416] border border-[#303030] min-w-[110px]">
+              <span className="text-[10px] text-zinc-400 font-bold uppercase tracking-wider block">Total Orders</span>
+              <span className="font-mono text-lg font-black text-white">{filteredOrders.length}</span>
+            </div>
+            <div className="p-3 rounded-2xl bg-[#141416] border border-[#303030] min-w-[110px]">
+              <span className="text-[10px] text-zinc-400 font-bold uppercase tracking-wider block">Revenue</span>
+              <span className="font-mono text-lg font-black text-orange-400">₹{totalSales.toLocaleString("en-IN")}</span>
+            </div>
+            <div className="p-3 rounded-2xl bg-[#141416] border border-[#303030] min-w-[110px]">
+              <span className="text-[10px] text-emerald-400 font-bold uppercase tracking-wider block">Cash Collected</span>
+              <span className="font-mono text-lg font-black text-emerald-400">₹{cashSales.toLocaleString("en-IN")}</span>
+            </div>
+          </div>
         </div>
 
-        {/* Live Filter Bar */}
-        <div className="flex flex-wrap items-center gap-2.5">
-          <div className="relative w-full sm:w-64">
+        {/* ── DATE SELECTOR & PRESETS BAR ─────────────────────────────────── */}
+        <div className="pt-3 border-t border-[#2a2a2c] flex flex-wrap items-center justify-between gap-3">
+          {/* Date Range Preset Buttons */}
+          <div className="flex flex-wrap items-center gap-1.5 bg-[#141416] p-1.5 rounded-2xl border border-[#303030]">
+            {[
+              { id: "today", label: "Today (26 Aug)" },
+              { id: "yesterday", label: "Yesterday (25 Aug)" },
+              { id: "7days", label: "Last 7 Days" },
+              { id: "all", label: "All Records" },
+              { id: "custom", label: "Custom Date" },
+            ].map((preset) => (
+              <button
+                key={preset.id}
+                type="button"
+                onClick={() => setDateFilterMode(preset.id as any)}
+                className={cn(
+                  "px-3 py-1.5 rounded-xl text-xs font-black transition-all cursor-pointer",
+                  dateFilterMode === preset.id
+                    ? "bg-orange-600 text-white shadow-md shadow-orange-600/30"
+                    : "text-zinc-400 hover:text-white hover:bg-[#202024]"
+                )}
+              >
+                {preset.label}
+              </button>
+            ))}
+          </div>
+
+          {/* Custom Date Input Picker (Shown when 'custom' is active) */}
+          {dateFilterMode === "custom" && (
+            <div className="flex items-center gap-2 bg-[#141416] px-3 py-1.5 rounded-2xl border border-orange-500/50">
+              <Calendar className="w-4 h-4 text-orange-400" />
+              <input
+                type="date"
+                value={customDate}
+                onChange={(e) => setCustomDate(e.target.value)}
+                className="bg-transparent text-xs font-bold text-white font-mono focus:outline-none cursor-pointer"
+              />
+            </div>
+          )}
+
+          {/* Account / Outlet Selector */}
+          <div className="flex items-center gap-2">
+            <Store className="w-4 h-4 text-zinc-400" />
+            <select
+              value={outletFilter}
+              onChange={(e) => setOutletFilter(e.target.value)}
+              className="h-9 px-3 rounded-xl bg-[#141416] border border-[#383838] text-xs text-zinc-200 font-bold focus:outline-none focus:border-orange-500 cursor-pointer"
+            >
+              <option value="all">All Outlets / Accounts</option>
+              {outlets.map((out) => (
+                <option key={out.id} value={out.id}>
+                  {out.name} ({out.code})
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
+
+        {/* ── SECONDARY FILTERS: Search, Channel & Payment ──────────────── */}
+        <div className="flex flex-wrap items-center gap-2.5 pt-1">
+          {/* Search Box */}
+          <div className="relative flex-1 min-w-[220px]">
             <Search className="w-4 h-4 text-zinc-400 absolute left-3 top-1/2 -translate-y-1/2" />
             <input
               type="text"
-              placeholder="Search #IK-xxxx, customer, shawarma..."
+              placeholder="Search #IK-xxxx, customer, item..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               className="w-full h-10 pl-9 pr-3 rounded-2xl bg-[#141416] border border-[#383838] text-xs text-white placeholder-zinc-500 focus:outline-none focus:border-orange-500 font-medium transition-colors"
@@ -95,23 +214,25 @@ export default function PosOrderHistoryPage() {
             )}
           </div>
 
+          {/* Channel Dropdown */}
           <select
             value={channelFilter}
             onChange={(e) => setChannelFilter(e.target.value)}
             className="h-10 px-3 rounded-2xl bg-[#141416] border border-[#383838] text-xs text-zinc-200 font-bold focus:outline-none focus:border-orange-500 cursor-pointer"
           >
-            <option value="all">All Channels</option>
+            <option value="all">All Order Channels</option>
             <option value="Walk-in Counter">Walk-in Counter</option>
             <option value="Zomato">Zomato</option>
             <option value="Swiggy">Swiggy</option>
           </select>
 
+          {/* Payment Method Dropdown */}
           <select
             value={paymentFilter}
             onChange={(e) => setPaymentFilter(e.target.value)}
             className="h-10 px-3 rounded-2xl bg-[#141416] border border-[#383838] text-xs text-zinc-200 font-bold focus:outline-none focus:border-orange-500 cursor-pointer"
           >
-            <option value="all">All Payments</option>
+            <option value="all">All Payment Methods</option>
             <option value="Cash">Cash</option>
             <option value="GPay / UPI">GPay / UPI</option>
             <option value="Card / POS">Card POS</option>
@@ -120,11 +241,20 @@ export default function PosOrderHistoryPage() {
         </div>
       </div>
 
-      {/* Large Visible Orders Table */}
+      {/* ── ORDERS & RECEIPTS TABLE ───────────────────────────────────────── */}
       <div className="rounded-3xl bg-[#1a1a1c] border border-[#2e2e30] overflow-hidden shadow-sm">
         <div className="p-4 border-b border-[#27272a] bg-[#161618] flex items-center justify-between text-xs">
           <span className="font-bold text-zinc-300">
-            Showing <strong className="text-orange-400 font-mono">{filteredOrders.length}</strong> Punched Orders
+            Showing <strong className="text-orange-400 font-mono">{filteredOrders.length}</strong> Orders for Date:{" "}
+            <span className="text-white font-mono uppercase font-black">
+              {dateFilterMode === "today"
+                ? todayStr
+                : dateFilterMode === "yesterday"
+                ? yesterdayStr
+                : dateFilterMode === "custom"
+                ? customDate
+                : "Multiple Days"}
+            </span>
           </span>
           <span className="font-mono font-bold text-zinc-300">
             Filtered Total: <strong className="text-emerald-400 text-sm">₹{totalSales.toLocaleString("en-IN")}</strong>
@@ -135,8 +265,8 @@ export default function PosOrderHistoryPage() {
           <table className="w-full text-left border-collapse">
             <thead>
               <tr className="border-b border-[#27272a] bg-[#141416] text-zinc-400 font-black uppercase tracking-wider text-[11px]">
-                <th className="py-4 px-5">Order # & Timestamp</th>
-                <th className="py-4 px-5">Customer & Channel</th>
+                <th className="py-4 px-5">Order # & Date</th>
+                <th className="py-4 px-5">Customer & Branch</th>
                 <th className="py-4 px-5">Items Punched</th>
                 <th className="py-4 px-5">Payment Method</th>
                 <th className="py-4 px-5 text-right">Bill Total</th>
@@ -146,42 +276,52 @@ export default function PosOrderHistoryPage() {
             <tbody className="divide-y divide-[#27272a] text-xs">
               {filteredOrders.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="py-12 text-center text-zinc-500 font-medium">
-                    No orders matching the current filter.
+                  <td colSpan={6} className="py-16 text-center text-zinc-500 font-medium">
+                    <Receipt className="w-10 h-10 mx-auto text-zinc-600 mb-2 opacity-50" />
+                    <p className="text-sm font-bold text-zinc-400">No orders found for the selected date & criteria</p>
+                    <p className="text-xs text-zinc-600 mt-1">Try selecting a different date preset or clearing filters.</p>
                   </td>
                 </tr>
               ) : (
                 filteredOrders.map((ord) => (
                   <tr key={ord.id} className="hover:bg-[#202024] transition-colors">
-                    {/* Order ID & Time */}
+                    {/* Order ID & Date/Time */}
                     <td className="py-4 px-5 align-top">
                       <span className="font-mono text-sm font-black text-orange-400 block tracking-tight">
                         {ord.orderNumber}
                       </span>
-                      <div className="flex items-center gap-1 text-[11px] text-zinc-400 mt-1 font-medium">
+                      <div className="flex items-center gap-1.5 text-[11px] text-zinc-400 mt-1 font-mono">
+                        <Calendar className="w-3 h-3 text-zinc-500" />
+                        <span>{ord.date || todayStr}</span>
+                        <span className="text-zinc-600">·</span>
                         <Clock className="w-3 h-3 text-zinc-500" />
                         <span>{ord.time}</span>
                       </div>
                     </td>
 
-                    {/* Customer & Channel */}
+                    {/* Customer & Branch */}
                     <td className="py-4 px-5 align-top space-y-1.5">
                       <div className="flex items-center gap-1.5 text-zinc-200 font-bold text-xs">
                         <User className="w-3.5 h-3.5 text-zinc-500" />
                         <span>{ord.customerName || "Counter Customer"}</span>
                       </div>
-                      <span
-                        className={cn(
-                          "inline-block px-2.5 py-0.5 rounded-lg text-[10px] font-black uppercase tracking-wider border",
-                          ord.channel === "Walk-in Counter"
-                            ? "bg-amber-500/15 text-amber-400 border-amber-500/30"
-                            : ord.channel === "Zomato"
-                            ? "bg-rose-500/15 text-rose-400 border-rose-500/30"
-                            : "bg-orange-500/15 text-orange-400 border-orange-500/30"
-                        )}
-                      >
-                        {ord.channel}
-                      </span>
+                      <div className="flex items-center gap-1.5 flex-wrap">
+                        <span
+                          className={cn(
+                            "inline-block px-2 py-0.5 rounded-lg text-[10px] font-black uppercase tracking-wider border",
+                            ord.channel === "Walk-in Counter"
+                              ? "bg-amber-500/15 text-amber-400 border-amber-500/30"
+                              : ord.channel === "Zomato"
+                              ? "bg-rose-500/15 text-rose-400 border-rose-500/30"
+                              : "bg-orange-500/15 text-orange-400 border-orange-500/30"
+                          )}
+                        >
+                          {ord.channel}
+                        </span>
+                        <span className="text-[10px] text-zinc-500 font-mono">
+                          {outlets.find((o) => o.id === ord.outletId)?.name || "Bandra West"}
+                        </span>
+                      </div>
                     </td>
 
                     {/* Items Punched (Large & Clear) */}
@@ -263,7 +403,9 @@ export default function PosOrderHistoryPage() {
               {/* Receipt Brand Header */}
               <div className="text-center space-y-1 pb-3 border-b border-dashed border-zinc-700">
                 <h3 className="text-base font-black text-orange-400">IRANI KOYLA SHAWARMA</h3>
-                <p className="text-[11px] font-bold text-zinc-300">{activeOutlet?.name || "Bandra West Flagship"}</p>
+                <p className="text-[11px] font-bold text-zinc-300">
+                  {outlets.find((o) => o.id === selectedReceipt.outletId)?.name || "Bandra West Flagship"}
+                </p>
                 <p className="text-[10px] text-zinc-500">Shop 1-2, Mohak City Plaza, Central Spine</p>
                 <p className="text-[10px] text-zinc-500">GSTIN: 27AABCI4920F1ZV | FSSAI: 11524008000492</p>
               </div>
@@ -275,7 +417,7 @@ export default function PosOrderHistoryPage() {
                   <span className="text-zinc-400">Cust: {selectedReceipt.customerName}</span>
                 </div>
                 <div className="text-right">
-                  <span className="block">{new Date().toLocaleDateString("en-IN")}</span>
+                  <span className="block">{selectedReceipt.date || todayStr}</span>
                   <span className="text-zinc-400">{selectedReceipt.time}</span>
                 </div>
               </div>
