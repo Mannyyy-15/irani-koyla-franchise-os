@@ -5,7 +5,7 @@ export interface Outlet {
   city: string;
   area: string;
   address: string;
-  status: "active" | "onboarding" | "suspended";
+  status: "active" | "onboarding" | "suspended" | "terminated";
   dailyTargetSales: number;
   dailyTargetWraps: number;
   currentDaySales: number;

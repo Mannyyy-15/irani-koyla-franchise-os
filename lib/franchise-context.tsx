@@ -137,6 +137,9 @@ interface FranchiseContextType {
   updateRoyaltyStatus: (id: string, status: RoyaltyStatement["status"], disputeReason?: string) => void;
   updateCompliance: (data: Omit<ComplianceChecklist, "id" | "date" | "overallScore" | "status">) => void;
   addOutlet: (outlet: Omit<Outlet, "id" | "code" | "currentDaySales" | "currentDayWraps" | "spitEfficiency">) => void;
+  updateOutlet: (id: string, updates: Partial<Outlet>) => void;
+  deleteOutlet: (id: string) => void;
+  terminateOutlet: (id: string, reason?: string) => void;
   addLiveOrder: (order: Omit<LiveOrder, "id" | "time" | "orderNumber" | "date"> & { date?: string }) => void;
   addPettyCashExpense: (expense: Omit<PettyCashExpense, "id" | "timestamp">) => void;
   performSafeDrop: (drop: Omit<SafeDrop, "id" | "timestamp">) => void;
@@ -513,6 +516,77 @@ export function FranchiseProvider({ children }: { children: React.ReactNode }) {
         magicToken: magicLoginToken,
       }]));
     } catch {}
+  };
+
+  const updateOutlet = (id: string, updates: Partial<Outlet>) => {
+    const target = outlets.find((o) => o.id === id);
+    const updatedOutlets = outlets.map((o) => (o.id === id ? { ...o, ...updates } : o));
+
+    const logEntry: AuditLog = {
+      id: `audit-${Date.now()}`,
+      timestamp: new Date().toISOString().replace("T", " ").substring(0, 19),
+      outletName: target?.name || "Franchise Outlet",
+      user: "HQ Central",
+      role: "Super Admin",
+      action: `Updated Outlet Profile [${target?.code || id}]`,
+      module: "Operations",
+      severity: "info",
+      details: `Profile and commercial configurations modified by Super Admin.`,
+    };
+
+    const updatedLogs = [logEntry, ...auditLogs];
+    setOutlets(updatedOutlets);
+    setAuditLogs(updatedLogs);
+    saveState({ outlets: updatedOutlets, auditLogs: updatedLogs });
+  };
+
+  const terminateOutlet = (id: string, reason?: string) => {
+    const target = outlets.find((o) => o.id === id);
+    const updatedOutlets = outlets.map((o) =>
+      o.id === id ? { ...o, status: "terminated" as const } : o
+    );
+
+    const logEntry: AuditLog = {
+      id: `audit-${Date.now()}`,
+      timestamp: new Date().toISOString().replace("T", " ").substring(0, 19),
+      outletName: target?.name || "Franchise Outlet",
+      user: "HQ Central",
+      role: "Super Admin",
+      action: `Terminated Franchise Agreement [${target?.code || id}]`,
+      module: "Operations",
+      severity: "critical",
+      details: `Outlet agreement terminated. Reason: ${reason || "HQ Administrative Termination"}. POS login revoked.`,
+    };
+
+    const updatedLogs = [logEntry, ...auditLogs];
+    setOutlets(updatedOutlets);
+    setAuditLogs(updatedLogs);
+    saveState({ outlets: updatedOutlets, auditLogs: updatedLogs });
+  };
+
+  const deleteOutlet = (id: string) => {
+    const target = outlets.find((o) => o.id === id);
+    const updatedOutlets = outlets.filter((o) => o.id !== id);
+
+    const logEntry: AuditLog = {
+      id: `audit-${Date.now()}`,
+      timestamp: new Date().toISOString().replace("T", " ").substring(0, 19),
+      outletName: target?.name || "Franchise Outlet",
+      user: "HQ Central",
+      role: "Super Admin",
+      action: `Deleted Franchise Outlet Record [${target?.code || id}]`,
+      module: "Operations",
+      severity: "warning",
+      details: `Permanently removed ${target?.name} from active network register.`,
+    };
+
+    const updatedLogs = [logEntry, ...auditLogs];
+    setOutlets(updatedOutlets);
+    setAuditLogs(updatedLogs);
+    if (selectedOutletId === id) {
+      setSelectedOutletId(updatedOutlets[0]?.id || "all");
+    }
+    saveState({ outlets: updatedOutlets, auditLogs: updatedLogs });
   };
 
   const addLiveOrder = (orderData: Omit<LiveOrder, "id" | "time" | "orderNumber" | "date"> & { date?: string }) => {
@@ -1080,6 +1154,9 @@ export function FranchiseProvider({ children }: { children: React.ReactNode }) {
         updateRoyaltyStatus,
         updateCompliance,
         addOutlet,
+        updateOutlet,
+        deleteOutlet,
+        terminateOutlet,
         addLiveOrder,
         addPettyCashExpense,
         performSafeDrop,

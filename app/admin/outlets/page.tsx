@@ -38,6 +38,11 @@ import {
   Send,
   Lock,
   Compass,
+  Edit3,
+  Trash2,
+  Ban,
+  Power,
+  Settings,
 } from "lucide-react";
 import { useFranchise } from "@/lib/franchise-context";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
@@ -47,7 +52,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { cn } from "@/components/ui/cn";
 
 export default function OutletsPage() {
-  const { outlets, addOutlet, role, activeOutlet, setSelectedOutletId, shifts, royalties, complianceList, meatBatches, dispatchShipment } = useFranchise();
+  const { outlets, addOutlet, updateOutlet, deleteOutlet, terminateOutlet, role, activeOutlet, setSelectedOutletId, shifts, royalties, complianceList, meatBatches, dispatchShipment } = useFranchise();
   const isSuperAdmin = role === "SUPER_ADMIN";
 
   const [searchQuery, setSearchQuery] = useState("");
@@ -65,6 +70,100 @@ export default function OutletsPage() {
 
   // Success Provisioning Modal
   const [createdOutletResult, setCreatedOutletResult] = useState<any | null>(null);
+
+  // Edit Outlet State
+  const [editingOutlet, setEditingOutlet] = useState<typeof outlets[0] | null>(null);
+  const [editName, setEditName] = useState("");
+  const [editCity, setEditCity] = useState("Mumbai");
+  const [editArea, setEditArea] = useState("");
+  const [editAddress, setEditAddress] = useState("");
+  const [editOwnerName, setEditOwnerName] = useState("");
+  const [editOwnerPhone, setEditOwnerPhone] = useState("");
+  const [editLoginPassword, setEditLoginPassword] = useState("");
+  const [editTargetSales, setEditTargetSales] = useState("60000");
+  const [editActiveSpits, setEditActiveSpits] = useState("2");
+  const [editRoyaltyRate, setEditRoyaltyRate] = useState("6.5");
+  const [editMarketingRate, setEditMarketingRate] = useState("2.0");
+  const [editStatus, setEditStatus] = useState<"active" | "onboarding" | "suspended" | "terminated">("active");
+
+  // Terminate & Delete Modals State
+  const [terminatingOutlet, setTerminatingOutlet] = useState<typeof outlets[0] | null>(null);
+  const [terminationReason, setTerminationReason] = useState("Franchise Agreement Renewal Period Ended");
+  const [deletingOutlet, setDeletingOutlet] = useState<typeof outlets[0] | null>(null);
+
+  const openEditModal = (outlet: typeof outlets[0]) => {
+    setEditingOutlet(outlet);
+    setEditName(outlet.name);
+    setEditCity(outlet.city);
+    setEditArea(outlet.area);
+    setEditAddress(outlet.address || "");
+    setEditOwnerName(outlet.ownerName);
+    setEditOwnerPhone(outlet.ownerPhone);
+    setEditLoginPassword(outlet.loginPassword || "");
+    setEditTargetSales(String(outlet.dailyTargetSales || 60000));
+    setEditActiveSpits(String(outlet.activeSpits || 2));
+    setEditRoyaltyRate(String(outlet.royaltyRatePercent || 6.5));
+    setEditMarketingRate(String(outlet.marketingFeePercent || 2.0));
+    setEditStatus(outlet.status);
+  };
+
+  const handleSaveEdit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingOutlet) return;
+
+    updateOutlet(editingOutlet.id, {
+      name: editName,
+      city: editCity,
+      area: editArea,
+      address: editAddress,
+      ownerName: editOwnerName,
+      ownerPhone: editOwnerPhone,
+      loginPassword: editLoginPassword,
+      dailyTargetSales: parseFloat(editTargetSales) || 60000,
+      activeSpits: parseInt(editActiveSpits) || 2,
+      royaltyRatePercent: parseFloat(editRoyaltyRate) || 6.5,
+      marketingFeePercent: parseFloat(editMarketingRate) || 2.0,
+      status: editStatus,
+    });
+
+    if (selectedDossierOutlet?.id === editingOutlet.id) {
+      setSelectedDossierOutlet((prev) => prev ? {
+        ...prev,
+        name: editName,
+        city: editCity,
+        area: editArea,
+        address: editAddress,
+        ownerName: editOwnerName,
+        ownerPhone: editOwnerPhone,
+        loginPassword: editLoginPassword,
+        dailyTargetSales: parseFloat(editTargetSales) || 60000,
+        activeSpits: parseInt(editActiveSpits) || 2,
+        royaltyRatePercent: parseFloat(editRoyaltyRate) || 6.5,
+        marketingFeePercent: parseFloat(editMarketingRate) || 2.0,
+        status: editStatus,
+      } : null);
+    }
+
+    setEditingOutlet(null);
+  };
+
+  const handleConfirmTerminate = () => {
+    if (!terminatingOutlet) return;
+    terminateOutlet(terminatingOutlet.id, terminationReason);
+    if (selectedDossierOutlet?.id === terminatingOutlet.id) {
+      setSelectedDossierOutlet((prev) => prev ? { ...prev, status: "terminated" } : null);
+    }
+    setTerminatingOutlet(null);
+  };
+
+  const handleConfirmDelete = () => {
+    if (!deletingOutlet) return;
+    deleteOutlet(deletingOutlet.id);
+    if (selectedDossierOutlet?.id === deletingOutlet.id) {
+      setSelectedDossierOutlet(null);
+    }
+    setDeletingOutlet(null);
+  };
 
   // Form states (5-Step Onboarding)
   const [name, setName] = useState("");
@@ -630,6 +729,26 @@ For central commissary refills or support, contact HQ Operations.
                 <Button
                   type="button"
                   variant="outline"
+                  onClick={() => openEditModal(outlet)}
+                  className="h-10 px-3 rounded-xl border-[#383838] bg-[#161618] text-xs font-bold text-zinc-300 hover:text-white hover:border-orange-500 cursor-pointer"
+                  title="Edit Franchise Profile"
+                >
+                  <Edit3 className="w-3.5 h-3.5 text-zinc-300" />
+                </Button>
+
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setDeletingOutlet(outlet)}
+                  className="h-10 px-3 rounded-xl border-[#383838] bg-[#161618] text-xs font-bold text-rose-400 hover:bg-rose-500/10 hover:border-rose-500 cursor-pointer"
+                  title="Delete Franchise Outlet Record"
+                >
+                  <Trash2 className="w-3.5 h-3.5" />
+                </Button>
+
+                <Button
+                  type="button"
+                  variant="outline"
                   onClick={() => copyWhatsAppPack(outlet)}
                   className="h-10 px-3 rounded-xl border-[#383838] bg-[#161618] text-xs font-bold text-emerald-400 hover:bg-emerald-500/10 hover:border-emerald-500 cursor-pointer"
                   title="Copy WhatsApp Access Pack"
@@ -1083,17 +1202,277 @@ For central commissary refills or support, contact HQ Operations.
                     </Button>
 
                     <Button
-                      onClick={() => handleQuickDispatchCone(selectedDossierOutlet)}
+                      onClick={() => openEditModal(selectedDossierOutlet)}
                       variant="outline"
-                      className="w-full border-emerald-500/40 bg-emerald-500/10 text-emerald-300 font-bold text-xs h-11 rounded-xl gap-2 hover:bg-emerald-500/20"
+                      className="w-full border-[#383838] bg-[#1a1a1c] text-white font-bold text-xs h-11 rounded-xl gap-2 hover:border-orange-500"
                     >
-                      <Truck className="w-4 h-4" />
-                      <span>Dispatch Emergency Meat Cones</span>
+                      <Edit3 className="w-4 h-4 text-orange-400" />
+                      <span>Edit Franchise Commercials & Info</span>
+                    </Button>
+
+                    <Button
+                      onClick={() => setTerminatingOutlet(selectedDossierOutlet)}
+                      variant="outline"
+                      className="w-full border-amber-500/40 bg-amber-500/10 text-amber-300 font-bold text-xs h-11 rounded-xl gap-2 hover:bg-amber-500/20"
+                    >
+                      <Ban className="w-4 h-4" />
+                      <span>Suspend / Terminate Franchise Agreement</span>
+                    </Button>
+
+                    <Button
+                      onClick={() => setDeletingOutlet(selectedDossierOutlet)}
+                      variant="outline"
+                      className="w-full border-rose-500/40 bg-rose-500/10 text-rose-300 font-bold text-xs h-11 rounded-xl gap-2 hover:bg-rose-500/20"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                      <span>Permanently Delete Outlet Record</span>
                     </Button>
                   </div>
                 </div>
               </div>
             )}
+          </DialogContent>
+        </Dialog>
+      )}
+
+      {/* ── EDIT FRANCHISE OUTLET MODAL ──────────────────────────────────── */}
+      {editingOutlet && (
+        <Dialog open={true} onOpenChange={() => setEditingOutlet(null)}>
+          <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto bg-[#1a1a1c] border border-[#303030] text-white p-6 rounded-3xl">
+            <DialogHeader className="border-b border-[#303030] pb-3">
+              <div className="flex items-center justify-between">
+                <DialogTitle className="text-lg font-black text-white flex items-center gap-2">
+                  <Edit3 className="w-5 h-5 text-orange-500" />
+                  <span>Edit Franchise Hub: {editingOutlet.name}</span>
+                </DialogTitle>
+                <span className="text-xs font-mono font-bold bg-[#242427] text-orange-400 px-2.5 py-1 rounded-lg border border-[#383838]">
+                  {editingOutlet.code}
+                </span>
+              </div>
+            </DialogHeader>
+
+            <form onSubmit={handleSaveEdit} className="space-y-4 pt-2">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="text-xs font-bold text-zinc-300 block mb-1">Outlet Display Name</label>
+                  <input
+                    type="text"
+                    required
+                    value={editName}
+                    onChange={(e) => setEditName(e.target.value)}
+                    className="w-full h-10 px-3 rounded-xl bg-[#141416] border border-[#303030] text-sm text-white focus:border-orange-500 font-semibold"
+                  />
+                </div>
+
+                <div>
+                  <label className="text-xs font-bold text-zinc-300 block mb-1">City</label>
+                  <input
+                    type="text"
+                    required
+                    value={editCity}
+                    onChange={(e) => setEditCity(e.target.value)}
+                    className="w-full h-10 px-3 rounded-xl bg-[#141416] border border-[#303030] text-sm text-white focus:border-orange-500 font-semibold"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="text-xs font-bold text-zinc-300 block mb-1">Neighborhood / Area</label>
+                  <input
+                    type="text"
+                    required
+                    value={editArea}
+                    onChange={(e) => setEditArea(e.target.value)}
+                    className="w-full h-10 px-3 rounded-xl bg-[#141416] border border-[#303030] text-sm text-white focus:border-orange-500 font-semibold"
+                  />
+                </div>
+
+                <div>
+                  <label className="text-xs font-bold text-zinc-300 block mb-1">Agreement Status</label>
+                  <select
+                    value={editStatus}
+                    onChange={(e) => setEditStatus(e.target.value as any)}
+                    className="w-full h-10 px-3 rounded-xl bg-[#141416] border border-[#303030] text-sm text-white focus:border-orange-500 font-semibold cursor-pointer"
+                  >
+                    <option value="active">Active & Live</option>
+                    <option value="onboarding">Onboarding / Pre-Launch</option>
+                    <option value="suspended">Suspended</option>
+                    <option value="terminated">Terminated</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="text-xs font-bold text-zinc-300 block mb-1">Franchise Partner Name</label>
+                  <input
+                    type="text"
+                    required
+                    value={editOwnerName}
+                    onChange={(e) => setEditOwnerName(e.target.value)}
+                    className="w-full h-10 px-3 rounded-xl bg-[#141416] border border-[#303030] text-sm text-white focus:border-orange-500"
+                  />
+                </div>
+
+                <div>
+                  <label className="text-xs font-bold text-zinc-300 block mb-1">Contact Phone</label>
+                  <input
+                    type="tel"
+                    required
+                    value={editOwnerPhone}
+                    onChange={(e) => setEditOwnerPhone(e.target.value)}
+                    className="w-full h-10 px-3 rounded-xl bg-[#141416] border border-[#303030] text-sm font-mono text-white focus:border-orange-500"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div>
+                  <label className="text-xs font-bold text-zinc-300 block mb-1">Daily Sales Target (₹)</label>
+                  <input
+                    type="number"
+                    value={editTargetSales}
+                    onChange={(e) => setEditTargetSales(e.target.value)}
+                    className="w-full h-10 px-3 rounded-xl bg-[#141416] border border-[#303030] text-sm font-mono font-bold text-emerald-400 focus:border-orange-500"
+                  />
+                </div>
+
+                <div>
+                  <label className="text-xs font-bold text-zinc-300 block mb-1">Active Spits</label>
+                  <input
+                    type="number"
+                    value={editActiveSpits}
+                    onChange={(e) => setEditActiveSpits(e.target.value)}
+                    className="w-full h-10 px-3 rounded-xl bg-[#141416] border border-[#303030] text-sm font-mono font-bold text-orange-400 focus:border-orange-500"
+                  />
+                </div>
+
+                <div>
+                  <label className="text-xs font-bold text-zinc-300 block mb-1">Royalty Rate (%)</label>
+                  <input
+                    type="number"
+                    step="0.1"
+                    value={editRoyaltyRate}
+                    onChange={(e) => setEditRoyaltyRate(e.target.value)}
+                    className="w-full h-10 px-3 rounded-xl bg-[#141416] border border-[#303030] text-sm font-mono font-bold text-amber-400 focus:border-orange-500"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="text-xs font-bold text-zinc-300 block mb-1">Portal Login Password</label>
+                <input
+                  type="text"
+                  value={editLoginPassword}
+                  onChange={(e) => setEditLoginPassword(e.target.value)}
+                  className="w-full h-10 px-3 rounded-xl bg-[#141416] border border-[#303030] text-sm font-mono text-amber-400 focus:border-orange-500"
+                />
+              </div>
+
+              <div className="flex justify-end gap-2 pt-3 border-t border-[#303030]">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setEditingOutlet(null)}
+                  className="bg-[#141416] border-[#303030] text-zinc-300 hover:text-white text-xs font-bold h-10 px-4 rounded-xl cursor-pointer"
+                >
+                  Cancel
+                </Button>
+                <Button
+                  type="submit"
+                  className="bg-orange-600 hover:bg-orange-500 text-white font-black text-xs uppercase tracking-wider h-10 px-5 rounded-xl cursor-pointer"
+                >
+                  Save Changes
+                </Button>
+              </div>
+            </form>
+          </DialogContent>
+        </Dialog>
+      )}
+
+      {/* ── TERMINATE AGREEMENT MODAL ─────────────────────────────────────── */}
+      {terminatingOutlet && (
+        <Dialog open={true} onOpenChange={() => setTerminatingOutlet(null)}>
+          <DialogContent className="max-w-md bg-[#1a1a1c] border border-amber-500/40 text-white p-6 rounded-3xl space-y-4">
+            <div className="w-12 h-12 rounded-2xl bg-amber-500/15 border border-amber-500/30 text-amber-400 flex items-center justify-center mx-auto">
+              <Ban className="w-6 h-6" />
+            </div>
+
+            <div className="text-center space-y-1">
+              <DialogTitle className="text-lg font-black text-white">
+                Terminate Franchise Agreement?
+              </DialogTitle>
+              <p className="text-xs text-zinc-400">
+                You are terminating the brand franchise contract for <strong>{terminatingOutlet.name}</strong> ({terminatingOutlet.code}).
+              </p>
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-xs font-bold text-zinc-300 block">Termination Reason / Audit Note</label>
+              <input
+                type="text"
+                value={terminationReason}
+                onChange={(e) => setTerminationReason(e.target.value)}
+                className="w-full h-10 px-3 rounded-xl bg-[#141416] border border-[#303030] text-xs text-white focus:border-amber-500"
+              />
+            </div>
+
+            <div className="flex items-center gap-2 pt-2">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setTerminatingOutlet(null)}
+                className="w-1/2 bg-[#141416] border-[#303030] text-zinc-300 text-xs font-bold h-10 rounded-xl"
+              >
+                Cancel
+              </Button>
+              <Button
+                type="button"
+                onClick={handleConfirmTerminate}
+                className="w-1/2 bg-amber-600 hover:bg-amber-500 text-white font-black text-xs uppercase tracking-wider h-10 rounded-xl"
+              >
+                Confirm Terminate
+              </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
+      )}
+
+      {/* ── DELETE CONFIRMATION MODAL ─────────────────────────────────────── */}
+      {deletingOutlet && (
+        <Dialog open={true} onOpenChange={() => setDeletingOutlet(null)}>
+          <DialogContent className="max-w-md bg-[#1a1a1c] border border-rose-500/40 text-white p-6 rounded-3xl space-y-4">
+            <div className="w-12 h-12 rounded-2xl bg-rose-500/15 border border-rose-500/30 text-rose-400 flex items-center justify-center mx-auto">
+              <Trash2 className="w-6 h-6" />
+            </div>
+
+            <div className="text-center space-y-1">
+              <DialogTitle className="text-lg font-black text-white">
+                Permanently Delete Franchise Outlet?
+              </DialogTitle>
+              <p className="text-xs text-zinc-400">
+                Are you sure you want to permanently delete <strong>{deletingOutlet.name}</strong> ({deletingOutlet.code})? This will remove the branch from all registers.
+              </p>
+            </div>
+
+            <div className="flex items-center gap-2 pt-2">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setDeletingOutlet(null)}
+                className="w-1/2 bg-[#141416] border-[#303030] text-zinc-300 text-xs font-bold h-10 rounded-xl"
+              >
+                Cancel
+              </Button>
+              <Button
+                type="button"
+                onClick={handleConfirmDelete}
+                className="w-1/2 bg-rose-600 hover:bg-rose-500 text-white font-black text-xs uppercase tracking-wider h-10 rounded-xl"
+              >
+                Delete Outlet
+              </Button>
+            </div>
           </DialogContent>
         </Dialog>
       )}
