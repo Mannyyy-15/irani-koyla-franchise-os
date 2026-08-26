@@ -145,6 +145,7 @@ export default function PosBillingTerminal() {
     id: m.id,
     name: m.name,
     category: m.category,
+    breadType: m.breadType,
     price: m.sellingPrice,
     meatWeight: m.meatWeight || (m.meatPortionGrams > 0 ? `${m.meatPortionGrams}g` : "N/A"),
     spit: m.spitType,
@@ -154,7 +155,7 @@ export default function PosBillingTerminal() {
     modifiers: m.modifiers || [],
   }));
 
-  const [activeCategory, setActiveCategory] = useState<string>("Most Ordered");
+  const [activeCategory, setActiveCategory] = useState<string>("All Items");
   const [searchTerm, setSearchTerm] = useState("");
   const [soundEnabled, setSoundEnabled] = useState<boolean>(true);
 
@@ -228,21 +229,26 @@ export default function PosBillingTerminal() {
   const [offlineQueuedToast, setOfflineQueuedToast] = useState(false);
 
   const categories = [
-    { name: "Most Ordered", icon: "⭐" },
     { name: "All Items", icon: "🔥" },
-    { name: "Shawarma Wraps", icon: "🌯" },
-    { name: "Combos & Meals", icon: "🍱" },
-    { name: "Platters & Dips", icon: "🍽️" },
+    { name: "Koyla Shawarma", icon: "🌯" },
+    { name: "Rumali Shawarma", icon: "🫓" },
+    { name: "Open Salad", icon: "🥗" },
+    { name: "Shawarma Platter", icon: "🍽️" },
     { name: "Irani Chai & Drinks", icon: "☕" },
-    { name: "Sides & Toum", icon: "🍟" },
   ];
 
   const filteredMenuItems = activePosItems.filter((item) => {
     let matchesCat = false;
     if (activeCategory === "All Items") {
       matchesCat = true;
-    } else if (activeCategory === "Most Ordered") {
-      matchesCat = ["pos-01", "pos-02", "pos-03", "pos-05", "pos-07"].includes(item.id) || item.popularRank <= 4;
+    } else if (activeCategory === "Koyla Shawarma") {
+      matchesCat = item.breadType === "Khubz (Lebanese)" && item.category === "Shawarma Wraps";
+    } else if (activeCategory === "Rumali Shawarma") {
+      matchesCat = item.breadType === "Rumali Roti" && item.category === "Shawarma Wraps";
+    } else if (activeCategory === "Open Salad") {
+      matchesCat = item.name.includes("Open Salad");
+    } else if (activeCategory === "Shawarma Platter") {
+      matchesCat = item.name.includes("Platter") || item.category === "Platters & Dips";
     } else {
       matchesCat = item.category === activeCategory;
     }
@@ -558,7 +564,10 @@ export default function PosBillingTerminal() {
               {categories.map((cat) => {
                 const count = activePosItems.filter((i) => {
                   if (cat.name === "All Items") return true;
-                  if (cat.name === "Most Ordered") return ["pos-01", "pos-02", "pos-03", "pos-05", "pos-07"].includes(i.id) || i.popularRank <= 4;
+                  if (cat.name === "Koyla Shawarma") return i.breadType === "Khubz (Lebanese)" && i.category === "Shawarma Wraps";
+                  if (cat.name === "Rumali Shawarma") return i.breadType === "Rumali Roti" && i.category === "Shawarma Wraps";
+                  if (cat.name === "Open Salad") return i.name.includes("Open Salad");
+                  if (cat.name === "Shawarma Platter") return i.name.includes("Platter") || i.category === "Platters & Dips";
                   return i.category === cat.name;
                 }).length;
                 const isActive = activeCategory === cat.name;
