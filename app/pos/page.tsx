@@ -206,6 +206,16 @@ export default function PosBillingTerminal() {
     categoryScrollRef.current.scrollLeft = scrollLeftPos - walk;
   };
 
+  // Keyboard Navigation & Fast Focus States
+  const searchInputRef = useRef<HTMLInputElement>(null);
+  const [focusedCardIndex, setFocusedCardIndex] = useState<number>(0);
+  const [instantPunchToast, setInstantPunchToast] = useState<{
+    show: boolean;
+    orderNumber: string;
+    amount: number;
+    paymentMethod: string;
+  } | null>(null);
+
   // Cart & Order State
   const [cart, setCart] = useState<CartItem[]>([]);
 
@@ -414,7 +424,24 @@ export default function PosBillingTerminal() {
       cashTendered: paymentMode === "Split Payment" ? splitCash : cashTendered,
       changeDue: paymentMode === "Split Payment" ? 0 : changeDue,
     });
-    setShowKotModal(true);
+
+    // Auto-trigger direct thermal receipt print without blocking cashier
+    if (typeof window !== "undefined") {
+      try {
+        window.print();
+      } catch {}
+    }
+
+    setInstantPunchToast({
+      show: true,
+      orderNumber: orderNum,
+      amount: grandTotal,
+      paymentMethod: paymentMode,
+    });
+    setTimeout(() => {
+      setInstantPunchToast(null);
+    }, 3500);
+
     setCart([]);
     setCustomerToken(`Counter Order #${Math.floor(10 + Math.random() * 80)}`);
   };
@@ -427,10 +454,21 @@ export default function PosBillingTerminal() {
     }
   };
 
-  // Global Keyboard Shortcuts (F1-F4, Enter, Esc, P)
+  // Global Keyboard Shortcuts (Tab to Search, Arrow Keys, Space/+, Enter, F1-F4, Esc)
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       const isInput = e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement;
+
+      // Tab Key: Instantly jump into search bar
+      if (e.key === "Tab") {
+        e.preventDefault();
+        if (searchInputRef.current) {
+          searchInputRef.current.focus();
+          searchInputRef.current.select();
+          playAudioEffect("tap", soundEnabled);
+        }
+        return;
+      }
 
       // Function Keys: F1 (Cash), F2 (UPI), F3 (Card), F4 (Split)
       if (e.key === "F1") {
@@ -458,8 +496,60 @@ export default function PosBillingTerminal() {
         return;
       }
 
-      // Escape: Close modals or clear cart
+      // Arrow Keys navigation over food items
+      if (["ArrowRight", "ArrowLeft", "ArrowDown", "ArrowUp"].includes(e.key)) {
+        if (!isInput || document.activeElement === searchInputRef.current) {
+          e.preventDefault();
+          if (document.activeElement === searchInputRef.current && (e.key === "ArrowDown" || e.key === "ArrowRight")) {
+            searchInputRef.current?.blur();
+          }
+          const totalItems = filteredMenuItems.length;
+          if (totalItems === 0) return;
+
+          setFocusedCardIndex((prev) => {
+            let nextIndex = prev;
+            if (e.key === "ArrowRight") {
+              nextIndex = (prev + 1) % totalItems;
+            } else if (e.key === "ArrowLeft") {
+              nextIndex = (prev - 1 + totalItems) % totalItems;
+            } else if (e.key === "ArrowDown") {
+              nextIndex = Math.min(totalItems - 1, prev + 4);
+            } else if (e.key === "ArrowUp") {
+              nextIndex = Math.max(0, prev - 4);
+            }
+            playAudioEffect("tap", soundEnabled);
+            return nextIndex;
+          });
+          return;
+        }
+      }
+
+      // Space or '+' key to add currently focused item to basket
+      if ((e.key === " " || e.key === "+") && !isInput) {
+        e.preventDefault();
+        const currentItem = filteredMenuItems[focusedCardIndex];
+        if (currentItem) {
+          addToCart(currentItem);
+        }
+        return;
+      }
+
+      // '-' key to remove/decrement currently focused item from basket
+      if (e.key === "-" && !isInput) {
+        e.preventDefault();
+        const currentItem = filteredMenuItems[focusedCardIndex];
+        if (currentItem) {
+          removeFromCart(currentItem.id);
+        }
+        return;
+      }
+
+      // Escape: Close modals or clear cart / blur search
       if (e.key === "Escape") {
+        if (document.activeElement === searchInputRef.current) {
+          searchInputRef.current?.blur();
+          return;
+        }
         if (showKotModal) {
           setShowKotModal(false);
           return;
@@ -489,14 +579,22 @@ export default function PosBillingTerminal() {
         return;
       }
 
-      // Enter: Instant Punch Order or Print Slip
+      // Enter: Instant Direct Punch Order and Auto Thermal Print
       if (e.key === "Enter") {
+        if (document.activeElement === searchInputRef.current) {
+          // Blur search and add the top matched item or focus grid
+          searchInputRef.current?.blur();
+          if (filteredMenuItems.length > 0 && cart.length === 0) {
+            addToCart(filteredMenuItems[0]);
+            return;
+          }
+        }
         if (showKotModal) {
           e.preventDefault();
           handleDirectPrint();
           return;
         }
-        if (!isInput && cart.length > 0) {
+        if (cart.length > 0) {
           e.preventDefault();
           handlePunchOrder();
           return;
@@ -506,10 +604,28 @@ export default function PosBillingTerminal() {
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [cart, paymentMode, showKotModal, showParkedModal, showUpiQrModal, parkedBills, soundEnabled, grandTotal, splitRemaining]);
+  }, [cart, paymentMode, showKotModal, showParkedModal, showUpiQrModal, parkedBills, soundEnabled, grandTotal, splitRemaining, filteredMenuItems, focusedCardIndex]);
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-12 gap-3 lg:gap-4 relative items-start pb-6" suppressHydrationWarning>
+      {/* Instant Direct Punch Success Floating Banner */}
+      {instantPunchToast && instantPunchToast.show && (
+        <div className="fixed top-20 left-1/2 -translate-x-1/2 z-50 p-4 px-6 rounded-2xl bg-[#1a1a1c] border border-emerald-500/60 text-white font-bold shadow-2xl flex items-center gap-3 animate-in fade-in slide-in-from-top-4 duration-200">
+          <div className="w-8 h-8 rounded-xl bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center text-emerald-400 shrink-0">
+            <CheckCircle2 className="w-5 h-5" />
+          </div>
+          <div>
+            <div className="flex items-center gap-2">
+              <span className="text-sm font-black text-emerald-400">Order {instantPunchToast.orderNumber} Punched!</span>
+              <span className="text-[10px] bg-emerald-500/20 text-emerald-300 px-1.5 py-0.5 rounded font-mono font-bold">
+                {instantPunchToast.paymentMethod} · ₹{instantPunchToast.amount}
+              </span>
+            </div>
+            <span className="text-[11px] text-zinc-300 block mt-0.5">Receipt automatically dispatched to thermal ESC/POS printer.</span>
+          </div>
+        </div>
+      )}
+
       {/* Offline Toast Notification */}
       {offlineQueuedToast && (
         <div className="fixed bottom-6 right-6 z-50 p-4 rounded-2xl bg-amber-950/90 border border-amber-500/50 text-amber-200 text-xs font-bold shadow-2xl flex items-center gap-3">
@@ -525,16 +641,17 @@ export default function PosBillingTerminal() {
       <div className="lg:col-span-7 xl:col-span-8 space-y-2.5 min-w-0">
         {/* Category Filters Bar & Fast Search + Sound & Hotkeys Bar */}
         <div className="flex flex-col sm:flex-row items-center gap-2.5">
-          <div className="relative w-full sm:w-60 xl:w-68 shrink-0">
+          <div className="relative w-full sm:w-64 xl:w-72 shrink-0">
             <Search className="w-4 h-4 text-zinc-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
             <input
+              ref={searchInputRef}
               type="text"
-              placeholder="Search shawarma, combo, chai…"
+              placeholder="Search or Press Tab..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full h-10 pl-9 pr-3 rounded-2xl bg-[#1f1f1f] border border-[#303030] text-xs sm:text-sm text-white placeholder-zinc-500 focus:outline-none focus:border-orange-500 transition-colors font-medium shadow-inner"
+              className="w-full h-10 pl-9 pr-12 rounded-2xl bg-[#1f1f1f] border border-[#303030] text-xs sm:text-sm text-white placeholder-zinc-500 focus:outline-none focus:border-orange-500 transition-colors font-medium shadow-inner"
             />
-            {searchTerm && (
+            {searchTerm ? (
               <button
                 type="button"
                 onClick={() => setSearchTerm("")}
@@ -542,6 +659,10 @@ export default function PosBillingTerminal() {
               >
                 <X className="w-3.5 h-3.5" />
               </button>
+            ) : (
+              <kbd className="hidden sm:inline-block absolute right-3 top-1/2 -translate-y-1/2 px-1.5 py-0.5 rounded bg-[#2a2a2e] text-[9px] text-zinc-400 font-mono border border-[#383838]">
+                Tab
+              </kbd>
             )}
           </div>
 
@@ -629,38 +750,54 @@ export default function PosBillingTerminal() {
         </div>
 
         {/* Fast Cashier Keyboard Hotkeys Bar */}
-        <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-xl bg-[#161618] border border-[#303030] text-[10px] font-mono text-zinc-400 justify-between select-none">
+        <div className="hidden sm:flex items-center gap-2 px-3 py-2 rounded-xl bg-[#161618] border border-[#303030] text-[10px] font-mono text-zinc-400 justify-between select-none shadow-sm">
           <div className="flex items-center gap-1.5 font-bold">
             <Keyboard className="w-3.5 h-3.5 text-orange-500" />
-            <span className="text-zinc-300 uppercase tracking-wider text-[9px]">Fast Register Hotkeys:</span>
+            <span className="text-zinc-300 uppercase tracking-wider text-[9px]">Cashier Hotkeys:</span>
           </div>
           <div className="flex items-center gap-2 flex-wrap text-[10px]">
-            <span className="bg-[#1f1f1f] px-1.5 py-0.5 rounded border border-[#383838] text-zinc-300"><strong className="text-orange-400">F1</strong> Cash</span>
-            <span className="bg-[#1f1f1f] px-1.5 py-0.5 rounded border border-[#383838] text-zinc-300"><strong className="text-orange-400">F2</strong> UPI</span>
-            <span className="bg-[#1f1f1f] px-1.5 py-0.5 rounded border border-[#383838] text-zinc-300"><strong className="text-orange-400">F3</strong> Card</span>
-            <span className="bg-[#1f1f1f] px-1.5 py-0.5 rounded border border-[#383838] text-zinc-300"><strong className="text-orange-400">F4</strong> Split</span>
-            <span className="bg-[#1f1f1f] px-1.5 py-0.5 rounded border border-[#383838] text-zinc-300"><strong className="text-emerald-400">Enter</strong> Punch/Print</span>
-            <span className="bg-[#1f1f1f] px-1.5 py-0.5 rounded border border-[#383838] text-zinc-300"><strong className="text-amber-400">P</strong> Park</span>
-            <span className="bg-[#1f1f1f] px-1.5 py-0.5 rounded border border-[#383838] text-zinc-300"><strong className="text-rose-400">Esc</strong> Clear</span>
+            <span className="bg-[#1f1f1f] px-1.5 py-0.5 rounded border border-[#383838] text-zinc-300"><strong className="text-orange-400">Tab</strong> Search</span>
+            <span className="bg-[#1f1f1f] px-1.5 py-0.5 rounded border border-[#383838] text-zinc-300"><strong className="text-orange-400">← ↑ ↓ →</strong> Select</span>
+            <span className="bg-[#1f1f1f] px-1.5 py-0.5 rounded border border-[#383838] text-zinc-300"><strong className="text-orange-400">Space/+</strong> Add</span>
+            <span className="bg-[#1f1f1f] px-1.5 py-0.5 rounded border border-[#383838] text-zinc-300"><strong className="text-rose-400">-</strong> Remove</span>
+            <span className="bg-[#1f1f1f] px-1.5 py-0.5 rounded border border-[#383838] text-zinc-300"><strong className="text-amber-400">F1</strong> Cash</span>
+            <span className="bg-[#1f1f1f] px-1.5 py-0.5 rounded border border-[#383838] text-zinc-300"><strong className="text-amber-400">F2</strong> UPI</span>
+            <span className="bg-[#1f1f1f] px-1.5 py-0.5 rounded border border-[#383838] text-zinc-300"><strong className="text-amber-400">F3</strong> Card</span>
+            <span className="bg-[#1f1f1f] px-1.5 py-0.5 rounded border border-[#383838] text-zinc-300"><strong className="text-emerald-400">Enter</strong> Punch & Print</span>
+            <span className="bg-[#1f1f1f] px-1.5 py-0.5 rounded border border-[#383838] text-zinc-300"><strong className="text-zinc-400">Esc</strong> Clear</span>
           </div>
         </div>
 
         {/* Big Food Cards Grid */}
         <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-3.5">
-          {filteredMenuItems.map((item) => {
+          {filteredMenuItems.map((item, index) => {
             const inCartQty = getItemCartQuantity(item.id);
+            const isKeyFocused = focusedCardIndex === index;
 
             return (
               <div
                 key={item.id}
-                onClick={() => addToCart(item)}
+                onClick={() => {
+                  setFocusedCardIndex(index);
+                  addToCart(item);
+                }}
                 className={cn(
-                  "group relative rounded-3xl bg-[#1f1f1f] border overflow-hidden transition-all duration-200 cursor-pointer shadow-md hover:shadow-2xl flex flex-col justify-between select-none",
-                  inCartQty > 0
+                  "group relative rounded-3xl bg-[#1f1f1f] border overflow-hidden transition-all duration-200 cursor-pointer shadow-md flex flex-col justify-between select-none",
+                  isKeyFocused
+                    ? "border-orange-500 ring-2 ring-orange-500 shadow-[0_0_25px_rgba(249,115,22,0.45)] scale-[1.02] z-10"
+                    : inCartQty > 0
                     ? "border-orange-500 bg-[#25201d] ring-1 ring-orange-500/50 shadow-orange-600/20"
                     : "border-[#303030] hover:border-orange-500/80"
                 )}
               >
+                {/* Keyboard Focus Tag */}
+                {isKeyFocused && (
+                  <div className="absolute top-2.5 left-2.5 z-10 flex items-center gap-1 bg-black/85 backdrop-blur-md text-orange-400 font-mono text-[9px] font-bold px-2 py-0.5 rounded-lg border border-orange-500/50 shadow-lg">
+                    <Keyboard className="w-2.5 h-2.5" />
+                    <span>Space to Add</span>
+                  </div>
+                )}
+
                 {/* Big Full-Bleed Clear Food Photo */}
                 <div className="relative h-36 sm:h-40 w-full overflow-hidden bg-[#161618]">
                   <img
@@ -721,9 +858,14 @@ export default function PosBillingTerminal() {
                     ) : (
                       <button
                         type="button"
-                        className="h-8 px-3 rounded-xl bg-orange-600/20 text-orange-400 group-hover:bg-orange-600 group-hover:text-white flex items-center gap-1 font-black text-xs uppercase tracking-wider transition-colors shadow-sm cursor-pointer"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setFocusedCardIndex(index);
+                          addToCart(item);
+                        }}
+                        className="h-8 px-3 rounded-xl bg-[#2a2a2a] hover:bg-orange-600 text-zinc-200 hover:text-white text-xs font-bold flex items-center gap-1 transition-all shadow-sm cursor-pointer"
                       >
-                        <Plus className="w-3.5 h-3.5 stroke-[3]" />
+                        <Plus className="w-3.5 h-3.5" />
                         <span>Add</span>
                       </button>
                     )}
