@@ -38,7 +38,7 @@ export default function LiveKotQueuePage() {
         <div>
           <div className="flex items-center gap-2">
             <span className="text-[10px] font-bold text-amber-500 uppercase tracking-widest leading-none">
-              {currentOutlet.name} ({currentOutlet.code}) • Counter Live Feed
+              Irani Koyla Shawarma &middot; Counter Live Feed
             </span>
             <span className="inline-flex items-center gap-1 text-[9px] font-bold text-emerald-400 bg-emerald-500/10 px-2 py-0.2 rounded-full border border-emerald-500/20">
               <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
@@ -121,7 +121,7 @@ export default function LiveKotQueuePage() {
               </div>
 
               {/* Ticket Footer & Actions */}
-              <div className="pt-2 border-t border-[#303030] flex items-center justify-between">
+              <div className="pt-2 border-t border-[#303030] flex items-center justify-between gap-2">
                 <div>
                   <span className="text-[10px] text-zinc-500 block">Tender: {order.paymentMethod}</span>
                   <span className="font-mono text-sm font-black text-amber-400">
@@ -129,15 +129,29 @@ export default function LiveKotQueuePage() {
                   </span>
                 </div>
 
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={() => setSelectedTicket(order)}
-                  className="border-[#303030] bg-[#161618] hover:bg-[#303030] text-zinc-300 hover:text-white text-[11px] font-bold h-7 px-2.5 gap-1 cursor-pointer"
-                >
-                  <Printer className="w-3 h-3 text-amber-400" />
-                  <span>Reprint KOT</span>
-                </Button>
+                <div className="flex items-center gap-1.5">
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => setSelectedTicket(order)}
+                    className="border-[#303030] bg-[#161618] hover:bg-[#303030] text-zinc-300 hover:text-white text-[11px] font-bold h-7 px-2 gap-1 cursor-pointer"
+                  >
+                    <span>View Bill</span>
+                  </Button>
+                  <Button
+                    size="sm"
+                    onClick={() => {
+                      setSelectedTicket(order);
+                      setTimeout(() => {
+                        if (typeof window !== "undefined") window.print();
+                      }, 150);
+                    }}
+                    className="bg-orange-600 hover:bg-orange-500 text-white text-[11px] font-bold h-7 px-2 gap-1 cursor-pointer"
+                  >
+                    <Printer className="w-3 h-3" />
+                    <span>Print Bill</span>
+                  </Button>
+                </div>
               </div>
             </div>
           ))}

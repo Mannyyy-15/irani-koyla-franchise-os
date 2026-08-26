@@ -5,6 +5,7 @@ import {
   Receipt,
   Search,
   Printer,
+  Eye,
   X,
   Clock,
   Calendar,
@@ -27,7 +28,7 @@ import { cn } from "@/components/ui/cn";
 import { LiveOrder } from "@/lib/mock-data";
 
 export default function PosOrderHistoryPage() {
-  const { liveOrders, activeOutlet, outlets } = useFranchise();
+  const { filteredOrders: outletOrders, activeOutlet, outlets, role } = useFranchise();
 
   // Filter States
   const [search, setSearch] = useState("");
@@ -44,7 +45,7 @@ export default function PosOrderHistoryPage() {
   const [selectedReceipt, setSelectedReceipt] = useState<LiveOrder | null>(null);
 
   // Filter Logic
-  const filteredOrders = liveOrders.filter((ord) => {
+  const filteredOrders = outletOrders.filter((ord) => {
     // Search Filter
     const matchesSearch =
       ord.orderNumber.toLowerCase().includes(search.toLowerCase()) ||
@@ -55,9 +56,9 @@ export default function PosOrderHistoryPage() {
     const matchesChannel = channelFilter === "all" || ord.channel === channelFilter;
     const matchesPayment = paymentFilter === "all" || ord.paymentMethod === paymentFilter;
 
-    // Account / Outlet Filter
-    const targetOutlet = outletFilter === "all" ? null : outletFilter;
-    const matchesOutlet = !targetOutlet || (ord.outletId || "bandra-west") === targetOutlet;
+    // Super Admin Outlet Filter
+    const matchesOutlet =
+      role !== "SUPER_ADMIN" || outletFilter === "all" || ord.outletId === outletFilter;
 
     // Date Filter
     let matchesDate = true;
@@ -70,7 +71,6 @@ export default function PosOrderHistoryPage() {
     } else if (dateFilterMode === "custom") {
       matchesDate = orderDate === customDate;
     } else if (dateFilterMode === "7days") {
-      // Any date within last 7 days
       matchesDate = true;
     } else if (dateFilterMode === "all") {
       matchesDate = true;
@@ -173,22 +173,24 @@ export default function PosOrderHistoryPage() {
             </div>
           )}
 
-          {/* Account / Outlet Selector */}
-          <div className="flex items-center gap-2">
-            <Store className="w-4 h-4 text-zinc-400" />
-            <select
-              value={outletFilter}
-              onChange={(e) => setOutletFilter(e.target.value)}
-              className="h-9 px-3 rounded-xl bg-[#141416] border border-[#383838] text-xs text-zinc-200 font-bold focus:outline-none focus:border-orange-500 cursor-pointer"
-            >
-              <option value="all">All Outlets / Accounts</option>
-              {outlets.map((out) => (
-                <option key={out.id} value={out.id}>
-                  {out.name} ({out.code})
-                </option>
-              ))}
-            </select>
-          </div>
+          {/* Account / Outlet Selector (Super Admin Only) */}
+          {role === "SUPER_ADMIN" && (
+            <div className="flex items-center gap-2">
+              <Store className="w-4 h-4 text-zinc-400" />
+              <select
+                value={outletFilter}
+                onChange={(e) => setOutletFilter(e.target.value)}
+                className="h-9 px-3 rounded-xl bg-[#141416] border border-[#383838] text-xs text-zinc-200 font-bold focus:outline-none focus:border-orange-500 cursor-pointer"
+              >
+                <option value="all">🏢 All Outlets Network</option>
+                {outlets.map((out) => (
+                  <option key={out.id} value={out.id}>
+                    {out.name} ({out.code})
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
         </div>
 
         {/* ── SECONDARY FILTERS: Search, Channel & Payment ──────────────── */}
@@ -266,11 +268,11 @@ export default function PosOrderHistoryPage() {
             <thead>
               <tr className="border-b border-[#27272a] bg-[#141416] text-zinc-400 font-black uppercase tracking-wider text-[11px]">
                 <th className="py-4 px-5">Order # & Date</th>
-                <th className="py-4 px-5">Customer & Branch</th>
+                <th className="py-4 px-5">Customer & Channel</th>
                 <th className="py-4 px-5">Items Punched</th>
                 <th className="py-4 px-5">Payment Method</th>
                 <th className="py-4 px-5 text-right">Bill Total</th>
-                <th className="py-4 px-5 text-right">Receipt Actions</th>
+                <th className="py-4 px-5 text-right">Bill Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-[#27272a] text-xs">
@@ -299,16 +301,16 @@ export default function PosOrderHistoryPage() {
                       </div>
                     </td>
 
-                    {/* Customer & Branch */}
+                    {/* Customer & Channel */}
                     <td className="py-4 px-5 align-top space-y-1.5">
                       <div className="flex items-center gap-1.5 text-zinc-200 font-bold text-xs">
                         <User className="w-3.5 h-3.5 text-zinc-500" />
                         <span>{ord.customerName || "Counter Customer"}</span>
                       </div>
-                      <div className="flex items-center gap-1.5 flex-wrap">
+                      <div>
                         <span
                           className={cn(
-                            "inline-block px-2 py-0.5 rounded-lg text-[10px] font-black uppercase tracking-wider border",
+                            "inline-block px-2.5 py-0.5 rounded-lg text-[10px] font-black uppercase tracking-wider border",
                             ord.channel === "Walk-in Counter"
                               ? "bg-amber-500/15 text-amber-400 border-amber-500/30"
                               : ord.channel === "Zomato"
@@ -318,13 +320,10 @@ export default function PosOrderHistoryPage() {
                         >
                           {ord.channel}
                         </span>
-                        <span className="text-[10px] text-zinc-500 font-mono">
-                          {outlets.find((o) => o.id === ord.outletId)?.name || "Bandra West"}
-                        </span>
                       </div>
                     </td>
 
-                    {/* Items Punched (Large & Clear) */}
+                    {/* Items Punched */}
                     <td className="py-4 px-5 align-top max-w-sm">
                       <div className="space-y-1">
                         {ord.items.map((it, idx) => (
@@ -356,7 +355,7 @@ export default function PosOrderHistoryPage() {
                       </span>
                     </td>
 
-                    {/* Bill Total (Large Bold) */}
+                    {/* Bill Total */}
                     <td className="py-4 px-5 align-top text-right">
                       <span className="font-mono text-base font-black text-white block">
                         ₹{ord.totalAmount.toLocaleString("en-IN")}
@@ -366,16 +365,32 @@ export default function PosOrderHistoryPage() {
                       </span>
                     </td>
 
-                    {/* Action: View & Reprint Thermal Bill */}
+                    {/* Action: View Bill & Print Bill Options */}
                     <td className="py-4 px-5 align-top text-right">
-                      <Button
-                        size="sm"
-                        onClick={() => setSelectedReceipt(ord)}
-                        className="h-9 px-3.5 rounded-xl bg-[#28282c] hover:bg-orange-600 text-zinc-200 hover:text-white text-xs font-bold gap-1.5 transition-all shadow-sm cursor-pointer"
-                      >
-                        <Printer className="w-3.5 h-3.5" />
-                        <span>Print Bill</span>
-                      </Button>
+                      <div className="flex items-center justify-end gap-1.5">
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => setSelectedReceipt(ord)}
+                          className="h-8 px-2.5 rounded-xl border-[#383838] bg-[#222226] hover:bg-[#2e2e34] text-zinc-200 hover:text-white text-xs font-bold gap-1 transition-all cursor-pointer"
+                          title="View Thermal Bill"
+                        >
+                          <Eye className="w-3.5 h-3.5 text-zinc-400" />
+                          <span>View Bill</span>
+                        </Button>
+                        <Button
+                          size="sm"
+                          onClick={() => {
+                            setSelectedReceipt(ord);
+                            setTimeout(() => handlePrint(), 150);
+                          }}
+                          className="h-8 px-2.5 rounded-xl bg-orange-600 hover:bg-orange-500 text-white text-xs font-bold gap-1 transition-all shadow-sm cursor-pointer"
+                          title="Print Thermal Bill"
+                        >
+                          <Printer className="w-3.5 h-3.5" />
+                          <span>Print Bill</span>
+                        </Button>
+                      </div>
                     </td>
                   </tr>
                 ))
@@ -385,15 +400,15 @@ export default function PosOrderHistoryPage() {
         </div>
       </div>
 
-      {/* ── MODAL: Large High-Contrast Thermal Receipt View ─────────────────────── */}
+      {/* ── MODAL: High-Contrast Thermal Receipt View & Print ─────────────────────── */}
       {selectedReceipt && (
         <Dialog open={true} onOpenChange={() => setSelectedReceipt(null)}>
           <DialogContent className="max-w-md bg-[#18181b] border border-[#383838] text-white p-6 rounded-3xl shadow-2xl">
             <DialogHeader className="pb-3 border-b border-[#2d2d30] flex flex-row items-center justify-between">
               <div className="flex items-center gap-2">
-                <Printer className="w-5 h-5 text-orange-400" />
+                <Receipt className="w-5 h-5 text-orange-400" />
                 <DialogTitle className="text-base font-black text-white">
-                  Thermal Receipt #{selectedReceipt.orderNumber}
+                  Thermal Bill Receipt #{selectedReceipt.orderNumber}
                 </DialogTitle>
               </div>
             </DialogHeader>
@@ -402,19 +417,16 @@ export default function PosOrderHistoryPage() {
             <div id="reprint-thermal-slip" className="p-5 rounded-2xl bg-[#0f0f10] border border-[#2d2d30] font-mono text-xs text-zinc-100 space-y-4">
               {/* Receipt Brand Header */}
               <div className="text-center space-y-1 pb-3 border-b border-dashed border-zinc-700">
-                <h3 className="text-base font-black text-orange-400">IRANI KOYLA SHAWARMA</h3>
-                <p className="text-[11px] font-bold text-zinc-300">
-                  {outlets.find((o) => o.id === selectedReceipt.outletId)?.name || "Bandra West Flagship"}
-                </p>
-                <p className="text-[10px] text-zinc-500">Shop 1-2, Mohak City Plaza, Central Spine</p>
-                <p className="text-[10px] text-zinc-500">GSTIN: 27AABCI4920F1ZV | FSSAI: 11524008000492</p>
+                <h3 className="text-base font-black text-orange-400 tracking-wider">IRANI KOYLA SHAWARMA</h3>
+                <p className="text-[11px] font-bold text-zinc-300">Signature Charcoal Spit Roasters</p>
+                <p className="text-[10px] text-zinc-400">GSTIN: 27AABCI4920F1ZV | FSSAI: 11524008000492</p>
               </div>
 
               {/* Order Meta */}
               <div className="flex justify-between text-[11px] text-zinc-300 pb-2 border-b border-dashed border-zinc-700">
                 <div>
                   <span className="block font-bold text-white">Order: {selectedReceipt.orderNumber}</span>
-                  <span className="text-zinc-400">Cust: {selectedReceipt.customerName}</span>
+                  <span className="text-zinc-400">Customer: {selectedReceipt.customerName}</span>
                 </div>
                 <div className="text-right">
                   <span className="block">{selectedReceipt.date || todayStr}</span>
@@ -453,21 +465,23 @@ export default function PosOrderHistoryPage() {
               </div>
             </div>
 
-            {/* Print Trigger Button */}
-            <div className="pt-2 flex items-center justify-end gap-3">
+            {/* Print & View Modal Actions */}
+            <div className="pt-2 flex items-center justify-between">
               <Button
-                variant="ghost"
+                type="button"
+                variant="outline"
                 onClick={() => setSelectedReceipt(null)}
-                className="text-xs text-zinc-400 hover:text-white"
+                className="text-xs text-zinc-300 hover:text-white border-[#383838] bg-[#222226]"
               >
-                Close
+                Close View
               </Button>
               <Button
+                type="button"
                 onClick={handlePrint}
                 className="bg-orange-600 hover:bg-orange-500 text-white font-black text-xs px-5 rounded-xl shadow-lg shadow-orange-600/30 gap-2 cursor-pointer"
               >
                 <Printer className="w-4 h-4" />
-                <span>Print Thermal Receipt</span>
+                <span>Print Bill</span>
               </Button>
             </div>
           </DialogContent>

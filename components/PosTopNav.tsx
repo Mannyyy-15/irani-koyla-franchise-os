@@ -155,17 +155,17 @@ export default function PosTopNav({
             </button>
           )}
 
-          {/* Terminal Title & Outlet Identifier */}
+          {/* Terminal Title & Brand Identity */}
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-xl bg-orange-500/10 border border-orange-500/30 text-orange-400 flex items-center justify-center shrink-0">
-              <Store className="w-4 h-4" />
+            <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-orange-500 to-amber-600 text-white flex items-center justify-center shrink-0 shadow-sm">
+              <Flame className="w-4 h-4" />
             </div>
             <div className="flex flex-col leading-none">
-              <span className="font-black text-white text-xs sm:text-sm tracking-tight truncate max-w-[140px] sm:max-w-[200px]">
-                {currentOutlet.name}
+              <span className="font-black text-white text-xs sm:text-sm tracking-tight truncate max-w-[160px] sm:max-w-[220px]">
+                Irani Koyla Shawarma
               </span>
-              <span className="text-[10px] text-orange-400 font-mono font-bold mt-0.5">
-                {currentOutlet.code} &middot; POS Register
+              <span className="text-[10px] text-zinc-400 font-semibold mt-0.5">
+                Counter POS Terminal
               </span>
             </div>
           </div>
