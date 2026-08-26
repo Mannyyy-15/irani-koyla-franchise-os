@@ -224,7 +224,7 @@ export interface AuditLog {
   user: string;
   role: string;
   action: string;
-  module: "Yield" | "Sales" | "Royalty" | "Compliance" | "Pricing" | "SupplyChain";
+  module: "Yield" | "Sales" | "Royalty" | "Compliance" | "Pricing" | "SupplyChain" | "Operations";
   severity: "info" | "warning" | "critical";
   details: string;
 }

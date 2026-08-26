@@ -61,6 +61,23 @@ const INITIAL_SAFE_DROPS: SafeDrop[] = [
 
 export type UserRole = "SUPER_ADMIN" | "FRANCHISE_OWNER";
 
+export interface DailyStoreSession {
+  date: string;
+  status: "OPEN" | "CLOSED" | "NOT_OPENED";
+  openedAt?: string;
+  closedAt?: string;
+  openingFloat: number;
+  spit1MountedKg: number;
+  spit2MountedKg: number;
+  cashierName: string;
+  spitMasterName: string;
+  actualCashCounted?: number;
+  cashDiscrepancy?: number;
+  closingMeatLeftKg?: number;
+  zReportNumber?: string;
+  notes?: string;
+}
+
 interface FranchiseContextType {
   role: UserRole;
   setRole: (role: UserRole) => void;
@@ -80,8 +97,26 @@ interface FranchiseContextType {
   pettyCashList: PettyCashExpense[];
   safeDropsList: SafeDrop[];
   shipments: CentralShipment[];
+  dailySession: DailyStoreSession;
   
-  // Actions
+  // Daily Lifecycle Actions
+  startFreshDay: (options: {
+    openingFloat: number;
+    spit1MountedKg: number;
+    spit2MountedKg?: number;
+    cashierName: string;
+    spitMasterName: string;
+    outletId?: string;
+  }) => void;
+  closeStoreDay: (options: {
+    actualCashCounted: number;
+    closingMeatLeftKg: number;
+    notes?: string;
+    outletId?: string;
+  }) => void;
+  resetStoreToFreshMorning: (outletId?: string) => void;
+  
+  // Existing Actions
   addMeatBatch: (batch: Omit<MeatBatch, "id" | "date" | "actualYieldPercent" | "status">) => void;
   closeShift: (shift: Omit<ShiftRegister, "id" | "status" | "reconciledAt">) => void;
   updateRoyaltyStatus: (id: string, status: RoyaltyStatement["status"], disputeReason?: string) => void;
@@ -154,6 +189,19 @@ export function FranchiseProvider({ children }: { children: React.ReactNode }) {
   const [safeDropsList, setSafeDropsList] = useState<SafeDrop[]>(INITIAL_SAFE_DROPS);
   const [shipments, setShipments] = useState<CentralShipment[]>(INITIAL_SHIPMENTS);
 
+  const DEFAULT_DAILY_SESSION: DailyStoreSession = {
+    date: new Date().toISOString().split("T")[0],
+    status: "OPEN",
+    openedAt: "10:30 AM",
+    openingFloat: 2000,
+    spit1MountedKg: 28.0,
+    spit2MountedKg: 15.0,
+    cashierName: "Imran Siddiqui",
+    spitMasterName: "Chef Raheem",
+  };
+
+  const [dailySession, setDailySession] = useState<DailyStoreSession>(DEFAULT_DAILY_SESSION);
+
   // Load from local storage if available
   useEffect(() => {
     try {
@@ -169,6 +217,9 @@ export function FranchiseProvider({ children }: { children: React.ReactNode }) {
         if (parsed.complianceList) setComplianceList(parsed.complianceList);
         if (parsed.auditLogs) setAuditLogs(parsed.auditLogs);
         if (parsed.liveOrders) setLiveOrders(parsed.liveOrders);
+        if (parsed.dailySession) setDailySession(parsed.dailySession);
+        if (parsed.pettyCashList) setPettyCashList(parsed.pettyCashList);
+        if (parsed.safeDropsList) setSafeDropsList(parsed.safeDropsList);
       }
     } catch {
       // Ignore local storage error
@@ -188,6 +239,9 @@ export function FranchiseProvider({ children }: { children: React.ReactNode }) {
         complianceList,
         auditLogs,
         liveOrders,
+        dailySession,
+        pettyCashList,
+        safeDropsList,
         ...updatedState,
       };
       localStorage.setItem(STORAGE_KEY, JSON.stringify(current));
@@ -598,6 +652,113 @@ export function FranchiseProvider({ children }: { children: React.ReactNode }) {
     saveState({ menuItems: updatedMenu, auditLogs: updatedLogs });
   };
 
+  // Daily Lifecycle Actions
+  const startFreshDay = (options: {
+    openingFloat: number;
+    spit1MountedKg: number;
+    spit2MountedKg?: number;
+    cashierName: string;
+    spitMasterName: string;
+    outletId?: string;
+  }) => {
+    const todayStr = new Date().toISOString().split("T")[0];
+    const timeNow = new Date().toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", hour12: true });
+
+    const newSession: DailyStoreSession = {
+      date: todayStr,
+      status: "OPEN",
+      openedAt: timeNow,
+      openingFloat: options.openingFloat,
+      spit1MountedKg: options.spit1MountedKg,
+      spit2MountedKg: options.spit2MountedKg || 0,
+      cashierName: options.cashierName,
+      spitMasterName: options.spitMasterName,
+    };
+
+    setDailySession(newSession);
+    setLiveOrders([]);
+    setPettyCashList([]);
+    setSafeDropsList([]);
+
+    const logEntry: AuditLog = {
+      id: `audit-${Date.now()}`,
+      timestamp: new Date().toISOString().replace("T", " ").substring(0, 19),
+      outletName: options.outletId ? (outlets.find((o) => o.id === options.outletId)?.name || options.outletId) : "Bandra West Flagship",
+      user: options.cashierName,
+      role: "Franchise Partner",
+      action: `Store Opened for Business (Float ₹${options.openingFloat})`,
+      module: "Operations",
+      severity: "info",
+      details: `Morning open completed. Cash float: ₹${options.openingFloat}. Spit 1: ${options.spit1MountedKg}kg mounted. Cashier: ${options.cashierName}, Spit Master: ${options.spitMasterName}.`,
+    };
+
+    const updatedLogs = [logEntry, ...auditLogs];
+    setAuditLogs(updatedLogs);
+
+    saveState({
+      dailySession: newSession,
+      liveOrders: [],
+      pettyCashList: [],
+      safeDropsList: [],
+      auditLogs: updatedLogs,
+    });
+  };
+
+  const closeStoreDay = (options: {
+    actualCashCounted: number;
+    closingMeatLeftKg: number;
+    notes?: string;
+    outletId?: string;
+  }) => {
+    const timeNow = new Date().toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", hour12: true });
+    const zNum = `IK-Z-${Math.floor(10000 + Math.random() * 90000)}`;
+    const discrepancy = options.actualCashCounted - outletTenderTotals.expectedCashInDrawer;
+
+    const closedSession: DailyStoreSession = {
+      ...dailySession,
+      status: "CLOSED",
+      closedAt: timeNow,
+      actualCashCounted: options.actualCashCounted,
+      cashDiscrepancy: discrepancy,
+      closingMeatLeftKg: options.closingMeatLeftKg,
+      zReportNumber: zNum,
+      notes: options.notes,
+    };
+
+    setDailySession(closedSession);
+
+    const logEntry: AuditLog = {
+      id: `audit-${Date.now()}`,
+      timestamp: new Date().toISOString().replace("T", " ").substring(0, 19),
+      outletName: options.outletId ? (outlets.find((o) => o.id === options.outletId)?.name || options.outletId) : "Bandra West Flagship",
+      user: dailySession.cashierName || "Store Manager",
+      role: "Franchise Partner",
+      action: `Store Closed · Z-Report #${zNum}`,
+      module: "Operations",
+      severity: Math.abs(discrepancy) > 50 ? "warning" : "info",
+      details: `EOD Close done. Counted cash: ₹${options.actualCashCounted}. Expected: ₹${outletTenderTotals.expectedCashInDrawer}. Variance: ₹${discrepancy}. Closing meat: ${options.closingMeatLeftKg}kg.`,
+    };
+
+    const updatedLogs = [logEntry, ...auditLogs];
+    setAuditLogs(updatedLogs);
+
+    saveState({
+      dailySession: closedSession,
+      auditLogs: updatedLogs,
+    });
+  };
+
+  const resetStoreToFreshMorning = (outletId?: string) => {
+    startFreshDay({
+      openingFloat: 2000,
+      spit1MountedKg: 28.0,
+      spit2MountedKg: 15.0,
+      cashierName: "Imran Siddiqui",
+      spitMasterName: "Chef Raheem",
+      outletId,
+    });
+  };
+
   // Delete / Archive Menu Item
   const deleteMenuItem = (id: string) => {
     const updatedMenu = menuItems.filter((item) => item.id !== id);
@@ -644,9 +805,8 @@ export function FranchiseProvider({ children }: { children: React.ReactNode }) {
       : safeDropsList.filter((d) => d.outletId === selectedOutletId);
 
   // Outlet Tender & Cash Drawer Totals
-  const targetShift = filteredShifts[0];
-  const openingCash = targetShift?.openingCash || 5000;
-  const baseShiftPettyCash = targetShift?.pettyCashExpenses || 800;
+  const openingCash = dailySession.openingFloat || 2000;
+  const baseShiftPettyCash = 0;
 
   // Order tender sums including Split Payment breakdown
   let orderCashSum = 0;
@@ -673,15 +833,11 @@ export function FranchiseProvider({ children }: { children: React.ReactNode }) {
   const livePettyCashSum = filteredPettyCash.reduce((sum, p) => sum + p.amount, 0);
   const liveSafeDropsSum = filteredSafeDrops.reduce((sum, d) => sum + d.amount, 0);
 
-  const baseShiftCash = targetShift?.cashSalesExpected || 14250;
-  const baseShiftGpay = targetShift?.upiSales || 22800;
-  const baseShiftCard = targetShift?.posCardSales || 7700;
+  const cashSales = orderCashSum;
+  const gpaySales = orderGpaySum;
+  const cardSales = orderCardSum;
 
-  const cashSales = baseShiftCash + orderCashSum;
-  const gpaySales = baseShiftGpay + orderGpaySum;
-  const cardSales = baseShiftCard + orderCardSum;
-
-  const totalPettyCash = baseShiftPettyCash + livePettyCashSum;
+  const totalPettyCash = livePettyCashSum;
   const expectedCashInDrawer = openingCash + cashSales - totalPettyCash - liveSafeDropsSum;
 
   // Channel Splits
@@ -689,12 +845,12 @@ export function FranchiseProvider({ children }: { children: React.ReactNode }) {
   const zomatoOrders = filteredOrders.filter((o) => o.channel === "Zomato");
   const swiggyOrders = filteredOrders.filter((o) => o.channel === "Swiggy");
 
-  const walkInSales = 30400 + walkInOrders.reduce((sum, o) => sum + o.totalAmount, 0);
-  const zomatoSales = 11350 + zomatoOrders.reduce((sum, o) => sum + o.totalAmount, 0);
-  const swiggySales = 7000 + swiggyOrders.reduce((sum, o) => sum + o.totalAmount, 0);
+  const walkInSales = walkInOrders.reduce((sum, o) => sum + o.totalAmount, 0);
+  const zomatoSales = zomatoOrders.reduce((sum, o) => sum + o.totalAmount, 0);
+  const swiggySales = swiggyOrders.reduce((sum, o) => sum + o.totalAmount, 0);
 
   const totalGrossRevenue = walkInSales + zomatoSales + swiggySales;
-  const totalOrdersToday = (targetShift?.totalOrders || 240) + filteredOrders.length;
+  const totalOrdersToday = filteredOrders.length;
 
   const outletTenderTotals = {
     openingCash,
@@ -705,11 +861,11 @@ export function FranchiseProvider({ children }: { children: React.ReactNode }) {
     safeDropsTotal: liveSafeDropsSum,
     expectedCashInDrawer,
     walkInSales,
-    walkInOrdersCount: 152 + walkInOrders.length,
+    walkInOrdersCount: walkInOrders.length,
     zomatoSales,
-    zomatoOrdersCount: 58 + zomatoOrders.length,
+    zomatoOrdersCount: zomatoOrders.length,
     swiggySales,
-    swiggyOrdersCount: 30 + swiggyOrders.length,
+    swiggyOrdersCount: swiggyOrders.length,
     totalOrdersToday,
     totalGrossRevenue,
   };
@@ -754,6 +910,10 @@ export function FranchiseProvider({ children }: { children: React.ReactNode }) {
         pettyCashList,
         safeDropsList,
         shipments,
+        dailySession,
+        startFreshDay,
+        closeStoreDay,
+        resetStoreToFreshMorning,
         addMeatBatch,
         closeShift,
         updateRoyaltyStatus,
