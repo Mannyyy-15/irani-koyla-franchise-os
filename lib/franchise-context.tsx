@@ -143,6 +143,8 @@ interface FranchiseContextType {
   dispatchShipment: (data: Omit<CentralShipment, "id">) => void;
   addMenuItem: (item: Omit<MenuItemRecipe, "id">) => void;
   updateMenuItem: (id: string, updates: Partial<MenuItemRecipe>) => void;
+  deleteMenuItem: (id: string) => void;
+  
   // Spit Management Actions
   addSpitMeatReload: (reload: {
     quantityKg: number;
@@ -764,7 +766,7 @@ export function FranchiseProvider({ children }: { children: React.ReactNode }) {
       user: reload.addedBy || dailySession.spitMasterName || "Spit Master",
       role: "Franchise Staff",
       action: `Spit Meat Reload: +${reload.quantityKg}kg`,
-      module: "Inventory",
+      module: "Operations",
       severity: "info",
       details: `Mounted fresh ${reload.meatType || "Chicken"} cone (+${reload.quantityKg}kg). Total spit meat loaded today: ${newTotalLoaded}kg.`,
     };

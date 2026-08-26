@@ -149,7 +149,7 @@ export function StoreClosingModal({ isOpen, onClose }: StoreClosingModalProps) {
                 <span className="absolute right-3.5 top-1/2 -translate-y-1/2 text-xs text-zinc-500 font-mono">kg</span>
               </div>
               <p className="text-[11px] text-zinc-500">
-                Morning spit: {dailySession.spit1MountedKg}kg &rarr; Meat carved: {(dailySession.spit1MountedKg - closingMeatLeftKg).toFixed(1)}kg.
+                Total spit loaded: {(dailySession.totalSpitMeatLoadedKg || dailySession.spitMountedKg || dailySession.spit1MountedKg || 28)}kg &rarr; Meat carved: {((dailySession.totalSpitMeatLoadedKg || dailySession.spitMountedKg || dailySession.spit1MountedKg || 28) - closingMeatLeftKg).toFixed(1)}kg.
               </p>
             </div>
 
@@ -209,7 +209,7 @@ export function StoreClosingModal({ isOpen, onClose }: StoreClosingModalProps) {
               </div>
               <div className="flex justify-between">
                 <span className="text-zinc-400">Meat Carved:</span>
-                <span className="text-orange-400 font-bold">{(dailySession.spit1MountedKg - closingMeatLeftKg).toFixed(1)} kg</span>
+                <span className="text-orange-400 font-bold">{((dailySession.totalSpitMeatLoadedKg || dailySession.spitMountedKg || dailySession.spit1MountedKg || 28) - closingMeatLeftKg).toFixed(1)} kg</span>
               </div>
             </div>
 
