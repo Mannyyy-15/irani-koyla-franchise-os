@@ -155,7 +155,7 @@ export default function PosBillingTerminal() {
     modifiers: m.modifiers || [],
   }));
 
-  const [activeCategory, setActiveCategory] = useState<string>("All Items");
+  const [activeCategory, setActiveCategory] = useState<string>("Most Ordered");
   const [searchTerm, setSearchTerm] = useState("");
   const [soundEnabled, setSoundEnabled] = useState<boolean>(true);
 
@@ -229,6 +229,7 @@ export default function PosBillingTerminal() {
   const [offlineQueuedToast, setOfflineQueuedToast] = useState(false);
 
   const categories = [
+    { name: "Most Ordered", icon: "⭐" },
     { name: "All Items", icon: "🔥" },
     { name: "Koyla Shawarma", icon: "🌯" },
     { name: "Rumali Shawarma", icon: "🫓" },
@@ -241,6 +242,8 @@ export default function PosBillingTerminal() {
     let matchesCat = false;
     if (activeCategory === "All Items") {
       matchesCat = true;
+    } else if (activeCategory === "Most Ordered") {
+      matchesCat = item.popularRank <= 6 || ["pos-iks-01", "pos-iks-02", "pos-iks-03", "pos-irs-01", "pos-ios-01", "pos-isp-01"].includes(item.id);
     } else if (activeCategory === "Koyla Shawarma") {
       matchesCat = item.breadType === "Khubz (Lebanese)" && item.category === "Shawarma Wraps";
     } else if (activeCategory === "Rumali Shawarma") {
@@ -564,6 +567,7 @@ export default function PosBillingTerminal() {
               {categories.map((cat) => {
                 const count = activePosItems.filter((i) => {
                   if (cat.name === "All Items") return true;
+                  if (cat.name === "Most Ordered") return i.popularRank <= 6 || ["pos-iks-01", "pos-iks-02", "pos-iks-03", "pos-irs-01", "pos-ios-01", "pos-isp-01"].includes(i.id);
                   if (cat.name === "Koyla Shawarma") return i.breadType === "Khubz (Lebanese)" && i.category === "Shawarma Wraps";
                   if (cat.name === "Rumali Shawarma") return i.breadType === "Rumali Roti" && i.category === "Shawarma Wraps";
                   if (cat.name === "Open Salad") return i.name.includes("Open Salad");
