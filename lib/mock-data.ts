@@ -130,6 +130,25 @@ export interface LiveOrder {
   outletId: string;
 }
 
+export interface RiderPickupOrder {
+  id: string;
+  orderNumber: string;
+  channel: "Zomato" | "Swiggy";
+  customerName: string;
+  items: { name: string; quantity: number }[];
+  totalAmount: number;
+  riderName: string;
+  riderPhone: string;
+  vehicleNumber: string;
+  etaMinutes: number; // 0 = at counter, > 0 = mins away
+  status: "Ready for Pickup" | "Rider Arrived" | "Preparing" | "Handed Over";
+  otp: string; // 4-digit OTP
+  bagToken: string; // e.g. "BAG-01"
+  readyAtTime: string;
+  handedOverAt?: string;
+  outletId: string;
+}
+
 export interface PettyCashExpense {
   id: string;
   timestamp: string;
@@ -1326,6 +1345,90 @@ export const INITIAL_SHIPMENTS: CentralShipment[] = [
     driverPhone: "+91 98205 11984",
     temperatureCelsius: 2.8,
     securitySealNumber: "SEAL-K-90218",
+  },
+];
+
+export const INITIAL_RIDER_ORDERS: RiderPickupOrder[] = [
+  {
+    id: "rdr-01",
+    orderNumber: "IK-9082",
+    channel: "Zomato",
+    customerName: "Rohan Varma",
+    items: [
+      { name: "Irani Rumali Special Chicken Shawarma", quantity: 1 },
+      { name: "Authentic Irani Dum Chai", quantity: 2 },
+    ],
+    totalAmount: 180,
+    riderName: "Deepak Yadav",
+    riderPhone: "+91 98204 88392",
+    vehicleNumber: "MH 02 DQ 8192",
+    etaMinutes: 2,
+    status: "Ready for Pickup",
+    otp: "4819",
+    bagToken: "BAG-01",
+    readyAtTime: "02:48 PM",
+    outletId: "bandra-west",
+  },
+  {
+    id: "rdr-02",
+    orderNumber: "IK-9084",
+    channel: "Swiggy",
+    customerName: "Pooja Hegde",
+    items: [
+      { name: "Irani Koyla Peri Peri Shawarma", quantity: 2 },
+      { name: "Signature Garlic Toum Dip", quantity: 1 },
+    ],
+    totalAmount: 230,
+    riderName: "Sanjay Mane",
+    riderPhone: "+91 98201 44021",
+    vehicleNumber: "MH 02 EE 3910",
+    etaMinutes: 0,
+    status: "Rider Arrived",
+    otp: "7294",
+    bagToken: "BAG-02",
+    readyAtTime: "02:35 PM",
+    outletId: "bandra-west",
+  },
+  {
+    id: "rdr-03",
+    orderNumber: "IK-9088",
+    channel: "Zomato",
+    customerName: "Aakash Mehta",
+    items: [
+      { name: "Irani Shawarma Platter", quantity: 2 },
+      { name: "Irani Open Cheese Salad", quantity: 1 },
+    ],
+    totalAmount: 678,
+    riderName: "Manoj Gaikwad",
+    riderPhone: "+91 98209 11094",
+    vehicleNumber: "MH 03 AZ 4491",
+    etaMinutes: 6,
+    status: "Preparing",
+    otp: "9102",
+    bagToken: "BAG-03",
+    readyAtTime: "02:55 PM",
+    outletId: "bandra-west",
+  },
+  {
+    id: "rdr-04",
+    orderNumber: "IK-9086",
+    channel: "Swiggy",
+    customerName: "Farhan Ansari",
+    items: [
+      { name: "Irani Koyla Shawarma", quantity: 3 },
+      { name: "Authentic Irani Dum Chai", quantity: 3 },
+    ],
+    totalAmount: 330,
+    riderName: "Imtiaz Qureshi",
+    riderPhone: "+91 98207 66201",
+    vehicleNumber: "MH 02 CP 9912",
+    etaMinutes: 0,
+    status: "Handed Over",
+    otp: "3184",
+    bagToken: "BAG-04",
+    readyAtTime: "02:10 PM",
+    handedOverAt: "02:18 PM",
+    outletId: "bandra-west",
   },
 ];
 

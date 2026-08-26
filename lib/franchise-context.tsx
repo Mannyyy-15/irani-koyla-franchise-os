@@ -14,6 +14,7 @@ import {
   PettyCashExpense,
   SafeDrop,
   CentralShipment,
+  RiderPickupOrder,
   INITIAL_OUTLETS,
   INITIAL_MEAT_BATCHES,
   INITIAL_SHIFTS,
@@ -24,6 +25,7 @@ import {
   INITIAL_ORDERS,
   INITIAL_STAFF,
   INITIAL_SHIPMENTS,
+  INITIAL_RIDER_ORDERS,
 } from "./mock-data";
 
 const INITIAL_PETTY_CASH: PettyCashExpense[] = [
@@ -130,6 +132,11 @@ interface FranchiseContextType {
   updateMenuItem: (id: string, updates: Partial<MenuItemRecipe>) => void;
   deleteMenuItem: (id: string) => void;
   
+  // Rider Station Actions
+  riderOrders: RiderPickupOrder[];
+  verifyRiderOtp: (orderId: string, enteredOtp: string) => { success: boolean; message: string };
+  updateRiderStatus: (orderId: string, status: RiderPickupOrder["status"]) => void;
+  
   // Helpers
   activeOutlet: Outlet | null;
   filteredMeatBatches: MeatBatch[];
@@ -188,6 +195,7 @@ export function FranchiseProvider({ children }: { children: React.ReactNode }) {
   const [pettyCashList, setPettyCashList] = useState<PettyCashExpense[]>(INITIAL_PETTY_CASH);
   const [safeDropsList, setSafeDropsList] = useState<SafeDrop[]>(INITIAL_SAFE_DROPS);
   const [shipments, setShipments] = useState<CentralShipment[]>(INITIAL_SHIPMENTS);
+  const [riderOrders, setRiderOrders] = useState<RiderPickupOrder[]>(INITIAL_RIDER_ORDERS);
 
   const DEFAULT_DAILY_SESSION: DailyStoreSession = {
     date: new Date().toISOString().split("T")[0],
@@ -220,6 +228,7 @@ export function FranchiseProvider({ children }: { children: React.ReactNode }) {
         if (parsed.dailySession) setDailySession(parsed.dailySession);
         if (parsed.pettyCashList) setPettyCashList(parsed.pettyCashList);
         if (parsed.safeDropsList) setSafeDropsList(parsed.safeDropsList);
+        if (parsed.riderOrders) setRiderOrders(parsed.riderOrders);
       }
     } catch {
       // Ignore local storage error
@@ -654,6 +663,44 @@ export function FranchiseProvider({ children }: { children: React.ReactNode }) {
     saveState({ menuItems: updatedMenu, auditLogs: updatedLogs });
   };
 
+  // Rider Pickup Station Handlers
+  const verifyRiderOtp = (orderId: string, enteredOtp: string): { success: boolean; message: string } => {
+    const target = riderOrders.find((r) => r.id === orderId);
+    if (!target) {
+      return { success: false, message: "Order not found." };
+    }
+    if (target.otp.trim() !== enteredOtp.trim()) {
+      return { success: false, message: "Incorrect OTP! Please check the rider app." };
+    }
+
+    const timeNow = new Date().toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", hour12: true });
+    const updated = riderOrders.map((r) => {
+      if (r.id === orderId) {
+        return {
+          ...r,
+          status: "Handed Over" as const,
+          handedOverAt: timeNow,
+        };
+      }
+      return r;
+    });
+
+    setRiderOrders(updated);
+    saveState({ riderOrders: updated });
+    return { success: true, message: `OTP Verified! Hand over ${target.bagToken} to ${target.riderName}.` };
+  };
+
+  const updateRiderStatus = (orderId: string, status: RiderPickupOrder["status"]) => {
+    const updated = riderOrders.map((r) => {
+      if (r.id === orderId) {
+        return { ...r, status };
+      }
+      return r;
+    });
+    setRiderOrders(updated);
+    saveState({ riderOrders: updated });
+  };
+
   // Daily Lifecycle Actions
   const startFreshDay = (options: {
     openingFloat: number;
@@ -928,6 +975,9 @@ export function FranchiseProvider({ children }: { children: React.ReactNode }) {
         addMenuItem,
         updateMenuItem,
         deleteMenuItem,
+        riderOrders,
+        verifyRiderOtp,
+        updateRiderStatus,
         activeOutlet,
         filteredMeatBatches,
         filteredShifts,

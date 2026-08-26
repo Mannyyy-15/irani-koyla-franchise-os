@@ -16,6 +16,8 @@ import {
   ChevronRight,
   PanelLeftClose,
   PanelLeftOpen,
+  Bike,
+  ClipboardCheck,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/components/ui/cn";
@@ -24,16 +26,19 @@ import { logout } from "@/app/actions/auth";
 
 const posNavigationSections = [
   {
-    label: "POS REGISTER",
+    label: "POS COUNTER",
     items: [
       { name: "Counter Billing", href: "/pos", icon: ShoppingBag, exact: true },
       { name: "Orders & Receipts", href: "/pos/history", icon: Receipt, exact: false, badgeKey: "orders" },
+      { name: "Rider Pickup Station", href: "/pos/pickup", icon: Bike, exact: false, badgeKey: "riders" },
+      { name: "Petty Cash Log", href: "/pos/expenses", icon: Banknote, exact: false },
     ],
   },
   {
-    label: "STORE HUB",
+    label: "STORE MANAGEMENT",
     items: [
-      { name: "Store Management", href: "/admin", icon: Store, exact: false },
+      { name: "Store Operations Hub", href: "/admin", icon: Store, exact: false },
+      { name: "Opening & Closing Audit", href: "/admin/compliance", icon: ClipboardCheck, exact: false },
     ],
   },
 ] as const;
@@ -49,10 +54,11 @@ function PosSidebarBody({
 }) {
   const pathname = usePathname();
   const router = useRouter();
-  const { activeOutlet, outlets, liveOrders } = useFranchise();
+  const { activeOutlet, outlets, liveOrders, riderOrders } = useFranchise();
   const currentOutlet = activeOutlet || outlets[0];
 
   const totalOrdersCount = liveOrders.length;
+  const activeRidersCount = riderOrders ? riderOrders.filter((r) => r.status !== "Handed Over").length : 0;
 
   const handleLogout = async () => {
     try {
@@ -140,7 +146,12 @@ function PosSidebarBody({
 
             {section.items.map((item) => {
               const isActive = item.exact ? pathname === item.href : pathname.startsWith(item.href);
-              const badgeValue = (item as any).badgeKey === "orders" ? totalOrdersCount : null;
+              const badgeValue =
+                (item as any).badgeKey === "orders"
+                  ? totalOrdersCount
+                  : (item as any).badgeKey === "riders"
+                  ? activeRidersCount
+                  : null;
 
               return (
                 <Link
