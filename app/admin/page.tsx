@@ -47,6 +47,7 @@ import { Progress } from "@/components/ui/Progress";
 import { cn } from "@/components/ui/cn";
 import { StoreOpeningModal } from "@/components/modals/StoreOpeningModal";
 import { StoreClosingModal } from "@/components/modals/StoreClosingModal";
+import { SpitReloadModal } from "@/components/modals/SpitReloadModal";
 
 const STORE_HOURLY_SALES = [
   { hour: "12 PM", sales: 3200, orders: 12 },
@@ -97,6 +98,7 @@ export default function AdminDashboardPage() {
   const [showDrawerBreakdown, setShowDrawerBreakdown] = useState(false);
   const [isOpeningModalOpen, setIsOpeningModalOpen] = useState(false);
   const [isClosingModalOpen, setIsClosingModalOpen] = useState(false);
+  const [isSpitReloadModalOpen, setIsSpitReloadModalOpen] = useState(false);
 
   // Filtered live orders for store view
   const filteredOrders = liveOrders.filter((o) => {
@@ -459,7 +461,7 @@ export default function AdminDashboardPage() {
                       {(typeof window !== "undefined" && (new Date().getHours() >= 19 || new Date().getHours() < 5)) ? "🌙 Evening Trading Active" : "🟢 Store Open & Live Billing"}
                     </span>
                     <span className="text-[10px] bg-[#242427] border border-[#383838] text-zinc-300 font-mono font-bold px-2 py-0.5 rounded-md">
-                      Float: ₹{dailySession.openingFloat.toLocaleString()} · Spit 1: {dailySession.spit1MountedKg}kg
+                      Float: ₹{dailySession.openingFloat.toLocaleString()} · Spit: {(dailySession.totalSpitMeatLoadedKg || dailySession.spitMountedKg || dailySession.spit1MountedKg || 28)}kg Loaded
                     </span>
                   </div>
                   <p className="text-xs text-zinc-400 mt-0.5">
@@ -469,8 +471,18 @@ export default function AdminDashboardPage() {
                 </div>
               </div>
 
-              {/* Dynamic Single Action Button according to Shift / Time */}
-              <div className="flex items-center gap-2 w-full md:w-auto justify-end">
+              {/* Dynamic Action Buttons: Reload Spit Meat & EOD Close */}
+              <div className="flex items-center gap-2 w-full md:w-auto justify-end flex-wrap">
+                <Button
+                  type="button"
+                  onClick={() => setIsSpitReloadModalOpen(true)}
+                  className="bg-orange-600/15 hover:bg-orange-600/25 border border-orange-500/40 text-orange-400 hover:text-orange-300 text-xs font-bold uppercase tracking-wider px-3.5 py-2.5 rounded-xl flex items-center gap-1.5 transition-all cursor-pointer"
+                  title="Mount fresh meat cone when spit is empty"
+                >
+                  <Flame className="w-3.5 h-3.5 text-orange-400" />
+                  <span>Reload Spit (+kg)</span>
+                </Button>
+
                 <Button
                   type="button"
                   onClick={() => setIsClosingModalOpen(true)}
@@ -792,6 +804,12 @@ export default function AdminDashboardPage() {
       <StoreClosingModal
         isOpen={isClosingModalOpen}
         onClose={() => setIsClosingModalOpen(false)}
+      />
+
+      {/* Spit Meat Reload Modal */}
+      <SpitReloadModal
+        isOpen={isSpitReloadModalOpen}
+        onClose={() => setIsSpitReloadModalOpen(false)}
       />
     </div>
   );

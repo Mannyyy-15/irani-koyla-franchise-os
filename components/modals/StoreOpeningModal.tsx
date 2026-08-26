@@ -91,44 +91,30 @@ export function StoreOpeningModal({ isOpen, onClose }: StoreOpeningModalProps) {
           </div>
 
           {/* Spit Mounting Weights */}
-          <div className="p-4 rounded-2xl bg-[#1f1f22] border border-[#303030] space-y-3">
-            <label className="text-xs font-bold text-zinc-300 flex items-center gap-2">
-              <Flame className="w-4 h-4 text-orange-400" />
-              Morning Spit Meat Cones Mounted (kg)
+          <div className="p-4 rounded-2xl bg-[#1f1f22] border border-[#303030] space-y-2.5">
+            <label className="text-xs font-bold text-zinc-300 flex items-center justify-between">
+              <span className="flex items-center gap-2">
+                <Flame className="w-4 h-4 text-orange-400" />
+                <span>Primary Charcoal Spit Initial Meat Cone (kg)</span>
+              </span>
+              <span className="text-[10px] text-zinc-500 font-mono">Standard 25kg - 35kg</span>
             </label>
-            <div className="grid grid-cols-2 gap-3">
-              <div>
-                <span className="text-[11px] text-zinc-400 block mb-1">Spit #1 (Chicken Koyla)</span>
-                <div className="relative">
-                  <input
-                    type="number"
-                    min="5"
-                    max="60"
-                    step="0.5"
-                    value={spit1MountedKg}
-                    onChange={(e) => setSpit1MountedKg(Number(e.target.value))}
-                    className="w-full h-10 px-3 rounded-xl bg-[#161618] border border-[#383838] text-orange-400 font-mono text-sm font-black focus:outline-none focus:border-orange-500"
-                    required
-                  />
-                  <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-zinc-500 font-mono">kg</span>
-                </div>
-              </div>
-              <div>
-                <span className="text-[11px] text-zinc-400 block mb-1">Spit #2 (Peri-Peri / Mutton)</span>
-                <div className="relative">
-                  <input
-                    type="number"
-                    min="0"
-                    max="60"
-                    step="0.5"
-                    value={spit2MountedKg}
-                    onChange={(e) => setSpit2MountedKg(Number(e.target.value))}
-                    className="w-full h-10 px-3 rounded-xl bg-[#161618] border border-[#383838] text-amber-400 font-mono text-sm font-black focus:outline-none focus:border-amber-500"
-                  />
-                  <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-zinc-500 font-mono">kg</span>
-                </div>
-              </div>
+            <div className="relative">
+              <input
+                type="number"
+                min="5"
+                max="60"
+                step="0.5"
+                value={spit1MountedKg}
+                onChange={(e) => setSpit1MountedKg(Number(e.target.value))}
+                className="w-full h-11 px-4 rounded-xl bg-[#161618] border border-[#383838] text-orange-400 font-mono text-lg font-black focus:outline-none focus:border-orange-500"
+                required
+              />
+              <span className="absolute right-4 top-1/2 -translate-y-1/2 text-xs text-zinc-400 font-mono font-bold">kg</span>
             </div>
+            <p className="text-[11px] text-zinc-500">
+              When this cone finishes during rush hours, use the <strong className="text-orange-400 font-medium">🍗 Reload Spit Meat</strong> button to add more.
+            </p>
           </div>
 
           {/* Shift Staff On Duty */}

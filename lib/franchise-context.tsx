@@ -63,14 +63,27 @@ const INITIAL_SAFE_DROPS: SafeDrop[] = [
 
 export type UserRole = "SUPER_ADMIN" | "FRANCHISE_OWNER";
 
+export interface SpitReloadEntry {
+  id: string;
+  timestamp: string;
+  quantityKg: number;
+  meatType: string;
+  batchCode?: string;
+  addedBy: string;
+  notes?: string;
+}
+
 export interface DailyStoreSession {
   date: string;
   status: "OPEN" | "CLOSED" | "NOT_OPENED";
   openedAt?: string;
   closedAt?: string;
   openingFloat: number;
-  spit1MountedKg: number;
-  spit2MountedKg: number;
+  spitMountedKg: number; // Primary Spit Initial mounted weight
+  spit1MountedKg?: number; // Backwards compatible alias
+  spit2MountedKg?: number; // Optional secondary
+  spitReloads?: SpitReloadEntry[]; // Mid-shift reloads whenever cone is empty!
+  totalSpitMeatLoadedKg?: number; // Initial + sum(reloads)
   cashierName: string;
   spitMasterName: string;
   actualCashCounted?: number;
@@ -130,7 +143,14 @@ interface FranchiseContextType {
   dispatchShipment: (data: Omit<CentralShipment, "id">) => void;
   addMenuItem: (item: Omit<MenuItemRecipe, "id">) => void;
   updateMenuItem: (id: string, updates: Partial<MenuItemRecipe>) => void;
-  deleteMenuItem: (id: string) => void;
+  // Spit Management Actions
+  addSpitMeatReload: (reload: {
+    quantityKg: number;
+    meatType?: string;
+    batchCode?: string;
+    addedBy?: string;
+    notes?: string;
+  }) => void;
   
   // Rider Station Actions
   riderOrders: RiderPickupOrder[];
@@ -202,8 +222,11 @@ export function FranchiseProvider({ children }: { children: React.ReactNode }) {
     status: "OPEN",
     openedAt: "10:30 AM",
     openingFloat: 2000,
+    spitMountedKg: 28.0,
     spit1MountedKg: 28.0,
-    spit2MountedKg: 15.0,
+    spit2MountedKg: 0,
+    spitReloads: [],
+    totalSpitMeatLoadedKg: 28.0,
     cashierName: "Imran Siddiqui",
     spitMasterName: "Chef Raheem",
   };
@@ -701,10 +724,61 @@ export function FranchiseProvider({ children }: { children: React.ReactNode }) {
     saveState({ riderOrders: updated });
   };
 
+  // Spit Meat Reload Action (When spit is empty / adding more meat)
+  const addSpitMeatReload = (reload: {
+    quantityKg: number;
+    meatType?: string;
+    batchCode?: string;
+    addedBy?: string;
+    notes?: string;
+  }) => {
+    const timeNow = new Date().toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", hour12: true });
+    const newEntry: SpitReloadEntry = {
+      id: `reload-${Date.now()}`,
+      timestamp: timeNow,
+      quantityKg: reload.quantityKg,
+      meatType: reload.meatType || "Chicken Koyla Marinated",
+      batchCode: reload.batchCode || "MB-20260826-01",
+      addedBy: reload.addedBy || dailySession.spitMasterName || "Chef Raheem",
+      notes: reload.notes || "Mounted fresh meat cone onto spit",
+    };
+
+    const currentReloads = dailySession.spitReloads || [];
+    const updatedReloads = [...currentReloads, newEntry];
+    const initialKg = dailySession.spitMountedKg || dailySession.spit1MountedKg || 28.0;
+    const reloadsTotal = updatedReloads.reduce((sum, r) => sum + r.quantityKg, 0);
+    const newTotalLoaded = initialKg + reloadsTotal;
+
+    const updatedSession: DailyStoreSession = {
+      ...dailySession,
+      spitReloads: updatedReloads,
+      totalSpitMeatLoadedKg: newTotalLoaded,
+    };
+
+    setDailySession(updatedSession);
+
+    const logEntry: AuditLog = {
+      id: `audit-${Date.now()}`,
+      timestamp: new Date().toISOString().replace("T", " ").substring(0, 19),
+      outletName: activeOutlet?.name || "Bandra West Flagship",
+      user: reload.addedBy || dailySession.spitMasterName || "Spit Master",
+      role: "Franchise Staff",
+      action: `Spit Meat Reload: +${reload.quantityKg}kg`,
+      module: "Inventory",
+      severity: "info",
+      details: `Mounted fresh ${reload.meatType || "Chicken"} cone (+${reload.quantityKg}kg). Total spit meat loaded today: ${newTotalLoaded}kg.`,
+    };
+
+    const updatedLogs = [logEntry, ...auditLogs];
+    setAuditLogs(updatedLogs);
+    saveState({ dailySession: updatedSession, auditLogs: updatedLogs });
+  };
+
   // Daily Lifecycle Actions
   const startFreshDay = (options: {
     openingFloat: number;
-    spit1MountedKg: number;
+    spitMountedKg?: number;
+    spit1MountedKg?: number;
     spit2MountedKg?: number;
     cashierName: string;
     spitMasterName: string;
@@ -712,14 +786,18 @@ export function FranchiseProvider({ children }: { children: React.ReactNode }) {
   }) => {
     const todayStr = new Date().toISOString().split("T")[0];
     const timeNow = new Date().toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", hour12: true });
+    const initialKg = options.spitMountedKg ?? options.spit1MountedKg ?? 28.0;
 
     const newSession: DailyStoreSession = {
       date: todayStr,
       status: "OPEN",
       openedAt: timeNow,
       openingFloat: options.openingFloat,
-      spit1MountedKg: options.spit1MountedKg,
+      spitMountedKg: initialKg,
+      spit1MountedKg: initialKg,
       spit2MountedKg: options.spit2MountedKg || 0,
+      spitReloads: [],
+      totalSpitMeatLoadedKg: initialKg,
       cashierName: options.cashierName,
       spitMasterName: options.spitMasterName,
     };
@@ -738,7 +816,7 @@ export function FranchiseProvider({ children }: { children: React.ReactNode }) {
       action: `Store Opened for Business (Float ₹${options.openingFloat})`,
       module: "Operations",
       severity: "info",
-      details: `Morning open completed. Cash float: ₹${options.openingFloat}. Spit 1: ${options.spit1MountedKg}kg mounted. Cashier: ${options.cashierName}, Spit Master: ${options.spitMasterName}.`,
+      details: `Morning open completed. Cash float: ₹${options.openingFloat}. Spit: ${initialKg}kg mounted. Cashier: ${options.cashierName}, Spit Master: ${options.spitMasterName}.`,
     };
 
     const updatedLogs = [logEntry, ...auditLogs];
@@ -975,6 +1053,7 @@ export function FranchiseProvider({ children }: { children: React.ReactNode }) {
         addMenuItem,
         updateMenuItem,
         deleteMenuItem,
+        addSpitMeatReload,
         riderOrders,
         verifyRiderOtp,
         updateRiderStatus,

@@ -20,6 +20,7 @@ import {
 import { useFranchise } from "@/lib/franchise-context";
 import { Button } from "@/components/ui/Button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/Dialog";
+import { SpitReloadModal } from "@/components/modals/SpitReloadModal";
 import { logout } from "@/app/actions/auth";
 import { cn } from "@/components/ui/cn";
 
@@ -35,16 +36,17 @@ export default function PosTopNav({
   const pathname = usePathname();
   const router = useRouter();
 
-  const { activeOutlet, outlets, outletTenderTotals, liveOrders, addPettyCashExpense, performSafeDrop } = useFranchise();
+  const { activeOutlet, outlets, outletTenderTotals, liveOrders, addPettyCashExpense, performSafeDrop, dailySession } = useFranchise();
   const currentOutlet = activeOutlet || outlets[0];
 
   const [currentTime, setCurrentTime] = useState("");
   const [isOnline, setIsOnline] = useState(true);
   const [offlineCount, setOfflineCount] = useState(0);
 
-  // Modals for Petty Cash & Safe Drop
+  // Modals for Petty Cash, Safe Drop, and Spit Reload
   const [showPettyModal, setShowPettyModal] = useState(false);
   const [showSafeDropModal, setShowSafeDropModal] = useState(false);
+  const [showSpitReloadModal, setShowSpitReloadModal] = useState(false);
 
   // Petty Cash Form State
   const [pettyAmount, setPettyAmount] = useState("150");
@@ -222,6 +224,20 @@ export default function PosTopNav({
 
         {/* Right Actions: Quick Petty Cash, Safe Drop, and Workspace */}
         <div className="flex items-center gap-2">
+          {/* Spit Meat Reload Action */}
+          <button
+            type="button"
+            onClick={() => setShowSpitReloadModal(true)}
+            className="flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-orange-600/15 border border-orange-500/40 hover:bg-orange-600/25 text-xs font-bold text-orange-400 hover:text-orange-300 transition-all cursor-pointer"
+            title="Mount / Reload Fresh Meat Cone onto Spit"
+          >
+            <Flame className="w-3.5 h-3.5 text-orange-400" />
+            <span className="hidden sm:inline">Reload Spit</span>
+            <span className="font-mono text-[10px] font-black bg-orange-500/20 px-1 rounded text-orange-300">
+              {(dailySession.totalSpitMeatLoadedKg || dailySession.spitMountedKg || dailySession.spit1MountedKg || 28)}kg
+            </span>
+          </button>
+
           {/* Petty Cash Outflow Button */}
           <button
             type="button"
@@ -403,6 +419,12 @@ export default function PosTopNav({
           </DialogContent>
         </Dialog>
       )}
+
+      {/* Spit Meat Reload Modal */}
+      <SpitReloadModal
+        isOpen={showSpitReloadModal}
+        onClose={() => setShowSpitReloadModal(false)}
+      />
     </>
   );
 }
