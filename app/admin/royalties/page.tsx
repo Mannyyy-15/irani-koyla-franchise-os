@@ -70,45 +70,53 @@ export default function RoyaltiesPage() {
 
       {/* KPI Metrics */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <Card className="border-[#303030] bg-[#1f1f1f]">
-          <CardContent className="p-4 sm:p-5">
-            <span className="text-xs font-semibold uppercase tracking-wider text-[#b8b8c5]/70 block">
-              Total Invoiced Dues
-            </span>
-            <p className="text-2xl font-black text-white font-mono mt-1">
-              ₹{totalPayableAll.toLocaleString("en-IN")}
-            </p>
-            <span className="text-[11px] text-[#b8b8c5]/50 block mt-1">
-              {filteredRoyalties.length} Monthly Statements
-            </span>
+        {/* Total Invoiced Dues */}
+        <Card className="border-[#2e2e30] bg-[#1a1a1c] shadow-sm rounded-2xl">
+          <CardContent className="p-5 flex items-center gap-4">
+            <div className="w-12 h-12 rounded-xl bg-[#242427] border border-[#333336] flex items-center justify-center shrink-0">
+              <FileText className="w-6 h-6 text-zinc-300" />
+            </div>
+            <div className="min-w-0">
+              <span className="text-[11px] font-semibold text-zinc-400 block">Total Invoiced Dues</span>
+              <p className="text-2xl font-bold text-white font-mono tracking-tight mt-0.5">
+                ₹{totalPayableAll.toLocaleString("en-IN")}
+              </p>
+              <span className="text-xs text-zinc-400 block mt-0.5">{filteredRoyalties.length} Monthly Statements</span>
+            </div>
           </CardContent>
         </Card>
 
-        <Card className="border-[#303030] bg-[#1f1f1f]">
-          <CardContent className="p-4 sm:p-5">
-            <span className="text-xs font-semibold uppercase tracking-wider text-emerald-400 block">
-              Settled & Remitted
-            </span>
-            <p className="text-2xl font-black text-emerald-400 font-mono mt-1">
-              ₹{totalPaid.toLocaleString("en-IN")}
-            </p>
-            <span className="text-[11px] text-emerald-400/80 block mt-1">
-              {((totalPaid / (totalPayableAll || 1)) * 100).toFixed(0)}% Remittance Rate
-            </span>
+        {/* Settled & Remitted */}
+        <Card className="border-[#2e2e30] bg-[#1a1a1c] shadow-sm rounded-2xl">
+          <CardContent className="p-5 flex items-center gap-4">
+            <div className="w-12 h-12 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center shrink-0 text-emerald-400">
+              <CheckCircle2 className="w-6 h-6" />
+            </div>
+            <div className="min-w-0">
+              <span className="text-[11px] font-semibold text-emerald-300 block">Settled & Remitted</span>
+              <p className="text-2xl font-bold text-emerald-400 font-mono tracking-tight mt-0.5">
+                ₹{totalPaid.toLocaleString("en-IN")}
+              </p>
+              <span className="text-xs text-emerald-400 font-medium block mt-0.5">
+                {((totalPaid / (totalPayableAll || 1)) * 100).toFixed(0)}% Remittance Rate
+              </span>
+            </div>
           </CardContent>
         </Card>
 
-        <Card className="border-[#303030] bg-[#1f1f1f]">
-          <CardContent className="p-4 sm:p-5">
-            <span className="text-xs font-semibold uppercase tracking-wider text-amber-400 block">
-              Pending / Under Review
-            </span>
-            <p className="text-2xl font-black text-amber-400 font-mono mt-1">
-              ₹{totalPending.toLocaleString("en-IN")}
-            </p>
-            <span className="text-[11px] text-[#b8b8c5]/50 block mt-1">
-              Due by 10th of every month
-            </span>
+        {/* Pending / Under Review */}
+        <Card className="border-[#2e2e30] bg-[#1a1a1c] shadow-sm rounded-2xl">
+          <CardContent className="p-5 flex items-center gap-4">
+            <div className="w-12 h-12 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center shrink-0 text-amber-400">
+              <Clock className="w-6 h-6" />
+            </div>
+            <div className="min-w-0">
+              <span className="text-[11px] font-semibold text-amber-300 block">Pending / Under Review</span>
+              <p className="text-2xl font-bold text-amber-400 font-mono tracking-tight mt-0.5">
+                ₹{totalPending.toLocaleString("en-IN")}
+              </p>
+              <span className="text-xs text-zinc-400 block mt-0.5">Due by 10th of month</span>
+            </div>
           </CardContent>
         </Card>
       </div>

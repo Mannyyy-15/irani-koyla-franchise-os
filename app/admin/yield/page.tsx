@@ -154,76 +154,76 @@ export default function MeatYieldPage() {
       </div>
 
       {/* KPI Cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Raw Meat Loaded */}
-        <Card className="border-[#303030] bg-[#1f1f1f]">
-          <CardContent className="p-4 sm:p-5">
-            <div className="flex items-center justify-between gap-2 mb-2">
-              <span className="text-xs font-semibold text-[#b8b8c5]/70 uppercase tracking-wider">
-                Raw Skewers Loaded
-              </span>
-              <Scale className="w-4 h-4 text-amber-500" />
+        <Card className="border-[#2e2e30] bg-[#1a1a1c] shadow-sm rounded-2xl">
+          <CardContent className="p-5 flex items-center gap-4">
+            <div className="w-12 h-12 rounded-xl bg-orange-500/10 border border-orange-500/30 flex items-center justify-center shrink-0 text-orange-400">
+              <Scale className="w-6 h-6" />
             </div>
-            <p className="text-2xl font-black text-white font-mono">
-              {totalRawReceived.toFixed(1)} <span className="text-xs text-[#b8b8c5]/60 font-sans">kg</span>
-            </p>
-            <span className="text-[11px] text-[#b8b8c5]/50 block mt-1">
-              Cooked: {totalCookedYield.toFixed(1)} kg carved
-            </span>
+            <div className="min-w-0">
+              <span className="text-[11px] font-semibold text-zinc-400 block">Raw Skewers Loaded</span>
+              <p className="text-2xl font-bold text-white font-mono tracking-tight mt-0.5">
+                {totalRawReceived.toFixed(1)} <span className="text-sm font-bold text-zinc-400 font-sans">kg</span>
+              </p>
+              <span className="text-xs text-zinc-400 block mt-0.5">
+                Cooked: {totalCookedYield.toFixed(1)} kg carved
+              </span>
+            </div>
           </CardContent>
         </Card>
 
         {/* Avg Spit Yield Efficiency */}
-        <Card className="border-[#303030] bg-[#1f1f1f]">
-          <CardContent className="p-4 sm:p-5">
-            <div className="flex items-center justify-between gap-2 mb-2">
-              <span className="text-xs font-semibold text-[#b8b8c5]/70 uppercase tracking-wider">
-                Yield Efficiency
-              </span>
-              <Percent className="w-4 h-4 text-emerald-500" />
+        <Card className="border-[#2e2e30] bg-[#1a1a1c] shadow-sm rounded-2xl">
+          <CardContent className="p-5 flex items-center gap-4">
+            <div className="w-12 h-12 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center shrink-0 text-emerald-400">
+              <Percent className="w-6 h-6" />
             </div>
-            <p className="text-2xl font-black text-emerald-400 font-mono">
-              {avgEfficiency}%
-            </p>
-            <span className="text-[11px] text-emerald-400/80 block mt-1">
-              Threshold: &ge; 92.0% target
-            </span>
+            <div className="min-w-0">
+              <span className="text-[11px] font-semibold text-emerald-300 block">Yield Efficiency</span>
+              <p className="text-2xl font-bold text-emerald-400 font-mono tracking-tight mt-0.5">
+                {avgEfficiency}%
+              </p>
+              <span className="text-xs text-emerald-400 font-medium block mt-0.5">
+                Target: &ge; 92.0% standard
+              </span>
+            </div>
           </CardContent>
         </Card>
 
         {/* Wraps Produced */}
-        <Card className="border-[#303030] bg-[#1f1f1f]">
-          <CardContent className="p-4 sm:p-5">
-            <div className="flex items-center justify-between gap-2 mb-2">
-              <span className="text-xs font-semibold text-[#b8b8c5]/70 uppercase tracking-wider">
-                Portions Produced
-              </span>
-              <UtensilsCrossed className="w-4 h-4 text-blue-500" />
+        <Card className="border-[#2e2e30] bg-[#1a1a1c] shadow-sm rounded-2xl">
+          <CardContent className="p-5 flex items-center gap-4">
+            <div className="w-12 h-12 rounded-xl bg-[#242427] border border-[#333336] flex items-center justify-center shrink-0 text-blue-400">
+              <UtensilsCrossed className="w-6 h-6" />
             </div>
-            <p className="text-2xl font-black text-white font-mono">
-              {totalWrapsProduced.toLocaleString()}
-            </p>
-            <span className="text-[11px] text-[#b8b8c5]/50 block mt-1">
-              Avg 110g meat per roll
-            </span>
+            <div className="min-w-0">
+              <span className="text-[11px] font-semibold text-zinc-400 block">Portions Produced</span>
+              <p className="text-2xl font-bold text-white font-mono tracking-tight mt-0.5">
+                {totalWrapsProduced.toLocaleString()}
+              </p>
+              <span className="text-xs text-zinc-400 block mt-0.5">
+                Avg 110g meat per roll
+              </span>
+            </div>
           </CardContent>
         </Card>
 
         {/* Trimming & Waste */}
-        <Card className="border-[#303030] bg-[#1f1f1f]">
-          <CardContent className="p-4 sm:p-5">
-            <div className="flex items-center justify-between gap-2 mb-2">
-              <span className="text-xs font-semibold text-[#b8b8c5]/70 uppercase tracking-wider">
-                Trimming & Scrap Waste
-              </span>
-              <AlertTriangle className="w-4 h-4 text-rose-500" />
+        <Card className="border-[#2e2e30] bg-[#1a1a1c] shadow-sm rounded-2xl">
+          <CardContent className="p-5 flex items-center gap-4">
+            <div className="w-12 h-12 rounded-xl bg-rose-500/10 border border-rose-500/30 flex items-center justify-center shrink-0 text-rose-400">
+              <AlertTriangle className="w-6 h-6" />
             </div>
-            <p className="text-2xl font-black text-rose-400 font-mono">
-              {totalWaste.toFixed(1)} <span className="text-xs text-[#b8b8c5]/60 font-sans">kg</span>
-            </p>
-            <span className="text-[11px] text-[#b8b8c5]/50 block mt-1">
-              {( (totalWaste / (totalRawReceived || 1)) * 100 ).toFixed(1)}% scrap ratio
-            </span>
+            <div className="min-w-0">
+              <span className="text-[11px] font-semibold text-rose-300 block">Trimming & Scrap Waste</span>
+              <p className="text-2xl font-bold text-rose-400 font-mono tracking-tight mt-0.5">
+                {totalWaste.toFixed(1)} <span className="text-sm font-bold text-zinc-400 font-sans">kg</span>
+              </p>
+              <span className="text-xs text-zinc-400 block mt-0.5">
+                {((totalWaste / (totalRawReceived || 1)) * 100).toFixed(1)}% scrap ratio
+              </span>
+            </div>
           </CardContent>
         </Card>
       </div>

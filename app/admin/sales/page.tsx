@@ -144,72 +144,68 @@ export default function DailySalesPage() {
       </div>
 
       {/* KPI Cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-        <Card className="border-[#303030] bg-[#1f1f1f]">
-          <CardContent className="p-4 sm:p-5">
-            <div className="flex items-center justify-between gap-2 mb-2">
-              <span className="text-xs font-semibold text-[#b8b8c5]/70 uppercase tracking-wider">
-                Total Gross Sales
-              </span>
-              <Receipt className="w-4 h-4 text-amber-500" />
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        {/* Total Gross Sales */}
+        <Card className="border-[#2e2e30] bg-[#1a1a1c] shadow-sm rounded-2xl">
+          <CardContent className="p-5 flex items-center gap-4">
+            <div className="w-12 h-12 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center shrink-0 text-amber-400">
+              <Receipt className="w-6 h-6" />
             </div>
-            <p className="text-2xl font-black text-white font-mono">
-              ₹{totalGross.toLocaleString("en-IN")}
-            </p>
-            <span className="text-[11px] text-[#b8b8c5]/50 block mt-1">
-              All reconciled shifts
-            </span>
+            <div className="min-w-0">
+              <span className="text-[11px] font-semibold text-zinc-400 block">Total Gross Sales</span>
+              <p className="text-2xl font-bold text-white font-mono tracking-tight mt-0.5">
+                ₹{totalGross.toLocaleString("en-IN")}
+              </p>
+              <span className="text-xs text-zinc-400 block mt-0.5">All reconciled shifts</span>
+            </div>
           </CardContent>
         </Card>
 
-        <Card className="border-[#303030] bg-[#1f1f1f]">
-          <CardContent className="p-4 sm:p-5">
-            <div className="flex items-center justify-between gap-2 mb-2">
-              <span className="text-xs font-semibold text-[#b8b8c5]/70 uppercase tracking-wider">
-                UPI & QR Collections
-              </span>
-              <Smartphone className="w-4 h-4 text-blue-500" />
+        {/* UPI & QR Collections */}
+        <Card className="border-[#2e2e30] bg-[#1a1a1c] shadow-sm rounded-2xl">
+          <CardContent className="p-5 flex items-center gap-4">
+            <div className="w-12 h-12 rounded-xl bg-blue-500/10 border border-blue-500/30 flex items-center justify-center shrink-0 text-blue-400">
+              <Smartphone className="w-6 h-6" />
             </div>
-            <p className="text-2xl font-black text-blue-400 font-mono">
-              ₹{totalUpi.toLocaleString("en-IN")}
-            </p>
-            <span className="text-[11px] text-[#b8b8c5]/50 block mt-1">
-              Direct settlement
-            </span>
+            <div className="min-w-0">
+              <span className="text-[11px] font-semibold text-blue-300 block">UPI & QR Collections</span>
+              <p className="text-2xl font-bold text-blue-400 font-mono tracking-tight mt-0.5">
+                ₹{totalUpi.toLocaleString("en-IN")}
+              </p>
+              <span className="text-xs text-zinc-400 block mt-0.5">Direct bank settlement</span>
+            </div>
           </CardContent>
         </Card>
 
-        <Card className="border-[#303030] bg-[#1f1f1f]">
-          <CardContent className="p-4 sm:p-5">
-            <div className="flex items-center justify-between gap-2 mb-2">
-              <span className="text-xs font-semibold text-[#b8b8c5]/70 uppercase tracking-wider">
-                Physical Cash in Hand
-              </span>
-              <Banknote className="w-4 h-4 text-emerald-500" />
+        {/* Physical Cash in Hand */}
+        <Card className="border-[#2e2e30] bg-[#1a1a1c] shadow-sm rounded-2xl">
+          <CardContent className="p-5 flex items-center gap-4">
+            <div className="w-12 h-12 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center shrink-0 text-emerald-400">
+              <Banknote className="w-6 h-6" />
             </div>
-            <p className="text-2xl font-black text-emerald-400 font-mono">
-              ₹{totalCash.toLocaleString("en-IN")}
-            </p>
-            <span className="text-[11px] text-[#b8b8c5]/50 block mt-1">
-              Counted drawer cash
-            </span>
+            <div className="min-w-0">
+              <span className="text-[11px] font-semibold text-emerald-300 block">Physical Cash in Hand</span>
+              <p className="text-2xl font-bold text-emerald-400 font-mono tracking-tight mt-0.5">
+                ₹{totalCash.toLocaleString("en-IN")}
+              </p>
+              <span className="text-xs text-zinc-400 block mt-0.5">Counted drawer cash</span>
+            </div>
           </CardContent>
         </Card>
 
-        <Card className="border-[#303030] bg-[#1f1f1f]">
-          <CardContent className="p-4 sm:p-5">
-            <div className="flex items-center justify-between gap-2 mb-2">
-              <span className="text-xs font-semibold text-[#b8b8c5]/70 uppercase tracking-wider">
-                Food Aggregators
-              </span>
-              <Truck className="w-4 h-4 text-orange-500" />
+        {/* Food Aggregators */}
+        <Card className="border-[#2e2e30] bg-[#1a1a1c] shadow-sm rounded-2xl">
+          <CardContent className="p-5 flex items-center gap-4">
+            <div className="w-12 h-12 rounded-xl bg-orange-500/10 border border-orange-500/30 flex items-center justify-center shrink-0 text-orange-400">
+              <Truck className="w-6 h-6" />
             </div>
-            <p className="text-2xl font-black text-orange-400 font-mono">
-              ₹{totalAggregators.toLocaleString("en-IN")}
-            </p>
-            <span className="text-[11px] text-[#b8b8c5]/50 block mt-1">
-              Zomato + Swiggy payout
-            </span>
+            <div className="min-w-0">
+              <span className="text-[11px] font-semibold text-orange-300 block">Food Aggregators</span>
+              <p className="text-2xl font-bold text-orange-400 font-mono tracking-tight mt-0.5">
+                ₹{totalAggregators.toLocaleString("en-IN")}
+              </p>
+              <span className="text-xs text-zinc-400 block mt-0.5">Zomato + Swiggy payout</span>
+            </div>
           </CardContent>
         </Card>
       </div>
