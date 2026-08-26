@@ -587,6 +587,32 @@ For central commissary refills or support, contact HQ Operations.
             </div>
           );
         })}
+
+        {filteredOutlets.length === 0 && (
+          <div className="col-span-full py-16 px-6 rounded-3xl bg-[#1f1f1f] border border-dashed border-[#303030] flex flex-col items-center justify-center text-center space-y-4">
+            <div className="w-16 h-16 rounded-3xl bg-orange-500/10 border border-orange-500/30 flex items-center justify-center text-orange-400 shadow-inner">
+              <Store className="w-8 h-8" />
+            </div>
+            <div className="space-y-1 max-w-md">
+              <h3 className="text-xl font-black text-white">No Franchise Outlets Registered</h3>
+              <p className="text-xs text-zinc-400">
+                You are logged in as Super Admin. Click the button below to onboard your first franchise partner, configure split rates, and issue credentials.
+              </p>
+            </div>
+            {isSuperAdmin && (
+              <Button
+                onClick={() => {
+                  handleGeneratePassword();
+                  setShowAddModal(true);
+                }}
+                className="bg-orange-600 hover:bg-orange-500 text-white font-black text-xs uppercase tracking-wider rounded-xl gap-2 shadow-lg shadow-orange-600/25 h-11 px-5 cursor-pointer"
+              >
+                <Plus className="w-4 h-4" />
+                <span>Onboard First Franchise Hub</span>
+              </Button>
+            )}
+          </div>
+        )}
       </div>
 
       {/* ── FRANCHISE 360° OPERATIONS DOSSIER MODAL ──────────────────────── */}

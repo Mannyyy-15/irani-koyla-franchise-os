@@ -199,7 +199,7 @@ interface FranchiseContextType {
 
 const FranchiseContext = createContext<FranchiseContextType | undefined>(undefined);
 
-const STORAGE_KEY = "irani_koyla_os_state_v2";
+const STORAGE_KEY = "irani_koyla_os_state_v3";
 
 export function FranchiseProvider({ children }: { children: React.ReactNode }) {
   const [role, setRoleState] = useState<UserRole>("SUPER_ADMIN");

@@ -25,7 +25,7 @@ import { useFranchise } from "@/lib/franchise-context";
 function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { loginAsRole } = useFranchise();
+  const { loginAsRole, outlets } = useFranchise();
 
   const [email, setEmail] = useState("admin@iranikoyla.com");
   const [password, setPassword] = useState("password123");
@@ -251,10 +251,10 @@ function LoginForm() {
             </button>
           </form>
 
-          {/* Quick Demo Test Accounts (Separated Roles) */}
+          {/* Quick Test Accounts */}
           <div className="p-4 rounded-2xl bg-[#1f1f1f] border border-[#303030] space-y-3">
             <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest block">
-              1-Click Switch Authorized Profile
+              1-Click Switch Profile
             </span>
 
             <div className="grid grid-cols-1 gap-2">
@@ -262,52 +262,51 @@ function LoginForm() {
               <button
                 type="button"
                 onClick={() => populateAccount("admin@iranikoyla.com")}
-                className="p-3 rounded-xl bg-[#161618] border border-[#303030] hover:border-orange-500 flex items-center justify-between text-xs text-left transition-all cursor-pointer group"
+                className="p-3 rounded-xl bg-[#161618] border border-orange-500/40 hover:border-orange-500 flex items-center justify-between text-xs text-left transition-all cursor-pointer group"
               >
                 <div>
                   <span className="font-bold text-white block group-hover:text-orange-400 transition-colors">
                     🏢 Irani Koyla Brand HQ (Super Admin)
                   </span>
-                  <span className="text-[10px] text-zinc-500 font-mono">admin@iranikoyla.com &middot; All Outlets</span>
+                  <span className="text-[10px] text-zinc-500 font-mono">admin@iranikoyla.com &middot; Brand Master</span>
                 </div>
                 <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-orange-500/10 text-orange-400 border border-orange-500/20 shrink-0">
-                  Full Network
+                  Super Admin
                 </span>
               </button>
 
-              {/* Franchise 1: Mohak City */}
-              <button
-                type="button"
-                onClick={() => populateAccount("partner.mohak@iranikoyla.com")}
-                className="p-3 rounded-xl bg-[#161618] border border-[#303030] hover:border-emerald-500 flex items-center justify-between text-xs text-left transition-all cursor-pointer group"
-              >
-                <div>
-                  <span className="font-bold text-white block group-hover:text-emerald-400 transition-colors">
-                    🏪 Mohak City Branch (Partner)
-                  </span>
-                  <span className="text-[10px] text-zinc-500 font-mono">partner.mohak@iranikoyla.com &middot; IK-MOH-01</span>
+              {/* Dynamic Onboarded Outlets (if any) */}
+              {outlets && outlets.length > 0 ? (
+                outlets.map((outlet) => (
+                  <button
+                    key={outlet.id}
+                    type="button"
+                    onClick={() => populateAccount(outlet.loginEmail || `partner.${outlet.id}@iranikoyla.com`)}
+                    className="p-3 rounded-xl bg-[#161618] border border-[#303030] hover:border-emerald-500 flex items-center justify-between text-xs text-left transition-all cursor-pointer group"
+                  >
+                    <div>
+                      <span className="font-bold text-white block group-hover:text-emerald-400 transition-colors">
+                        🏪 {outlet.name}
+                      </span>
+                      <span className="text-[10px] text-zinc-500 font-mono">
+                        {outlet.loginEmail || `partner.${outlet.id}@iranikoyla.com`} &middot; {outlet.code}
+                      </span>
+                    </div>
+                    <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 shrink-0">
+                      Franchise Partner
+                    </span>
+                  </button>
+                ))
+              ) : (
+                <div className="p-3 rounded-xl bg-[#161618]/60 border border-dashed border-[#303030] text-center">
+                  <p className="text-[11px] text-zinc-400">
+                    No franchise hubs registered yet.
+                  </p>
+                  <p className="text-[10px] text-zinc-500 mt-0.5">
+                    Log in as Super Admin &rarr; Outlets &rarr; "Onboard Franchise Hub" to add your first branch.
+                  </p>
                 </div>
-                <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 shrink-0">
-                  Mohak Only
-                </span>
-              </button>
-
-              {/* Franchise 2: Bandra West */}
-              <button
-                type="button"
-                onClick={() => populateAccount("partner.bandra@iranikoyla.com")}
-                className="p-3 rounded-xl bg-[#161618] border border-[#303030] hover:border-blue-500 flex items-center justify-between text-xs text-left transition-all cursor-pointer group"
-              >
-                <div>
-                  <span className="font-bold text-white block group-hover:text-blue-400 transition-colors">
-                    🏪 Bandra West Flagship (Partner)
-                  </span>
-                  <span className="text-[10px] text-zinc-500 font-mono">partner.bandra@iranikoyla.com &middot; IK-MUM-01</span>
-                </div>
-                <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-blue-500/10 text-blue-400 border border-blue-500/20 shrink-0">
-                  Bandra Only
-                </span>
-              </button>
+              )}
             </div>
           </div>
         </div>
