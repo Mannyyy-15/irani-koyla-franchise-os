@@ -145,46 +145,29 @@ export default function AdminDashboardPage() {
     <div className="space-y-6">
       {/* ── TOP HEADER AREA ────────────────────────────────────────────── */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-1">
-        <div className="space-y-1.5">
-          <p className="text-[11px] font-black text-orange-500 uppercase tracking-widest leading-none flex items-center gap-2">
-            <Store className="w-3.5 h-3.5" />
-            <span>
-              {isSuperAdmin
-                ? "Brand HQ Global • Multi-Branch Operations"
-                : `${outletName} • ${outletCode}`}
+        <div className="flex items-center gap-3 flex-wrap">
+          <h1 className="text-2xl font-bold text-white tracking-tight">
+            {isSuperAdmin ? "Network Overview" : outletName}
+          </h1>
+          {!isSuperAdmin && (
+            <span className={cn(
+              "px-2.5 py-0.5 rounded-lg text-[11px] font-mono font-bold flex items-center gap-1.5 border",
+              dailySession.status === "OPEN"
+                ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/30"
+                : "bg-zinc-800 text-zinc-400 border-zinc-700"
+            )}>
+              <span className={cn("w-1.5 h-1.5 rounded-full", dailySession.status === "OPEN" ? "bg-emerald-400 animate-pulse" : "bg-zinc-500")} />
+              <span>{dailySession.status === "OPEN" ? "Live" : "Closed"}</span>
             </span>
-          </p>
-          <div className="flex items-center gap-3 flex-wrap">
-            <h1 className="text-2xl sm:text-3xl font-black text-white tracking-tight pt-0.5">
-              {isSuperAdmin ? "Network Executive Command Center" : "Store Overview & Live Analytics"}
-            </h1>
-            {!isSuperAdmin && (
-              <span className={cn(
-                "px-2.5 py-1 rounded-xl text-[11px] font-mono font-black flex items-center gap-1.5 border",
-                dailySession.status === "OPEN"
-                  ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/30"
-                  : "bg-zinc-800 text-zinc-400 border-zinc-700"
-              )}>
-                <span className={cn("w-2 h-2 rounded-full", dailySession.status === "OPEN" ? "bg-emerald-400 animate-pulse" : "bg-zinc-500")} />
-                <span>{dailySession.status === "OPEN" ? `Live · Float ₹${dailySession.openingFloat.toLocaleString()}` : "Closed"}</span>
-              </span>
-            )}
-          </div>
-          {isSuperAdmin && (
-            <p className="text-xs sm:text-sm text-zinc-400 leading-relaxed max-w-2xl pt-1">
-              Real-time multi-unit performance, sales velocity, spit yield benchmarks, and live counter stream across {outlets.length} franchise locations.
-            </p>
           )}
         </div>
 
         {/* Top Right Action Group */}
         <div className="flex items-center gap-2 flex-wrap">
-          {/* Monthly Intelligence View Link */}
           <Link href="/admin/monthly">
             <Button
               variant="outline"
-              className="bg-[#202023] hover:bg-[#2a2a2e] border-[#383838] text-zinc-200 hover:text-white font-bold text-xs h-11 px-3.5 rounded-xl cursor-pointer shadow-sm flex items-center gap-1.5"
-              title="View Complete Monthly Sales & Meat Utilization Ledger"
+              className="bg-[#202023] hover:bg-[#2a2a2e] border-[#383838] text-zinc-200 hover:text-white font-bold text-xs h-10 px-3.5 rounded-xl cursor-pointer shadow-sm flex items-center gap-1.5"
             >
               <CalendarDays className="w-3.5 h-3.5 text-orange-400" />
               <span>Monthly Overview</span>
@@ -193,9 +176,9 @@ export default function AdminDashboardPage() {
 
           {isSuperAdmin ? (
             <Link href="/admin/outlets/new">
-              <Button className="bg-orange-600 hover:bg-orange-500 text-white font-black text-xs uppercase tracking-wider rounded-xl gap-2 shadow-lg shadow-orange-600/25 h-11 px-4 cursor-pointer">
+              <Button className="bg-orange-600 hover:bg-orange-500 text-white font-bold text-xs rounded-xl gap-2 h-10 px-4 cursor-pointer">
                 <Plus className="w-4 h-4" />
-                <span>Onboard Franchise Hub</span>
+                <span>Onboard Franchise</span>
               </Button>
             </Link>
           ) : (
@@ -203,7 +186,7 @@ export default function AdminDashboardPage() {
               {dailySession.status !== "OPEN" ? (
                 <Button
                   onClick={() => setIsOpeningModalOpen(true)}
-                  className="bg-gradient-to-r from-orange-600 to-amber-600 hover:from-orange-500 hover:to-amber-500 text-white font-black text-xs uppercase tracking-wider rounded-xl gap-2 shadow-lg shadow-orange-600/30 h-11 px-4 cursor-pointer"
+                  className="bg-orange-600 hover:bg-orange-500 text-white font-bold text-xs rounded-xl gap-2 h-10 px-4 cursor-pointer"
                 >
                   <Sun className="w-4 h-4" />
                   <span>Start Morning Shift</span>
@@ -212,8 +195,7 @@ export default function AdminDashboardPage() {
                 <>
                   <Button
                     onClick={() => setIsSpitReloadModalOpen(true)}
-                    className="bg-[#242427] hover:bg-[#303035] border border-[#383838] hover:border-orange-500/50 text-zinc-200 hover:text-white font-black text-xs uppercase tracking-wider rounded-xl gap-1.5 h-11 px-3.5 cursor-pointer transition-all"
-                    title="Mount fresh meat cone when spit is empty"
+                    className="bg-[#242427] hover:bg-[#303035] border border-[#383838] hover:border-orange-500/50 text-zinc-200 hover:text-white font-bold text-xs rounded-xl gap-1.5 h-10 px-3.5 cursor-pointer"
                   >
                     <Flame className="w-3.5 h-3.5 text-orange-400" />
                     <span>Reload Spit</span>
@@ -224,7 +206,7 @@ export default function AdminDashboardPage() {
 
                   <Button
                     onClick={() => setIsClosingModalOpen(true)}
-                    className="bg-indigo-600/15 hover:bg-indigo-600 border border-indigo-500/40 text-indigo-300 hover:text-white font-black text-xs uppercase tracking-wider rounded-xl gap-1.5 h-11 px-3.5 cursor-pointer transition-all"
+                    className="bg-indigo-600/15 hover:bg-indigo-600 border border-indigo-500/40 text-indigo-300 hover:text-white font-bold text-xs rounded-xl gap-1.5 h-10 px-3.5 cursor-pointer"
                   >
                     <Moon className="w-3.5 h-3.5" />
                     <span>EOD Close</span>
@@ -305,19 +287,14 @@ export default function AdminDashboardPage() {
           {/* Multi-Branch Live Performance Matrix */}
           <div className="p-5 rounded-2xl bg-[#1f1f1f] border border-[#303030] space-y-4">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-[#303030] pb-3">
-              <div>
-                <h2 className="text-base font-black text-white flex items-center gap-2">
-                  <Building className="w-4 h-4 text-orange-500" />
-                  <span>Franchise Branch Performance Comparison Matrix</span>
-                </h2>
-                <p className="text-xs text-zinc-400 mt-0.5">
-                  Live sales velocity, target realization %, spit carving yield, and compliance status across all hubs.
-                </p>
-              </div>
+              <h2 className="text-base font-bold text-white flex items-center gap-2">
+                <Building className="w-4 h-4 text-orange-500" />
+                <span>Franchise Outlets</span>
+              </h2>
 
               <Link href="/admin/outlets">
                 <Button size="sm" variant="outline" className="text-xs font-bold border-[#303030] bg-[#161618] text-orange-400 rounded-xl gap-1">
-                  <span>Manage Outlets & Credentials</span>
+                  <span>View All</span>
                   <ChevronRight className="w-3.5 h-3.5" />
                 </Button>
               </Link>

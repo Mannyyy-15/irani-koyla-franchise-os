@@ -445,29 +445,20 @@ For central commissary refills or support, contact HQ Operations.
 
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-1">
-        <div className="space-y-1.5">
-          <p className="text-[11px] font-black text-orange-500 uppercase tracking-widest leading-none flex items-center gap-2">
-            <Store className="w-3.5 h-3.5" />
-            <span>{isSuperAdmin ? "Brand HQ Franchise Network" : "Store Profile"}</span>
-          </p>
-          <h1 className="text-2xl sm:text-3xl font-black text-white tracking-tight pt-0.5">
-            {isSuperAdmin ? "Franchise Hubs & Provisioning Center" : activeOutlet?.name || "Bandra West (Flagship)"}
+        <div>
+          <h1 className="text-2xl font-bold text-white tracking-tight">
+            {isSuperAdmin ? "Franchise Outlets" : activeOutlet?.name || "Store Profile"}
           </h1>
-          <p className="text-xs sm:text-sm text-zinc-400 leading-relaxed max-w-2xl pt-1">
-            {isSuperAdmin
-              ? "Onboard new partners, provision custom credentials, manage magic login links, and audit live sales across all franchise hubs."
-              : `Branch Code: ${activeOutlet?.code || "IK-MUM-01"} · ${activeOutlet?.address}`}
-          </p>
         </div>
 
         {isSuperAdmin && (
           <div className="flex items-center gap-2">
             <Link href="/admin/outlets/new">
               <Button
-                className="bg-orange-600 hover:bg-orange-500 text-white font-black text-xs uppercase tracking-wider rounded-xl gap-2 shadow-lg shadow-orange-600/25 cursor-pointer h-11 px-5"
+                className="bg-orange-600 hover:bg-orange-500 text-white font-bold text-xs rounded-xl gap-2 h-10 px-4 cursor-pointer"
               >
                 <Plus className="w-4 h-4" />
-                <span>Onboard New Franchise Partner</span>
+                <span>Onboard Franchise</span>
               </Button>
             </Link>
           </div>

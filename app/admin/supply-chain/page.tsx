@@ -95,25 +95,18 @@ export default function SupplyChainPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <p className="text-[10px] font-bold text-orange-500 uppercase tracking-widest leading-none mb-1.5 flex items-center gap-1.5">
-            <Truck className="w-3.5 h-3.5" />
-            <span>Central Commissary & Logistics</span>
-          </p>
-          <h1 className="text-2xl sm:text-3xl font-black text-white tracking-tight">
-            Cold-Chain Meat & Spice Supply Dispatch
+          <h1 className="text-2xl font-bold text-white tracking-tight">
+            Supply Chain
           </h1>
-          <p className="text-xs sm:text-sm text-[#b8b8c5]/70 mt-0.5">
-            Central marination kitchen production, refrigerated van tracking, and tamper-proof seal audits.
-          </p>
         </div>
 
         <div className="flex items-center gap-2">
           <Button
             onClick={() => setShowDispatchModal(true)}
-            className="bg-orange-600 hover:bg-orange-500 text-white font-black text-xs uppercase tracking-wider rounded-xl gap-2 shadow-lg shadow-orange-600/25 cursor-pointer"
+            className="bg-orange-600 hover:bg-orange-500 text-white font-bold text-xs h-10 px-4 rounded-xl gap-2 shadow-md cursor-pointer"
           >
             <Plus className="w-4 h-4" />
-            <span>Dispatch New Cold Shipment</span>
+            <span>New Dispatch</span>
           </Button>
         </div>
       </div>

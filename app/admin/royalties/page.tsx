@@ -55,16 +55,9 @@ export default function RoyaltiesPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <p className="text-[10px] font-bold text-[#b8b8c5]/60 uppercase tracking-widest leading-none mb-1.5 flex items-center gap-1.5">
-            <WalletCards className="w-3.5 h-3.5 text-amber-500" />
-            <span>Franchise Financial Ledger</span>
-          </p>
-          <h1 className="text-2xl sm:text-3xl font-black text-white tracking-tight">
-            Royalty Statements & Agreement Dues
+          <h1 className="text-2xl font-bold text-white tracking-tight">
+            Royalties
           </h1>
-          <p className="text-xs sm:text-sm text-[#b8b8c5]/60 mt-0.5">
-            6.5% Brand Fee &middot; 2.0% Marketing Fund &middot; 18% GST &middot; Central Commissary Meat Invoicing.
-          </p>
         </div>
       </div>
 

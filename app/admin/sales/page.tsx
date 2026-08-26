@@ -124,24 +124,17 @@ export default function DailySalesPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <p className="text-[10px] font-bold text-[#b8b8c5]/60 uppercase tracking-widest leading-none mb-1.5 flex items-center gap-1.5">
-            <Receipt className="w-3.5 h-3.5 text-emerald-500" />
-            <span>Shift Cash & Tender Reconciliation</span>
-          </p>
-          <h1 className="text-2xl sm:text-3xl font-black text-white tracking-tight">
-            Daily Register Shifts & Cash Reconcile
+          <h1 className="text-2xl font-bold text-white tracking-tight">
+            Daily Sales & Shifts
           </h1>
-          <p className="text-xs sm:text-sm text-[#b8b8c5]/60 mt-0.5">
-            Physical drawer cash denomination count vs. expected POS register collections.
-          </p>
         </div>
 
         <Button
           onClick={() => setShowShiftModal(true)}
-          className="bg-amber-600 hover:bg-amber-500 text-white font-bold gap-2 shadow-md self-start sm:self-auto cursor-pointer"
+          className="bg-orange-600 hover:bg-orange-500 text-white font-bold text-xs h-10 px-4 rounded-xl gap-2 shadow-md self-start sm:self-auto cursor-pointer"
         >
           <Plus className="w-4 h-4" />
-          <span>Close & Reconcile Shift</span>
+          <span>Close Shift</span>
         </Button>
       </div>
 

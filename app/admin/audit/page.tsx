@@ -43,16 +43,9 @@ export default function AuditTrailPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <p className="text-[10px] font-bold text-[#b8b8c5]/60 uppercase tracking-widest leading-none mb-1.5 flex items-center gap-1.5">
-            <FilePieChart className="w-3.5 h-3.5 text-amber-500" />
-            <span>Governance & Operations Traceability</span>
-          </p>
-          <h1 className="text-2xl sm:text-3xl font-black text-white tracking-tight">
-            Operational & System Audit Trail
+          <h1 className="text-2xl font-bold text-white tracking-tight">
+            Audit Trail
           </h1>
-          <p className="text-xs sm:text-sm text-[#b8b8c5]/60 mt-0.5">
-            Immutable trail of register shift closings, meat batch loads, royalty statements, and hygiene audits.
-          </p>
         </div>
       </div>
 

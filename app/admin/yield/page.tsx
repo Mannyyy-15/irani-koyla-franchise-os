@@ -135,24 +135,17 @@ export default function MeatYieldPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <p className="text-[10px] font-bold text-[#b8b8c5]/60 uppercase tracking-widest leading-none mb-1.5 flex items-center gap-1.5">
-            <Flame className="w-3.5 h-3.5 text-amber-500" />
-            <span>Spit Efficiency & Portion Control</span>
-          </p>
-          <h1 className="text-2xl sm:text-3xl font-black text-white tracking-tight">
-            Shawarma Batch Production & Meat Yield
+          <h1 className="text-2xl font-bold text-white tracking-tight">
+            Meat Yield & Spits
           </h1>
-          <p className="text-xs sm:text-sm text-[#b8b8c5]/60 mt-0.5">
-            Standard: 110g regular wrap &middot; 160g jumbo wrap &middot; Minimum 92.0% cooked yield efficiency.
-          </p>
         </div>
 
         <Button
           onClick={() => setShowAddModal(true)}
-          className="bg-amber-600 hover:bg-amber-500 text-white font-bold gap-2 shadow-md self-start sm:self-auto cursor-pointer"
+          className="bg-orange-600 hover:bg-orange-500 text-white font-bold text-xs h-10 px-4 rounded-xl gap-2 shadow-md self-start sm:self-auto cursor-pointer"
         >
           <Plus className="w-4 h-4" />
-          <span>Log Spit Batch</span>
+          <span>Log Batch</span>
         </Button>
       </div>
 

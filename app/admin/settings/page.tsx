@@ -64,16 +64,9 @@ export default function SettingsPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <div className="flex items-center gap-2 text-xs font-bold text-amber-500 uppercase tracking-widest">
-            <SettingsIcon className="w-4 h-4" />
-            <span>Network Configuration</span>
-          </div>
-          <h1 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white tracking-tight mt-1">
-            System Settings & Franchise Rules
+          <h1 className="text-2xl font-bold text-white tracking-tight">
+            Settings
           </h1>
-          <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400">
-            Configure brand fee percentages, portion control weights, and food safety thresholds.
-          </p>
         </div>
 
         {savedToast && (

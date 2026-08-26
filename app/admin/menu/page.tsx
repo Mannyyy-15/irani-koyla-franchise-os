@@ -145,18 +145,9 @@ export default function MenuBOMPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <p className="text-[10px] font-bold text-orange-500 uppercase tracking-widest leading-none mb-1.5 flex items-center gap-1.5">
-            <UtensilsCrossed className="w-3.5 h-3.5" />
-            <span>{isSuperAdmin ? "Brand HQ Master Menu & Recipe BOM" : "Store Menu & Portion Standards"}</span>
-          </p>
-          <h1 className="text-2xl sm:text-3xl font-black text-white tracking-tight">
-            {isSuperAdmin ? "Master Recipe & Live POS Menu Control" : "Authorized Menu & Standard Portions"}
+          <h1 className="text-2xl font-bold text-white tracking-tight">
+            {isSuperAdmin ? "Menu & Recipes" : "Menu"}
           </h1>
-          <p className="text-xs sm:text-sm text-[#b8b8c5]/70 mt-0.5">
-            {isSuperAdmin
-              ? "Add, price, or modify recipes here. Changes sync automatically to every franchise Counter POS terminal."
-              : "Standardized portion weights, approved brand pricing, and kitchen assembly guidelines."}
-          </p>
         </div>
 
         <div className="flex items-center gap-2">

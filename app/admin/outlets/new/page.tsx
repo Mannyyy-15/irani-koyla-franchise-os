@@ -180,20 +180,17 @@ export default function NewFranchiseOnboardingPage() {
             className="inline-flex items-center gap-1.5 text-xs font-bold text-zinc-400 hover:text-orange-400 transition-colors"
           >
             <ArrowLeft className="w-4 h-4" />
-            <span>Back to Franchise Hubs Directory</span>
+            <span>Back to Outlets</span>
           </Link>
           <div className="flex items-center gap-3">
-            <h1 className="text-2xl sm:text-3xl font-black text-white tracking-tight flex items-center gap-2.5">
-              <Store className="w-7 h-7 text-orange-500" />
-              <span>Onboard Franchise Outlet</span>
+            <h1 className="text-2xl font-bold text-white tracking-tight flex items-center gap-2.5">
+              <Store className="w-6 h-6 text-orange-500" />
+              <span>Onboard Franchise</span>
             </h1>
-            <span className="px-2.5 py-1 rounded-xl text-[11px] font-mono font-bold bg-[#242427] text-orange-400 border border-[#383838]">
+            <span className="px-2 py-0.5 rounded-lg text-[11px] font-mono font-bold bg-[#242427] text-orange-400 border border-[#383838]">
               {previewOutletCode}
             </span>
           </div>
-          <p className="text-xs text-zinc-400">
-            Register a new franchise branch with verified partner credentials, royalty agreement, and instant POS access.
-          </p>
         </div>
       </div>
 

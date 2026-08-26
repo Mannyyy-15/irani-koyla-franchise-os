@@ -160,20 +160,9 @@ export default function CompliancePage() {
       <div className="p-5 sm:p-6 rounded-3xl bg-[#1a1a1c] border border-[#2e2e30] space-y-4 shadow-sm">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-xl bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center text-emerald-400">
-                <ClipboardCheck className="w-4 h-4" />
-              </div>
-              <span className="text-xs font-black text-emerald-400 uppercase tracking-wider">
-                Store Operations Quality Control
-              </span>
-            </div>
-            <h1 className="text-2xl font-black text-white tracking-tight mt-1">
-              Daily Store Opening & Closing Audit Checklists
+            <h1 className="text-2xl font-bold text-white tracking-tight">
+              Compliance & Checklists
             </h1>
-            <p className="text-xs text-zinc-400 mt-0.5">
-              {activeOutlet?.name || "Bandra West Flagship"} · 2-minute digital checklist for store managers before opening & closing.
-            </p>
           </div>
 
           <div className="flex items-center gap-2">
@@ -190,9 +179,9 @@ export default function CompliancePage() {
         {/* Navigation Tabs: Morning Opening / Night Closing / Audit History */}
         <div className="pt-3 border-t border-[#2a2a2c] flex flex-wrap items-center gap-2">
           {[
-            { id: "opening", label: "🌅 Morning Store Opening (2-Min)", icon: Sun },
-            { id: "closing", label: "🌙 Night Store Closing (2-Min)", icon: Moon },
-            { id: "history", label: "📋 FSSAI Audit Log History", icon: FileCheck },
+            { id: "opening", label: "Morning Opening", icon: Sun },
+            { id: "closing", label: "Night Closing", icon: Moon },
+            { id: "history", label: "Audit History", icon: FileCheck },
           ].map((tab) => (
             <button
               key={tab.id}

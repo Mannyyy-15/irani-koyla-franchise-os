@@ -187,19 +187,10 @@ export default function MonthlyOverviewPage() {
     <div className="space-y-6">
       {/* ── TOP HEADER AREA ────────────────────────────────────────────── */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-1">
-        <div className="space-y-1.5">
-          <p className="text-[11px] font-black text-orange-500 uppercase tracking-widest leading-none flex items-center gap-2">
-            <Store className="w-3.5 h-3.5" />
-            <span>{outletName} • {outletCode}</span>
-          </p>
-          <div className="flex items-center gap-3 flex-wrap">
-            <h1 className="text-2xl sm:text-3xl font-black text-white tracking-tight pt-0.5">
-              Monthly Overview & Performance
-            </h1>
-            <span className="px-2.5 py-1 rounded-xl text-[11px] font-mono font-bold bg-[#242427] text-zinc-300 border border-[#383838]">
-              🗓️ Live Ledger
-            </span>
-          </div>
+        <div>
+          <h1 className="text-2xl font-bold text-white tracking-tight">
+            Monthly Overview
+          </h1>
         </div>
 
         {/* Right Header Action Group */}
