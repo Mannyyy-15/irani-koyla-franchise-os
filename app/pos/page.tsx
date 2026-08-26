@@ -236,7 +236,9 @@ export default function PosBillingTerminal() {
   const [completedOrder, setCompletedOrder] = useState<any | null>(null);
   const [showKotModal, setShowKotModal] = useState(false);
   const [showUpiQrModal, setShowUpiQrModal] = useState(false);
+  const [showCashModal, setShowCashModal] = useState(false);
   const [offlineQueuedToast, setOfflineQueuedToast] = useState(false);
+  const cashModalInputRef = useRef<HTMLInputElement>(null);
 
   const categories = [
     { name: "Most Ordered", icon: "⭐" },
@@ -442,8 +444,30 @@ export default function PosBillingTerminal() {
       setInstantPunchToast(null);
     }, 3500);
 
+    setShowCashModal(false);
     setCart([]);
     setCustomerToken(`Counter Order #${Math.floor(10 + Math.random() * 80)}`);
+  };
+
+  const handleInitiatePunch = (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    if (cart.length === 0) return;
+
+    if (paymentMode === "Cash") {
+      const currentCashVal = parseFloat(cashTendered) || 0;
+      if (currentCashVal < grandTotal) {
+        const roundedDefault = Math.max(grandTotal, Math.ceil(grandTotal / 100) * 100);
+        setCashTendered(roundedDefault.toString());
+      }
+      setShowCashModal(true);
+      setTimeout(() => {
+        cashModalInputRef.current?.focus();
+        cashModalInputRef.current?.select();
+      }, 50);
+      return;
+    }
+
+    handlePunchOrder();
   };
 
   // Direct One-Click Thermal ESC/POS Print
@@ -454,7 +478,7 @@ export default function PosBillingTerminal() {
     }
   };
 
-  // Global Keyboard Shortcuts (Tab to Search, Arrow Keys, Space/+, Enter, F1-F4, Esc)
+  // Global Keyboard Shortcuts (Tab to Search, Arrow Keys, Space/+, Backspace, Enter, F1-F4, Esc)
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       const isInput = e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement;
@@ -525,7 +549,7 @@ export default function PosBillingTerminal() {
       }
 
       // Space or '+' key to add currently focused item to basket
-      if ((e.key === " " || e.key === "+") && !isInput) {
+      if ((e.key === " " || e.key === "+") && !isInput && !showCashModal) {
         e.preventDefault();
         const currentItem = filteredMenuItems[focusedCardIndex];
         if (currentItem) {
@@ -534,8 +558,8 @@ export default function PosBillingTerminal() {
         return;
       }
 
-      // '-' key to remove/decrement currently focused item from basket
-      if (e.key === "-" && !isInput) {
+      // Backspace or '-' key to remove/decrement currently focused item from basket (when not in text input)
+      if ((e.key === "Backspace" || e.key === "-") && !isInput && !showCashModal) {
         e.preventDefault();
         const currentItem = filteredMenuItems[focusedCardIndex];
         if (currentItem) {
@@ -548,6 +572,10 @@ export default function PosBillingTerminal() {
       if (e.key === "Escape") {
         if (document.activeElement === searchInputRef.current) {
           searchInputRef.current?.blur();
+          return;
+        }
+        if (showCashModal) {
+          setShowCashModal(false);
           return;
         }
         if (showKotModal) {
@@ -569,7 +597,7 @@ export default function PosBillingTerminal() {
       }
 
       // 'P' or 'p' to park bill or open parked bills modal
-      if ((e.key === "p" || e.key === "P") && !isInput) {
+      if ((e.key === "p" || e.key === "P") && !isInput && !showCashModal) {
         e.preventDefault();
         if (cart.length > 0) {
           handleParkBill();
@@ -579,8 +607,13 @@ export default function PosBillingTerminal() {
         return;
       }
 
-      // Enter: Instant Direct Punch Order and Auto Thermal Print
+      // Enter: Instant Direct Punch Order or Open Cash Tender Modal
       if (e.key === "Enter") {
+        if (showCashModal) {
+          e.preventDefault();
+          handlePunchOrder();
+          return;
+        }
         if (document.activeElement === searchInputRef.current) {
           // Blur search and add the top matched item or focus grid
           searchInputRef.current?.blur();
@@ -596,7 +629,7 @@ export default function PosBillingTerminal() {
         }
         if (cart.length > 0) {
           e.preventDefault();
-          handlePunchOrder();
+          handleInitiatePunch();
           return;
         }
       }
@@ -604,7 +637,7 @@ export default function PosBillingTerminal() {
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [cart, paymentMode, showKotModal, showParkedModal, showUpiQrModal, parkedBills, soundEnabled, grandTotal, splitRemaining, filteredMenuItems, focusedCardIndex]);
+  }, [cart, paymentMode, showKotModal, showParkedModal, showUpiQrModal, showCashModal, parkedBills, soundEnabled, grandTotal, splitRemaining, filteredMenuItems, focusedCardIndex, cashTendered]);
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-12 gap-3 lg:gap-4 relative items-start pb-6" suppressHydrationWarning>
@@ -759,11 +792,11 @@ export default function PosBillingTerminal() {
             <span className="bg-[#1f1f1f] px-1.5 py-0.5 rounded border border-[#383838] text-zinc-300"><strong className="text-orange-400">Tab</strong> Search</span>
             <span className="bg-[#1f1f1f] px-1.5 py-0.5 rounded border border-[#383838] text-zinc-300"><strong className="text-orange-400">← ↑ ↓ →</strong> Select</span>
             <span className="bg-[#1f1f1f] px-1.5 py-0.5 rounded border border-[#383838] text-zinc-300"><strong className="text-orange-400">Space/+</strong> Add</span>
-            <span className="bg-[#1f1f1f] px-1.5 py-0.5 rounded border border-[#383838] text-zinc-300"><strong className="text-rose-400">-</strong> Remove</span>
+            <span className="bg-[#1f1f1f] px-1.5 py-0.5 rounded border border-[#383838] text-zinc-300"><strong className="text-rose-400">Backspace</strong> Remove</span>
             <span className="bg-[#1f1f1f] px-1.5 py-0.5 rounded border border-[#383838] text-zinc-300"><strong className="text-amber-400">F1</strong> Cash</span>
             <span className="bg-[#1f1f1f] px-1.5 py-0.5 rounded border border-[#383838] text-zinc-300"><strong className="text-amber-400">F2</strong> UPI</span>
             <span className="bg-[#1f1f1f] px-1.5 py-0.5 rounded border border-[#383838] text-zinc-300"><strong className="text-amber-400">F3</strong> Card</span>
-            <span className="bg-[#1f1f1f] px-1.5 py-0.5 rounded border border-[#383838] text-zinc-300"><strong className="text-emerald-400">Enter</strong> Punch & Print</span>
+            <span className="bg-[#1f1f1f] px-1.5 py-0.5 rounded border border-[#383838] text-zinc-300"><strong className="text-emerald-400">Enter</strong> Punch</span>
             <span className="bg-[#1f1f1f] px-1.5 py-0.5 rounded border border-[#383838] text-zinc-300"><strong className="text-zinc-400">Esc</strong> Clear</span>
           </div>
         </div>
@@ -879,7 +912,7 @@ export default function PosBillingTerminal() {
 
       {/* RIGHT COLUMN: Ultra-Clean Counter Billing Register (Sticky & Max-Height Constrained) */}
       <div className="lg:col-span-5 xl:col-span-4 sticky top-3 lg:top-4 z-20 self-start w-full">
-        <form onSubmit={handlePunchOrder} className="flex flex-col justify-between overflow-hidden rounded-3xl bg-[#1f1f1f] border border-[#303030] p-3.5 sm:p-4 shadow-2xl space-y-2.5 max-h-[calc(100vh-5.5rem)]">
+        <form onSubmit={handleInitiatePunch} className="flex flex-col justify-between overflow-hidden rounded-3xl bg-[#1f1f1f] border border-[#303030] p-3.5 sm:p-4 shadow-2xl space-y-2.5 max-h-[calc(100vh-5.5rem)]">
           {/* Header Bar */}
           <div className="shrink-0 flex items-center justify-between border-b border-[#303030] pb-2.5">
             <div className="flex items-center gap-2">
@@ -1391,6 +1424,122 @@ export default function PosBillingTerminal() {
             </div>
           </DialogContent>
         </Dialog>
+      )}
+
+      {/* ── MODAL: Cash Received & Change Due Popup ────────────────────── */}
+      {showCashModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-in fade-in duration-150">
+          <div className="relative w-full max-w-md rounded-3xl bg-[#18181b] border border-[#383838] p-6 shadow-2xl space-y-5 text-white">
+            {/* Header */}
+            <div className="flex items-center justify-between border-b border-[#2d2d30] pb-3.5">
+              <div className="flex items-center gap-2.5">
+                <div className="w-9 h-9 rounded-xl bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center text-emerald-400">
+                  <Banknote className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="text-base font-black text-white">Cash Tender & Change Due</h3>
+                  <span className="text-xs text-zinc-400">Press Enter to Confirm & Print Receipt</span>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowCashModal(false)}
+                className="w-7 h-7 rounded-lg bg-[#27272a] hover:bg-[#333] text-zinc-400 hover:text-white flex items-center justify-center cursor-pointer"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            {/* Bill Total Banner */}
+            <div className="p-4 rounded-2xl bg-[#202024] border border-[#303030] flex items-center justify-between">
+              <span className="text-xs font-bold text-zinc-400 uppercase tracking-wider">Bill Amount</span>
+              <span className="font-mono text-2xl font-black text-orange-400">₹{grandTotal.toFixed(2)}</span>
+            </div>
+
+            {/* Cash Received Input */}
+            <div className="space-y-2">
+              <label className="text-xs font-bold text-zinc-300 flex items-center justify-between">
+                <span>Cash Received from Customer (₹)</span>
+                <span className="text-[10px] text-zinc-500 font-mono">Type or tap preset</span>
+              </label>
+              <input
+                ref={cashModalInputRef}
+                type="number"
+                min="0"
+                value={cashTendered}
+                onChange={(e) => setCashTendered(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    e.preventDefault();
+                    handlePunchOrder();
+                  }
+                }}
+                className="w-full h-12 px-4 rounded-2xl bg-[#121214] border-2 border-emerald-500/60 text-emerald-400 font-mono text-xl font-black focus:outline-none focus:border-emerald-400 transition-colors shadow-inner"
+              />
+
+              {/* Quick Note Presets */}
+              <div className="grid grid-cols-5 gap-1.5 pt-1">
+                {[
+                  { label: "Exact", val: grandTotal },
+                  { label: "₹100", val: 100 },
+                  { label: "₹200", val: 200 },
+                  { label: "₹500", val: 500 },
+                  { label: "₹2000", val: 2000 },
+                ].map((preset) => (
+                  <button
+                    key={preset.label}
+                    type="button"
+                    onClick={() => {
+                      setCashTendered(preset.val.toString());
+                      cashModalInputRef.current?.focus();
+                    }}
+                    className={cn(
+                      "py-1.5 rounded-xl border text-xs font-mono font-black transition-all cursor-pointer text-center",
+                      parseFloat(cashTendered) === preset.val
+                        ? "bg-emerald-600 text-white border-emerald-500 shadow-md"
+                        : "bg-[#202024] border-[#383838] text-zinc-300 hover:bg-[#28282c] hover:text-white"
+                    )}
+                  >
+                    {preset.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Change Due Big Display */}
+            <div className="p-4 rounded-2xl bg-[#121214] border border-[#303030] flex items-center justify-between">
+              <div>
+                <span className="text-xs font-bold text-zinc-400 block">Change to Return</span>
+                <span className="text-[10px] text-zinc-500">Hand back to customer</span>
+              </div>
+              <span className={cn(
+                "font-mono text-2xl sm:text-3xl font-black",
+                changeDue > 0 ? "text-emerald-400" : "text-zinc-500"
+              )}>
+                ₹{changeDue.toFixed(2)}
+              </span>
+            </div>
+
+            {/* Action Buttons */}
+            <div className="pt-2 flex items-center justify-end gap-2.5">
+              <button
+                type="button"
+                onClick={() => setShowCashModal(false)}
+                className="px-4 py-2.5 rounded-xl bg-[#27272a] hover:bg-[#333] text-zinc-300 text-xs font-bold transition-colors cursor-pointer"
+              >
+                Cancel (Esc)
+              </button>
+              <button
+                type="button"
+                onClick={() => handlePunchOrder()}
+                className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white text-xs font-black shadow-lg shadow-emerald-600/30 flex items-center gap-2 transition-all cursor-pointer"
+              >
+                <Printer className="w-4 h-4" />
+                <span>Confirm & Print Bill (Enter)</span>
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );
