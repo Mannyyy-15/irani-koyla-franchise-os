@@ -308,16 +308,14 @@ For central commissary refills or support, contact HQ Operations.
 
         {isSuperAdmin && (
           <div className="flex items-center gap-2">
-            <Button
-              onClick={() => {
-                handleGeneratePassword();
-                setShowAddModal(true);
-              }}
-              className="bg-orange-600 hover:bg-orange-500 text-white font-black text-xs uppercase tracking-wider rounded-xl gap-2 shadow-lg shadow-orange-600/25 cursor-pointer h-11 px-4"
-            >
-              <Plus className="w-4 h-4" />
-              <span>Onboard New Franchise Partner</span>
-            </Button>
+            <Link href="/admin/outlets/new">
+              <Button
+                className="bg-orange-600 hover:bg-orange-500 text-white font-black text-xs uppercase tracking-wider rounded-xl gap-2 shadow-lg shadow-orange-600/25 cursor-pointer h-11 px-5"
+              >
+                <Plus className="w-4 h-4" />
+                <span>Onboard New Franchise Partner</span>
+              </Button>
+            </Link>
           </div>
         )}
       </div>
@@ -600,16 +598,14 @@ For central commissary refills or support, contact HQ Operations.
               </p>
             </div>
             {isSuperAdmin && (
-              <Button
-                onClick={() => {
-                  handleGeneratePassword();
-                  setShowAddModal(true);
-                }}
-                className="bg-orange-600 hover:bg-orange-500 text-white font-black text-xs uppercase tracking-wider rounded-xl gap-2 shadow-lg shadow-orange-600/25 h-11 px-5 cursor-pointer"
-              >
-                <Plus className="w-4 h-4" />
-                <span>Onboard First Franchise Hub</span>
-              </Button>
+              <Link href="/admin/outlets/new">
+                <Button
+                  className="bg-orange-600 hover:bg-orange-500 text-white font-black text-xs uppercase tracking-wider rounded-xl gap-2 shadow-lg shadow-orange-600/25 h-11 px-6 cursor-pointer"
+                >
+                  <Plus className="w-4 h-4" />
+                  <span>Onboard First Franchise Hub</span>
+                </Button>
+              </Link>
             )}
           </div>
         )}

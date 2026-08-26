@@ -94,7 +94,7 @@ const config: Config = {
           "radial-gradient(90% 55% at 50% -5%, rgba(255, 106, 0, 0.15), transparent 65%), linear-gradient(#080402, #0d0705, #080402)",
       },
       fontFamily: {
-        sans: ["var(--font-jakarta)", "ui-sans-serif", "system-ui", "sans-serif"],
+        sans: ['"Plus Jakarta Sans"', "ui-sans-serif", "system-ui", "-apple-system", "sans-serif"],
       },
       borderRadius: {
         // Restrained, intentional scale (Linear/Stripe/Vercel feel).

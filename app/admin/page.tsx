@@ -192,7 +192,7 @@ export default function AdminDashboardPage() {
           </Link>
 
           {isSuperAdmin ? (
-            <Link href="/admin/outlets">
+            <Link href="/admin/outlets/new">
               <Button className="bg-orange-600 hover:bg-orange-500 text-white font-black text-xs uppercase tracking-wider rounded-xl gap-2 shadow-lg shadow-orange-600/25 h-11 px-4 cursor-pointer">
                 <Plus className="w-4 h-4" />
                 <span>Onboard Franchise Hub</span>
