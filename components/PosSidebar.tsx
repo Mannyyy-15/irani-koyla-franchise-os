@@ -24,23 +24,14 @@ import { logout } from "@/app/actions/auth";
 
 const posNavigationSections = [
   {
-    label: "COUNTER OPERATIONS",
+    label: "POS REGISTER",
     items: [
       { name: "Counter Billing", href: "/pos", icon: ShoppingBag, exact: true },
-      { name: "Live Order Tickets", href: "/pos/live-kot", icon: Clock, exact: false, badgeKey: "orders" },
-      { name: "Menu & 86-List", href: "/pos/menu", icon: UtensilsCrossed, exact: false },
+      { name: "Orders & Receipts", href: "/pos/history", icon: Receipt, exact: false, badgeKey: "orders" },
     ],
   },
   {
-    label: "REGISTER & AUDIT",
-    items: [
-      { name: "Order History", href: "/pos/history", icon: Receipt, exact: false },
-      { name: "Shift Register", href: "/pos/shift", icon: Banknote, exact: false },
-      { name: "Live Spit Roasters", href: "/pos/spit-live", icon: Flame, exact: false },
-    ],
-  },
-  {
-    label: "WORKSPACE",
+    label: "STORE HUB",
     items: [
       { name: "Store Management", href: "/admin", icon: Store, exact: false },
       { name: "Switch Workspace", href: "/select-portal", icon: Layers, exact: false },

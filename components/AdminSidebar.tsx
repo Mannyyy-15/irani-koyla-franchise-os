@@ -71,14 +71,12 @@ const franchiseNav = [
     items: [
       { name: "Spit & Meat Yield", href: "/admin/yield", icon: Flame },
       { name: "Order Raw Materials", href: "/admin/supply-chain", icon: Truck },
-      { name: "Menu & 86 Items", href: "/admin/menu", icon: UtensilsCrossed },
     ],
   },
   {
-    label: "FINANCE & AUDIT",
+    label: "FINANCE & ROYALTIES",
     items: [
       { name: "P&L & Royalty Invoices", href: "/admin/royalties", icon: WalletCards },
-      { name: "Shifts & Cash Audit", href: "/admin/sales", icon: FilePieChart },
     ],
   },
   {
