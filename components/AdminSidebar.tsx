@@ -21,6 +21,7 @@ import {
   Truck,
   PanelLeftClose,
   PanelLeftOpen,
+  CalendarDays,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/components/ui/cn";
@@ -35,6 +36,7 @@ const superAdminNav = [
     label: "HQ COMMAND",
     items: [
       { name: "HQ Overview", href: "/admin", icon: LayoutDashboard },
+      { name: "Monthly Performance", href: "/admin/monthly", icon: CalendarDays },
       { name: "Franchise Hubs", href: "/admin/outlets", icon: Store },
       { name: "Central Supply Chain", href: "/admin/supply-chain", icon: Truck },
       { name: "Master Menu & Recipes", href: "/admin/menu", icon: UtensilsCrossed },
@@ -63,6 +65,7 @@ const franchiseNav = [
     label: "STORE PULSE",
     items: [
       { name: "Store Overview", href: "/admin", icon: LayoutDashboard },
+      { name: "Monthly Performance", href: "/admin/monthly", icon: CalendarDays },
       { name: "Counter POS Register", href: "/pos", icon: Receipt },
     ],
   },

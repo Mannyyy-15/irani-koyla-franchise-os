@@ -25,6 +25,7 @@ import {
   Sun,
   Moon,
   RotateCcw,
+  CalendarDays,
 } from "lucide-react";
 import {
   AreaChart,
@@ -155,6 +156,18 @@ export default function AdminDashboardPage() {
 
         {/* Top Right Action Group */}
         <div className="flex items-center gap-2 flex-wrap">
+          {/* Monthly Intelligence View Link */}
+          <Link href="/admin/monthly">
+            <Button
+              variant="outline"
+              className="bg-[#202023] hover:bg-[#2a2a2e] border-[#383838] text-zinc-200 hover:text-white font-bold text-xs h-11 px-3.5 rounded-xl cursor-pointer shadow-sm flex items-center gap-1.5"
+              title="View Complete Monthly Sales & Meat Utilization Ledger"
+            >
+              <CalendarDays className="w-3.5 h-3.5 text-orange-400" />
+              <span>Monthly Overview</span>
+            </Button>
+          </Link>
+
           {isSuperAdmin ? (
             <Link href="/admin/outlets">
               <Button className="bg-orange-600 hover:bg-orange-500 text-white font-black text-xs uppercase tracking-wider rounded-xl gap-2 shadow-lg shadow-orange-600/25 h-11 px-4 cursor-pointer">
