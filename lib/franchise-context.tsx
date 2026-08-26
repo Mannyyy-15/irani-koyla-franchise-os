@@ -563,6 +563,26 @@ export function FranchiseProvider({ children }: { children: React.ReactNode }) {
     setAuditLogs(updatedLogs);
 
     saveState({ liveOrders: updatedOrders, outlets: updatedOutlets, auditLogs: updatedLogs });
+
+    // Non-blocking background database persistence
+    try {
+      fetch("/api/koyla/orders", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          id: orderId,
+          orderNumber: orderNum,
+          outletId: newOrder.outletId || "mohak-city",
+          customerName: newOrder.customerName || "Counter Guest",
+          channel: newOrder.channel || "Walk-in Counter",
+          paymentMethod: newOrder.paymentMethod || "Cash",
+          itemsJson: JSON.stringify(newOrder.items),
+          totalAmount: newOrder.totalAmount,
+          status: newOrder.status || "Completed",
+          time: timeNow,
+        }),
+      }).catch(() => {});
+    } catch {}
   };
 
   // Add Petty Cash expense
