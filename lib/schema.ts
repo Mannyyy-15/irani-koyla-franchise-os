@@ -883,7 +883,162 @@ export const centralShipmentsDb = mysqlTable("central_shipments", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
+export const meatBatchesDb = mysqlTable("meat_batches", {
+  id: varchar("id", { length: 100 }).primaryKey(),
+  batchNumber: varchar("batch_number", { length: 100 }).notNull(),
+  outletId: varchar("outlet_id", { length: 100 }).notNull().references(() => franchiseOutlets.id, { onDelete: "cascade" }),
+  meatType: varchar("meat_type", { length: 100 }).notNull().default("Koyla Marinated Chicken"),
+  spitId: varchar("spit_id", { length: 100 }).notNull().default("Spit-01 (Main Front)"),
+  date: varchar("date", { length: 50 }).notNull(),
+  timeLoaded: varchar("time_loaded", { length: 50 }).notNull(),
+  rawMeatReceivedKg: double("raw_meat_received_kg").notNull().default(0),
+  marinationLossKg: double("marination_loss_kg").notNull().default(0),
+  skewerWeightKg: double("skewer_weight_kg").notNull().default(0),
+  cookedWeightKg: double("cooked_weight_kg").notNull().default(0),
+  wrapsProduced: int("wraps_produced").notNull().default(0),
+  jumboWrapsProduced: int("jumbo_wraps_produced").notNull().default(0),
+  plattersProduced: int("platters_produced").notNull().default(0),
+  wasteScrapsKg: double("waste_scraps_kg").notNull().default(0),
+  targetYieldKg: double("target_yield_kg").notNull().default(0),
+  actualYieldPercent: double("actual_yield_percent").notNull().default(0),
+  coreTempCelsius: double("core_temp_celsius").notNull().default(78.5),
+  status: mysqlEnum("status", ["roasting", "depleted", "scrapped"]).notNull().default("roasting"),
+  loggedBy: varchar("logged_by", { length: 255 }),
+  notes: text("notes"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export const shiftRegistersDb = mysqlTable("shift_registers", {
+  id: varchar("id", { length: 100 }).primaryKey(),
+  outletId: varchar("outlet_id", { length: 100 }).notNull().references(() => franchiseOutlets.id, { onDelete: "cascade" }),
+  date: varchar("date", { length: 50 }).notNull(),
+  shiftType: varchar("shift_type", { length: 100 }).notNull().default("Full Day Register"),
+  cashierName: varchar("cashier_name", { length: 255 }).notNull(),
+  openingCash: int("opening_cash").notNull().default(2000),
+  cashSalesExpected: int("cash_sales_expected").notNull().default(0),
+  cashInDrawerActual: int("cash_in_drawer_actual").notNull().default(0),
+  cashDifference: int("cash_difference").notNull().default(0),
+  upiSales: int("upi_sales").notNull().default(0),
+  swiggySales: int("swiggy_sales").notNull().default(0),
+  zomatoSales: int("zomato_sales").notNull().default(0),
+  posCardSales: int("pos_card_sales").notNull().default(0),
+  pettyCashExpenses: int("petty_cash_expenses").notNull().default(0),
+  totalOrders: int("total_orders").notNull().default(0),
+  totalGrossSales: int("total_gross_sales").notNull().default(0),
+  discountsGiven: int("discounts_given").notNull().default(0),
+  netRevenue: int("net_revenue").notNull().default(0),
+  status: mysqlEnum("status", ["reconciled", "variance_flagged", "pending_review"]).notNull().default("reconciled"),
+  reconciledAt: varchar("reconciled_at", { length: 100 }),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export const royaltyStatementsDb = mysqlTable("royalty_statements", {
+  id: varchar("id", { length: 100 }).primaryKey(),
+  invoiceNumber: varchar("invoice_number", { length: 100 }).notNull().unique(),
+  outletId: varchar("outlet_id", { length: 100 }).notNull().references(() => franchiseOutlets.id, { onDelete: "cascade" }),
+  month: varchar("month", { length: 50 }).notNull(),
+  grossSales: int("gross_sales").notNull().default(0),
+  royaltyRatePercent: double("royalty_rate_percent").notNull().default(6.5),
+  royaltyAmount: int("royalty_amount").notNull().default(0),
+  marketingFeePercent: double("marketing_fee_percent").notNull().default(2.0),
+  marketingFeeAmount: int("marketing_fee_amount").notNull().default(0),
+  centralKitchenSupplyCost: int("central_kitchen_supply_cost").notNull().default(0),
+  deductionsAndAdjustments: int("deductions_and_adjustments").notNull().default(0),
+  gstAmount: int("gst_amount").notNull().default(0),
+  totalPayable: int("total_payable").notNull().default(0),
+  dueDate: varchar("due_date", { length: 50 }).notNull(),
+  status: mysqlEnum("status", ["paid", "pending", "overdue", "disputed"]).notNull().default("pending"),
+  paidAt: varchar("paid_at", { length: 100 }),
+  disputeReason: text("dispute_reason"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export const complianceChecklistsDb = mysqlTable("compliance_checklists", {
+  id: varchar("id", { length: 100 }).primaryKey(),
+  outletId: varchar("outlet_id", { length: 100 }).notNull().references(() => franchiseOutlets.id, { onDelete: "cascade" }),
+  date: varchar("date", { length: 50 }).notNull(),
+  inspectedBy: varchar("inspected_by", { length: 255 }).notNull(),
+  deepFreezerTemp: double("deep_freezer_temp").notNull().default(-18.0),
+  chillerTemp: double("chiller_temp").notNull().default(3.0),
+  spitCoreTemp: double("spit_core_temp").notNull().default(78.5),
+  oilPolarCompoundPercent: double("oil_polar_compound_percent").notNull().default(15.0),
+  fssaiDisplayVerified: int("fssai_display_verified").notNull().default(1),
+  staffHairnetsGloves: int("staff_hairnets_gloves").notNull().default(1),
+  pestControlVerified: int("pest_control_verified").notNull().default(1),
+  waterQualityTested: int("water_quality_tested").notNull().default(1),
+  overallScore: int("overall_score").notNull().default(100),
+  status: mysqlEnum("status", ["pass", "flagged", "failed"]).notNull().default("pass"),
+  remarks: text("remarks"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export const pettyCashExpensesDb = mysqlTable("petty_cash_expenses", {
+  id: varchar("id", { length: 100 }).primaryKey(),
+  outletId: varchar("outlet_id", { length: 100 }).notNull().references(() => franchiseOutlets.id, { onDelete: "cascade" }),
+  amount: int("amount").notNull(),
+  category: varchar("category", { length: 100 }).notNull(),
+  reason: varchar("reason", { length: 255 }).notNull(),
+  authorizedBy: varchar("authorized_by", { length: 255 }).notNull(),
+  receiptNumber: varchar("receipt_number", { length: 100 }),
+  timestamp: varchar("timestamp", { length: 50 }).notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export const safeDropsDb = mysqlTable("safe_drops", {
+  id: varchar("id", { length: 100 }).primaryKey(),
+  outletId: varchar("outlet_id", { length: 100 }).notNull().references(() => franchiseOutlets.id, { onDelete: "cascade" }),
+  amount: int("amount").notNull(),
+  authorizedBy: varchar("authorized_by", { length: 255 }).notNull(),
+  safeNumber: varchar("safe_number", { length: 100 }).notNull(),
+  notes: text("notes"),
+  timestamp: varchar("timestamp", { length: 50 }).notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export const riderPickupOrdersDb = mysqlTable("rider_pickup_orders", {
+  id: varchar("id", { length: 100 }).primaryKey(),
+  orderNumber: varchar("order_number", { length: 100 }).notNull(),
+  outletId: varchar("outlet_id", { length: 100 }).notNull().references(() => franchiseOutlets.id, { onDelete: "cascade" }),
+  channel: mysqlEnum("channel", ["Zomato", "Swiggy"]).notNull(),
+  bagToken: varchar("bag_token", { length: 50 }).notNull(),
+  riderName: varchar("rider_name", { length: 255 }).notNull(),
+  riderPhone: varchar("rider_phone", { length: 50 }),
+  vehicleNumber: varchar("vehicle_number", { length: 50 }),
+  otp: varchar("otp", { length: 10 }).notNull(),
+  status: mysqlEnum("status", ["Ready for Pickup", "Rider Arrived", "Handed Over"]).notNull().default("Ready for Pickup"),
+  itemsSummary: varchar("items_summary", { length: 255 }).notNull(),
+  arrivedAt: varchar("arrived_at", { length: 50 }),
+  handedOverAt: varchar("handed_over_at", { length: 50 }),
+  customerName: varchar("customer_name", { length: 255 }),
+  orderAmount: int("order_amount").notNull().default(0),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export const menuItemRecipesDb = mysqlTable("menu_item_recipes", {
+  id: varchar("id", { length: 100 }).primaryKey(),
+  name: varchar("name", { length: 255 }).notNull(),
+  category: varchar("category", { length: 100 }).notNull(),
+  meatPortionGrams: int("meat_portion_grams").notNull(),
+  sauceGrams: int("sauce_grams").notNull(),
+  breadType: varchar("bread_type", { length: 100 }).notNull(),
+  sellingPrice: int("selling_price").notNull(),
+  cogsCost: int("cogs_cost").notNull(),
+  grossMarginPercent: double("gross_margin_percent").notNull(),
+  isTopSeller: int("is_top_seller").notNull().default(0),
+  description: text("description"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
 export type FranchiseOutletDb = typeof franchiseOutlets.$inferSelect;
 export type LiveOrderDb = typeof liveOrdersDb.$inferSelect;
 export type CentralShipmentDb = typeof centralShipmentsDb.$inferSelect;
+export type MeatBatchDb = typeof meatBatchesDb.$inferSelect;
+export type ShiftRegisterDb = typeof shiftRegistersDb.$inferSelect;
+export type RoyaltyStatementDb = typeof royaltyStatementsDb.$inferSelect;
+export type ComplianceChecklistDb = typeof complianceChecklistsDb.$inferSelect;
+export type PettyCashExpenseDb = typeof pettyCashExpensesDb.$inferSelect;
+export type SafeDropDb = typeof safeDropsDb.$inferSelect;
+export type RiderPickupOrderDb = typeof riderPickupOrdersDb.$inferSelect;
+export type MenuItemRecipeDb = typeof menuItemRecipesDb.$inferSelect;
+
 

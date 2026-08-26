@@ -33,6 +33,7 @@ import {
   VolumeX,
   Keyboard,
   Zap,
+  ArrowRight,
 } from "lucide-react";
 import { useFranchise } from "@/lib/franchise-context";
 import { Button } from "@/components/ui/Button";
@@ -237,6 +238,7 @@ export default function PosBillingTerminal() {
   const [showKotModal, setShowKotModal] = useState(false);
   const [showUpiQrModal, setShowUpiQrModal] = useState(false);
   const [showCashModal, setShowCashModal] = useState(false);
+  const [showMobileCartDrawer, setShowMobileCartDrawer] = useState(false);
   const [offlineQueuedToast, setOfflineQueuedToast] = useState(false);
   const cashModalInputRef = useRef<HTMLInputElement>(null);
 
@@ -1539,6 +1541,153 @@ export default function PosBillingTerminal() {
                 <Printer className="w-4 h-4" />
                 <span>Confirm & Print Bill (Enter)</span>
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── MOBILE: Sticky Floating Cart Checkout Bar (Visible only on mobile screens when cart has items) ── */}
+      {cart.length > 0 && (
+        <div className="lg:hidden fixed bottom-3 left-3 right-3 z-40 animate-in slide-in-from-bottom-3 duration-200">
+          <button
+            type="button"
+            onClick={() => setShowMobileCartDrawer(true)}
+            className="w-full bg-[#18181b]/95 backdrop-blur-xl border border-orange-500/50 shadow-[0_10px_35px_rgba(0,0,0,0.8)] rounded-2xl p-3 px-4 flex items-center justify-between text-white transition-all cursor-pointer hover:border-orange-400"
+          >
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-orange-600 flex items-center justify-center shadow-md text-white font-bold">
+                <ShoppingBag className="w-5 h-5" />
+              </div>
+              <div className="text-left">
+                <span className="text-xs text-zinc-400 font-bold block">
+                  {cart.reduce((s, c) => s + c.quantity, 0)} Items in Basket
+                </span>
+                <span className="font-mono text-base font-black text-orange-400">
+                  ₹{grandTotal.toFixed(2)}
+                </span>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-2 bg-gradient-to-r from-orange-600 to-amber-600 text-white font-black text-xs px-4 py-2.5 rounded-xl shadow-md">
+              <span>Review & Pay</span>
+              <ArrowRight className="w-4 h-4" />
+            </div>
+          </button>
+        </div>
+      )}
+
+      {/* ── MOBILE: Cart & Tender Bottom Sheet Drawer (Full Screen Responsive on Mobile) ── */}
+      {showMobileCartDrawer && (
+        <div className="lg:hidden fixed inset-0 z-50 flex flex-col justify-end bg-black/80 backdrop-blur-md animate-in fade-in duration-200">
+          <div className="w-full max-h-[90vh] flex flex-col justify-between rounded-t-3xl bg-[#18181b] border-t border-[#383838] p-4 text-white shadow-2xl space-y-3 overflow-hidden">
+            {/* Drawer Header */}
+            <div className="flex items-center justify-between border-b border-[#2d2d30] pb-3 shrink-0">
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 rounded-xl bg-orange-500/20 border border-orange-500/40 flex items-center justify-center text-orange-400">
+                  <ShoppingBag className="w-4 h-4" />
+                </div>
+                <div>
+                  <h3 className="text-sm font-black text-white">Current Order Basket</h3>
+                  <span className="text-[10px] text-zinc-400 font-mono">{customerToken}</span>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={clearCart}
+                  className="p-2 rounded-xl bg-[#242428] text-zinc-400 hover:text-rose-400"
+                  title="Clear Cart"
+                >
+                  <Trash2 className="w-4 h-4" />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setShowMobileCartDrawer(false)}
+                  className="p-2 rounded-xl bg-[#242428] text-zinc-400 hover:text-white"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+
+            {/* Cart Items List */}
+            <div className="flex-1 overflow-y-auto space-y-2 max-h-[40vh] pr-1">
+              {cart.map((item, idx) => (
+                <div key={idx} className="p-3 rounded-2xl bg-[#121214] border border-[#2d2d30] flex items-center justify-between gap-3">
+                  <div className="min-w-0">
+                    <span className="font-bold text-xs text-white block truncate">{item.name}</span>
+                    <span className="font-mono text-xs text-orange-400 font-bold">₹{item.price} each</span>
+                  </div>
+
+                  <div className="flex items-center gap-1.5 bg-[#1a1a1e] p-1 rounded-xl border border-[#383838] shrink-0">
+                    <button
+                      type="button"
+                      onClick={() => updateQuantity(idx, -1)}
+                      className="w-7 h-7 rounded-lg bg-[#252528] text-white hover:text-rose-400 flex items-center justify-center text-xs font-bold"
+                    >
+                      -
+                    </button>
+                    <span className="font-mono text-xs font-black text-white px-2">{item.quantity}</span>
+                    <button
+                      type="button"
+                      onClick={() => updateQuantity(idx, 1)}
+                      className="w-7 h-7 rounded-lg bg-orange-600 text-white flex items-center justify-center text-xs font-bold shadow"
+                    >
+                      +
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Payment Method Selector Pills */}
+            <div className="pt-2 border-t border-[#2d2d30] space-y-2 shrink-0">
+              <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider block">Select Payment Mode</span>
+              <div className="grid grid-cols-3 gap-2">
+                {[
+                  { mode: "Cash", icon: Banknote, color: "text-emerald-400" },
+                  { mode: "GPay / UPI", icon: Smartphone, color: "text-blue-400" },
+                  { mode: "Card / POS", icon: CreditCard, color: "text-purple-400" },
+                ].map(({ mode, icon: Icon, color }) => (
+                  <button
+                    key={mode}
+                    type="button"
+                    onClick={() => {
+                      setPaymentMode(mode as any);
+                      playAudioEffect("mode", soundEnabled);
+                    }}
+                    className={cn(
+                      "py-2 px-1.5 rounded-xl border text-xs font-black flex flex-col items-center gap-1 transition-all",
+                      paymentMode === mode
+                        ? "bg-orange-600 border-orange-500 text-white shadow-md shadow-orange-600/30"
+                        : "bg-[#141416] border-[#303030] text-zinc-400 hover:text-white"
+                    )}
+                  >
+                    <Icon className={cn("w-4 h-4", paymentMode === mode ? "text-white" : color)} />
+                    <span className="text-[10px] truncate">{mode}</span>
+                  </button>
+                ))}
+              </div>
+
+              {/* Total Banner & Punch Button */}
+              <div className="pt-2 flex items-center justify-between gap-3">
+                <div className="flex flex-col">
+                  <span className="text-[10px] text-zinc-400 font-bold uppercase">Total Due</span>
+                  <span className="font-mono text-xl font-black text-orange-400">₹{grandTotal.toFixed(2)}</span>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    handleInitiatePunch(e);
+                  }}
+                  className="flex-1 h-12 rounded-xl bg-gradient-to-r from-orange-600 to-amber-600 text-white font-black text-xs uppercase tracking-wider flex items-center justify-center gap-2 shadow-lg shadow-orange-600/30 active:scale-95 transition-all cursor-pointer"
+                >
+                  <Printer className="w-4 h-4" />
+                  <span>Punch & Print Bill</span>
+                </button>
+              </div>
             </div>
           </div>
         </div>

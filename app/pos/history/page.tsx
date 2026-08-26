@@ -263,7 +263,8 @@ export default function PosOrderHistoryPage() {
           </span>
         </div>
 
-        <div className="overflow-x-auto">
+        {/* ── DESKTOP VIEW: High-Density Table (hidden on mobile) ── */}
+        <div className="hidden md:block overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>
               <tr className="border-b border-[#27272a] bg-[#141416] text-zinc-400 font-black uppercase tracking-wider text-[11px]">
@@ -397,6 +398,96 @@ export default function PosOrderHistoryPage() {
               )}
             </tbody>
           </table>
+        </div>
+
+        {/* ── MOBILE VIEW: High-Contrast Touch Cards Stream (visible only on mobile) ── */}
+        <div className="block md:hidden divide-y divide-[#27272a]">
+          {filteredOrders.length === 0 ? (
+            <div className="py-12 text-center text-zinc-500 font-medium p-4">
+              <Receipt className="w-10 h-10 mx-auto text-zinc-600 mb-2 opacity-50" />
+              <p className="text-sm font-bold text-zinc-400">No orders found for the selected criteria</p>
+            </div>
+          ) : (
+            filteredOrders.map((ord) => (
+              <div key={ord.id} className="p-4 space-y-3 bg-[#18181b] hover:bg-[#1e1e22] transition-colors">
+                {/* Header: Order #, Time, Status */}
+                <div className="flex items-start justify-between">
+                  <div>
+                    <span className="font-mono text-base font-black text-orange-400 block">{ord.orderNumber}</span>
+                    <div className="flex items-center gap-1.5 text-[11px] text-zinc-400 font-mono mt-0.5">
+                      <span>{ord.date || todayStr}</span>
+                      <span>·</span>
+                      <span>{ord.time}</span>
+                    </div>
+                  </div>
+
+                  <div className="text-right">
+                    <span className="font-mono text-base font-black text-white block">₹{ord.totalAmount.toLocaleString("en-IN")}</span>
+                    <span
+                      className={cn(
+                        "inline-block px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-wider border mt-0.5",
+                        ord.channel === "Walk-in Counter"
+                          ? "bg-amber-500/15 text-amber-400 border-amber-500/30"
+                          : ord.channel === "Zomato"
+                          ? "bg-rose-500/15 text-rose-400 border-rose-500/30"
+                          : "bg-orange-500/15 text-orange-400 border-orange-500/30"
+                      )}
+                    >
+                      {ord.channel}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Customer & Items Summary */}
+                <div className="p-3 rounded-2xl bg-[#121214] border border-[#27272a] space-y-1.5 text-xs">
+                  <div className="flex items-center justify-between text-zinc-300 font-bold border-b border-[#222] pb-1.5">
+                    <div className="flex items-center gap-1.5 truncate">
+                      <User className="w-3.5 h-3.5 text-zinc-500 shrink-0" />
+                      <span className="truncate">{ord.customerName || "Counter Customer"}</span>
+                    </div>
+                    <span className="font-mono text-[11px] text-emerald-400 shrink-0 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">
+                      {ord.paymentMethod}
+                    </span>
+                  </div>
+
+                  <div className="space-y-1 pt-1">
+                    {ord.items.map((it, idx) => (
+                      <div key={idx} className="flex justify-between text-[11px] text-zinc-300">
+                        <span className="truncate pr-2">
+                          <strong className="text-orange-400 font-mono">{it.quantity}x</strong> {it.name}
+                        </span>
+                        <span className="font-mono text-zinc-400 shrink-0">₹{it.price * it.quantity}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Dual Action Buttons */}
+                <div className="grid grid-cols-2 gap-2 pt-1">
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => setSelectedReceipt(ord)}
+                    className="h-9 rounded-xl border-[#383838] bg-[#222226] hover:bg-[#2e2e34] text-zinc-200 text-xs font-bold gap-1.5 cursor-pointer"
+                  >
+                    <Eye className="w-4 h-4 text-zinc-400" />
+                    <span>View Bill</span>
+                  </Button>
+                  <Button
+                    size="sm"
+                    onClick={() => {
+                      setSelectedReceipt(ord);
+                      setTimeout(() => handlePrint(), 150);
+                    }}
+                    className="h-9 rounded-xl bg-orange-600 hover:bg-orange-500 text-white text-xs font-bold gap-1.5 shadow-sm cursor-pointer"
+                  >
+                    <Printer className="w-4 h-4" />
+                    <span>Print Bill</span>
+                  </Button>
+                </div>
+              </div>
+            ))
+          )}
         </div>
       </div>
 
