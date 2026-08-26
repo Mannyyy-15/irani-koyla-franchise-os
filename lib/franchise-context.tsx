@@ -286,7 +286,7 @@ export function FranchiseProvider({ children }: { children: React.ReactNode }) {
 
   const loginAsRole = (newRole: UserRole, outletId?: string) => {
     setRoleState(newRole);
-    const targetOutlet = newRole === "SUPER_ADMIN" ? "all" : (outletId || "mohak-city");
+    const targetOutlet = newRole === "SUPER_ADMIN" ? (outletId || "all") : (outletId || "mohak-city");
     setSelectedOutletId(targetOutlet);
     saveState({ role: newRole, selectedOutletId: targetOutlet });
   };
@@ -304,6 +304,10 @@ export function FranchiseProvider({ children }: { children: React.ReactNode }) {
   };
 
   const handleSetSelectedOutletId = (id: string) => {
+    // Franchise Partners are strictly locked to their own outlet and cannot peek into others
+    if (role === "FRANCHISE_OWNER") {
+      return;
+    }
     setSelectedOutletId(id);
     saveState({ selectedOutletId: id });
   };
@@ -895,43 +899,51 @@ export function FranchiseProvider({ children }: { children: React.ReactNode }) {
     saveState({ menuItems: updatedMenu });
   };
 
-  // Filtered views based on selectedOutletId
-  const activeOutlet = outlets.find((o) => o.id === selectedOutletId) || null;
+  // Filtered views based on role and selectedOutletId
+  const effectiveOutletId =
+    role === "FRANCHISE_OWNER"
+      ? (selectedOutletId === "all" ? "mohak-city" : selectedOutletId)
+      : selectedOutletId;
+
+  const activeOutlet =
+    role === "FRANCHISE_OWNER"
+      ? (outlets.find((o) => o.id === effectiveOutletId) || outlets[0])
+      : (selectedOutletId === "all" ? null : (outlets.find((o) => o.id === selectedOutletId) || null));
 
   const filteredMeatBatches =
-    selectedOutletId === "all"
+    effectiveOutletId === "all"
       ? meatBatches
-      : meatBatches.filter((b) => b.outletId === selectedOutletId);
+      : meatBatches.filter((b) => b.outletId === effectiveOutletId);
 
   const filteredShifts =
-    selectedOutletId === "all"
+    effectiveOutletId === "all"
       ? shifts
-      : shifts.filter((s) => s.outletId === selectedOutletId);
+      : shifts.filter((s) => s.outletId === effectiveOutletId);
 
   const filteredRoyalties =
-    selectedOutletId === "all"
+    effectiveOutletId === "all"
       ? royalties
-      : royalties.filter((r) => r.outletId === selectedOutletId);
+      : royalties.filter((r) => r.outletId === effectiveOutletId);
 
   const filteredCompliance =
-    selectedOutletId === "all"
+    effectiveOutletId === "all"
       ? complianceList
-      : complianceList.filter((c) => c.outletId === selectedOutletId);
+      : complianceList.filter((c) => c.outletId === effectiveOutletId);
 
   const filteredOrders =
-    selectedOutletId === "all"
+    effectiveOutletId === "all"
       ? liveOrders
-      : liveOrders.filter((o) => o.outletId === selectedOutletId);
+      : liveOrders.filter((o) => o.outletId === effectiveOutletId);
 
   const filteredPettyCash =
-    selectedOutletId === "all"
+    effectiveOutletId === "all"
       ? pettyCashList
-      : pettyCashList.filter((p) => p.outletId === selectedOutletId);
+      : pettyCashList.filter((p) => p.outletId === effectiveOutletId);
 
   const filteredSafeDrops =
-    selectedOutletId === "all"
+    effectiveOutletId === "all"
       ? safeDropsList
-      : safeDropsList.filter((d) => d.outletId === selectedOutletId);
+      : safeDropsList.filter((d) => d.outletId === effectiveOutletId);
 
   // Outlet Tender & Cash Drawer Totals
   const openingCash = dailySession.openingFloat || 2000;

@@ -38,7 +38,11 @@ export default function PosRiderPickupPage() {
   const [otpError, setOtpError] = useState("");
   const [otpSuccessMsg, setOtpSuccessMsg] = useState("");
 
-  const filteredRiders = (riderOrders || []).filter((rdr) => {
+  const outletRiders = activeOutlet
+    ? (riderOrders || []).filter((r) => r.outletId === activeOutlet.id)
+    : (riderOrders || []);
+
+  const filteredRiders = outletRiders.filter((rdr) => {
     const matchesSearch =
       rdr.orderNumber.toLowerCase().includes(search.toLowerCase()) ||
       rdr.riderName.toLowerCase().includes(search.toLowerCase()) ||
@@ -57,7 +61,7 @@ export default function PosRiderPickupPage() {
     return matchesSearch && matchesChannel && matchesStatus;
   });
 
-  const activeCount = (riderOrders || []).filter((r) => r.status !== "Handed Over").length;
+  const activeCount = outletRiders.filter((r) => r.status !== "Handed Over").length;
   const arrivedCount = (riderOrders || []).filter((r) => r.status === "Rider Arrived").length;
   const completedCount = (riderOrders || []).filter((r) => r.status === "Handed Over").length;
 

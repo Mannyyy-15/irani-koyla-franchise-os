@@ -229,9 +229,12 @@ export default function TopNav({ onMenuClick }: { onMenuClick?: () => void }) {
           </div>
         ) : (
           <div className="flex items-center gap-2">
-            <span className="font-bold text-xs text-white bg-[#161618] border border-[#303030] px-3 py-1.5 rounded-xl flex items-center gap-1.5">
+            <span className="font-bold text-xs text-white bg-[#161618] border border-[#303030] px-3 py-1.5 rounded-xl flex items-center gap-2">
               <Store className="w-3.5 h-3.5 text-orange-500" />
-              <span>{activeOutlet?.name || "Bandra West"}</span>
+              <span>{activeOutlet?.name || "Mohak City Branch"}</span>
+              <span className="text-[10px] font-mono font-bold text-orange-400 bg-orange-500/10 px-1.5 py-0.5 rounded border border-orange-500/30">
+                {activeOutlet?.code || "IK-MOH-01"}
+              </span>
             </span>
 
             <Link

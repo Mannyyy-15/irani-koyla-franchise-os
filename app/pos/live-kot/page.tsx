@@ -18,11 +18,12 @@ import { cn } from "@/components/ui/cn";
 import { LiveOrder } from "@/lib/mock-data";
 
 export default function LiveKotQueuePage() {
-  const { liveOrders, activeOutlet } = useFranchise();
+  const { filteredOrders: outletOrders, activeOutlet, outlets } = useFranchise();
+  const currentOutlet = activeOutlet || outlets[0];
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedTicket, setSelectedTicket] = useState<LiveOrder | null>(null);
 
-  const filteredOrders = liveOrders.filter((ord) => {
+  const displayedOrders = outletOrders.filter((ord) => {
     return (
       ord.orderNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
       (ord.customerName && ord.customerName.toLowerCase().includes(searchTerm.toLowerCase())) ||
@@ -37,7 +38,7 @@ export default function LiveKotQueuePage() {
         <div>
           <div className="flex items-center gap-2">
             <span className="text-[10px] font-bold text-amber-500 uppercase tracking-widest leading-none">
-              Counter Live Feed
+              {currentOutlet.name} ({currentOutlet.code}) • Counter Live Feed
             </span>
             <span className="inline-flex items-center gap-1 text-[9px] font-bold text-emerald-400 bg-emerald-500/10 px-2 py-0.2 rounded-full border border-emerald-500/20">
               <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
@@ -45,7 +46,7 @@ export default function LiveKotQueuePage() {
             </span>
           </div>
           <h1 className="text-xl font-black text-white tracking-tight mt-0.5">
-            Live Counter Order Tickets Stream ({liveOrders.length} Completed)
+            Live Counter Order Tickets Stream ({outletOrders.length} Completed)
           </h1>
         </div>
 
@@ -63,13 +64,13 @@ export default function LiveKotQueuePage() {
       </div>
 
       {/* Tickets Cards Grid */}
-      {filteredOrders.length === 0 ? (
+      {displayedOrders.length === 0 ? (
         <div className="p-12 rounded-2xl bg-[#1f1f1f] border border-[#303030] text-center text-xs text-zinc-500">
           <span>No tickets found matching your search.</span>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3.5">
-          {filteredOrders.map((order) => (
+          {displayedOrders.map((order) => (
             <div
               key={order.id}
               className="p-4 rounded-2xl bg-[#1f1f1f] border border-[#303030] hover:border-amber-500/50 transition-all flex flex-col justify-between space-y-3 shadow-md"

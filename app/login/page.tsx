@@ -95,13 +95,33 @@ function LoginForm() {
     }
 
     try {
-      const targetRole = isSuperAdmin ? "SUPER_ADMIN" : "FRANCHISE_OWNER";
-      const targetOutlet = isSuperAdmin ? "all" : "mohak-city";
+      const cleanEmail = email.trim().toLowerCase();
+      const isSuperAdmin = cleanEmail === "admin@iranikoyla.com" || cleanEmail.includes("admin");
+      
+      let targetRole: "SUPER_ADMIN" | "FRANCHISE_OWNER" = "FRANCHISE_OWNER";
+      let targetOutlet = "mohak-city";
+
+      if (isSuperAdmin) {
+        targetRole = "SUPER_ADMIN";
+        targetOutlet = "all";
+      } else {
+        targetRole = "FRANCHISE_OWNER";
+        const matchedOutlet = INITIAL_OUTLETS.find(
+          (o) =>
+            (o.loginEmail && o.loginEmail.toLowerCase() === cleanEmail) ||
+            cleanEmail.includes(o.id) ||
+            cleanEmail.includes(o.code.toLowerCase()) ||
+            (cleanEmail.includes("mohak") && o.id === "mohak-city") ||
+            (cleanEmail.includes("bandra") && o.id === "bandra-west") ||
+            (cleanEmail.includes("andheri") && o.id === "andheri-east")
+        );
+        targetOutlet = matchedOutlet ? matchedOutlet.id : "mohak-city";
+      }
 
       await mockLoginAction(targetRole);
       loginAsRole(targetRole, targetOutlet);
 
-      if (isSuperAdmin) {
+      if (targetRole === "SUPER_ADMIN") {
         router.push("/admin");
       } else {
         router.push("/select-portal");
@@ -133,7 +153,7 @@ function LoginForm() {
                 Irani Koyla <span className="text-orange-500">FranchiseOS</span>
               </span>
               <span className="text-[11px] font-semibold text-zinc-400 uppercase tracking-widest">
-                Shawarma Franchise Network
+                Multi-Tenant Authentication
               </span>
             </div>
           </div>
@@ -143,7 +163,7 @@ function LoginForm() {
               Sign In to Your Workspace
             </h1>
             <p className="text-xs sm:text-sm text-zinc-400 mt-1">
-              Select between Brand HQ Super Admin or Mohak City Franchise Partner terminal.
+              Select Brand HQ (Super Admin) or your specific Franchise Partner terminal.
             </p>
           </div>
 
@@ -231,13 +251,14 @@ function LoginForm() {
             </button>
           </form>
 
-          {/* Quick Demo Test Accounts (Strictly 2 Accounts) */}
+          {/* Quick Demo Test Accounts (Separated Roles) */}
           <div className="p-4 rounded-2xl bg-[#1f1f1f] border border-[#303030] space-y-3">
             <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest block">
               1-Click Switch Authorized Profile
             </span>
 
             <div className="grid grid-cols-1 gap-2">
+              {/* Super Admin HQ */}
               <button
                 type="button"
                 onClick={() => populateAccount("admin@iranikoyla.com")}
@@ -245,15 +266,16 @@ function LoginForm() {
               >
                 <div>
                   <span className="font-bold text-white block group-hover:text-orange-400 transition-colors">
-                    🏢 Irani Koyla Shawarma (Super Admin HQ)
+                    🏢 Irani Koyla Brand HQ (Super Admin)
                   </span>
-                  <span className="text-[10px] text-zinc-500 font-mono">admin@iranikoyla.com &middot; password123</span>
+                  <span className="text-[10px] text-zinc-500 font-mono">admin@iranikoyla.com &middot; All Outlets</span>
                 </div>
-                <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-orange-500/10 text-orange-400 border border-orange-500/20">
-                  Brand HQ
+                <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-orange-500/10 text-orange-400 border border-orange-500/20 shrink-0">
+                  Full Network
                 </span>
               </button>
 
+              {/* Franchise 1: Mohak City */}
               <button
                 type="button"
                 onClick={() => populateAccount("partner.mohak@iranikoyla.com")}
@@ -261,12 +283,29 @@ function LoginForm() {
               >
                 <div>
                   <span className="font-bold text-white block group-hover:text-emerald-400 transition-colors">
-                    🏪 Mohak City Branch (Franchise Partner)
+                    🏪 Mohak City Branch (Partner)
                   </span>
-                  <span className="text-[10px] text-zinc-500 font-mono">partner.mohak@iranikoyla.com &middot; password123</span>
+                  <span className="text-[10px] text-zinc-500 font-mono">partner.mohak@iranikoyla.com &middot; IK-MOH-01</span>
                 </div>
-                <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-                  Store + POS
+                <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 shrink-0">
+                  Mohak Only
+                </span>
+              </button>
+
+              {/* Franchise 2: Bandra West */}
+              <button
+                type="button"
+                onClick={() => populateAccount("partner.bandra@iranikoyla.com")}
+                className="p-3 rounded-xl bg-[#161618] border border-[#303030] hover:border-blue-500 flex items-center justify-between text-xs text-left transition-all cursor-pointer group"
+              >
+                <div>
+                  <span className="font-bold text-white block group-hover:text-blue-400 transition-colors">
+                    🏪 Bandra West Flagship (Partner)
+                  </span>
+                  <span className="text-[10px] text-zinc-500 font-mono">partner.bandra@iranikoyla.com &middot; IK-MUM-01</span>
+                </div>
+                <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-blue-500/10 text-blue-400 border border-blue-500/20 shrink-0">
+                  Bandra Only
                 </span>
               </button>
             </div>
