@@ -57,7 +57,7 @@ export default function OutletsPage() {
 
   const [searchQuery, setSearchQuery] = useState("");
   const [cityFilter, setCityFilter] = useState<string>("all");
-  const [statusFilter, setStatusFilter] = useState<"all" | "active" | "onboarding">("all");
+  const [statusFilter, setStatusFilter] = useState<"all" | "active" | "onboarding" | "suspended" | "terminated">("all");
   const [sortBy, setSortBy] = useState<"sales" | "yield" | "wraps" | "name">("sales");
 
   // Modals & Drawers
