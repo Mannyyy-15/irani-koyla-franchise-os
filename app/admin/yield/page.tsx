@@ -69,7 +69,7 @@ export default function MeatYieldPage() {
   const avgEfficiency =
     filteredMeatBatches.length > 0
       ? (filteredMeatBatches.reduce((acc, b) => acc + b.actualYieldPercent, 0) / filteredMeatBatches.length).toFixed(1)
-      : "92.4";
+      : "0.0";
 
   const displayedBatches = filteredMeatBatches.filter((b) => {
     const matchesFilter = meatTypeFilter === "all" || b.meatType.includes(meatTypeFilter);
@@ -99,14 +99,17 @@ export default function MeatYieldPage() {
   const handleCreateBatch = (e: React.FormEvent) => {
     e.preventDefault();
     const targetO = outlets.find((o) => o.id === outletId) || outlets[0];
+    const targetCode = targetO?.code || "IK-HQ-01";
+    const targetName = targetO?.name || "Brand HQ";
+    const targetId = targetO?.id || "hq-main";
     const skewer = parseFloat(skewerWeightKg) || 30;
     const cooked = parseFloat(cookedWeightKg) || 27;
-    const batchNum = `IK-${targetO.code.split("-")[2] || "MUM"}-${new Date().toISOString().slice(2, 10).replace(/-/g, "")}-${Date.now().toString().slice(-2)}`;
+    const batchNum = `IK-${targetCode.split("-")[2] || "MUM"}-${new Date().toISOString().slice(2, 10).replace(/-/g, "")}-${Date.now().toString().slice(-2)}`;
 
     addMeatBatch({
       batchNumber: batchNum,
-      outletId: targetO.id,
-      outletName: targetO.name,
+      outletId: targetId,
+      outletName: targetName,
       meatType,
       spitId,
       timeLoaded: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
@@ -114,9 +117,9 @@ export default function MeatYieldPage() {
       marinationLossKg: parseFloat(marinationLossKg) || 1.0,
       skewerWeightKg: skewer,
       cookedWeightKg: cooked,
-      wrapsProduced: parseInt(wrapsCount) || 200,
-      jumboWrapsProduced: parseInt(jumboCount) || 40,
-      plattersProduced: parseInt(plattersCount) || 15,
+      wrapsProduced: parseInt(wrapsCount) || 0,
+      jumboWrapsProduced: parseInt(jumboCount) || 0,
+      plattersProduced: parseInt(plattersCount) || 0,
       wasteScrapsKg: parseFloat(wasteScrapsKg) || 0.8,
       targetYieldKg: Number((skewer * 0.92).toFixed(1)),
       coreTempCelsius: parseFloat(coreTemp) || 78.0,

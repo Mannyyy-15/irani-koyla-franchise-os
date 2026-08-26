@@ -71,22 +71,24 @@ export default function DailySalesPage() {
   const handleCloseShiftSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const targetO = outlets.find((o) => o.id === outletId) || outlets[0];
-    const gross = parseFloat(grossSales) || 50000;
-    const upi = parseFloat(upiSales) || 20000;
-    const swiggy = parseFloat(swiggySales) || 9000;
-    const zomato = parseFloat(zomatoSales) || 6000;
+    const targetId = targetO?.id || "hq-main";
+    const targetName = targetO?.name || "Brand HQ";
+    const gross = parseFloat(grossSales) || 0;
+    const upi = parseFloat(upiSales) || 0;
+    const swiggy = parseFloat(swiggySales) || 0;
+    const zomato = parseFloat(zomatoSales) || 0;
     const pos = parseFloat(posCardSales) || 0;
     const petty = parseFloat(pettyCash) || 0;
     const disc = parseFloat(discounts) || 0;
-    const open = parseFloat(openingCash) || 5000;
+    const open = parseFloat(openingCash) || 2000;
 
     const expectedCashSales = gross - (upi + swiggy + zomato + pos);
     const expectedDrawerTotal = open + expectedCashSales - petty;
     const diff = countedPhysicalCash - expectedDrawerTotal;
 
     closeShift({
-      outletId: targetO.id,
-      outletName: targetO.name,
+      outletId: targetId,
+      outletName: targetName,
       date: new Date().toISOString().split("T")[0],
       shiftType,
       cashierName,

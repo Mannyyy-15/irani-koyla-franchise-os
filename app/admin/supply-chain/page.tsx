@@ -63,14 +63,16 @@ export default function SupplyChainPage() {
   const handleCreateDispatch = (e: React.FormEvent) => {
     e.preventDefault();
     const outlet = outlets.find((o) => o.id === targetOutletId) || outlets[0];
+    const targetId = outlet?.id || "hq-main";
+    const targetName = outlet?.name || "Brand HQ";
     const cCount = parseInt(chickenCones) || 0;
     const mCount = parseInt(muttonCones) || 0;
     const totalWeight = cCount * 30.0 + mCount * 18.0;
 
     dispatchShipment({
       shipmentNumber: `IK-DISP-${new Date().toISOString().replace(/\D/g, "").slice(2, 10)}`,
-      outletId: outlet.id,
-      outletName: outlet.name,
+      outletId: targetId,
+      outletName: targetName,
       dispatchedAt: new Date().toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", hour12: true }) + ", Today",
       status: "in_transit",
       chickenConesCount: cCount,

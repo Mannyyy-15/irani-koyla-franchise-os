@@ -145,55 +145,63 @@ export default function RoyaltiesPage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-[#303030]">
-                {filteredRoyalties.map((inv) => (
-                  <tr key={inv.id} className="hover:bg-[#303030]/40 transition-colors">
-                    <td className="py-3.5 px-4">
-                      <span className="font-bold text-amber-400 font-mono block">{inv.invoiceNumber}</span>
-                      <span className="text-[10px] text-[#b8b8c5]/50">{inv.month}</span>
-                    </td>
-                    <td className="py-3.5 px-4">
-                      <span className="font-bold text-white block">{inv.outletName}</span>
-                      <span className="text-[10px] text-[#b8b8c5]/60">Due: {inv.dueDate}</span>
-                    </td>
-                    <td className="py-3.5 px-4 font-mono text-slate-200">
-                      ₹{inv.grossSales.toLocaleString("en-IN")}
-                    </td>
-                    <td className="py-3.5 px-4 font-mono text-[#b8b8c5]">
-                      ₹{inv.royaltyAmount.toLocaleString("en-IN")}
-                    </td>
-                    <td className="py-3.5 px-4 font-mono text-[#b8b8c5]">
-                      ₹{inv.marketingFeeAmount.toLocaleString("en-IN")}
-                    </td>
-                    <td className="py-3.5 px-4 font-mono text-orange-400">
-                      ₹{inv.centralKitchenSupplyCost.toLocaleString("en-IN")}
-                    </td>
-                    <td className="py-3.5 px-4 font-black text-white font-mono text-sm">
-                      ₹{inv.totalPayable.toLocaleString("en-IN")}
-                    </td>
-                    <td className="py-3.5 px-4 text-right">
-                      <div className="flex items-center justify-end gap-2">
-                        <span className={cn(
-                          "px-2 py-0.5 rounded-full text-[10px] font-bold",
-                          inv.status === "paid" ? "bg-emerald-500/10 text-emerald-400" :
-                          inv.status === "disputed" ? "bg-rose-500/10 text-rose-400" :
-                          "bg-amber-500/10 text-amber-400"
-                        )}>
-                          {inv.status}
-                        </span>
+                {filteredRoyalties.length > 0 ? (
+                  filteredRoyalties.map((inv) => (
+                    <tr key={inv.id} className="hover:bg-[#303030]/40 transition-colors">
+                      <td className="py-3.5 px-4">
+                        <span className="font-bold text-amber-400 font-mono block">{inv.invoiceNumber}</span>
+                        <span className="text-[10px] text-[#b8b8c5]/50">{inv.month}</span>
+                      </td>
+                      <td className="py-3.5 px-4">
+                        <span className="font-bold text-white block">{inv.outletName}</span>
+                        <span className="text-[10px] text-[#b8b8c5]/60">Due: {inv.dueDate}</span>
+                      </td>
+                      <td className="py-3.5 px-4 font-mono text-slate-200">
+                        ₹{inv.grossSales.toLocaleString("en-IN")}
+                      </td>
+                      <td className="py-3.5 px-4 font-mono text-[#b8b8c5]">
+                        ₹{inv.royaltyAmount.toLocaleString("en-IN")}
+                      </td>
+                      <td className="py-3.5 px-4 font-mono text-[#b8b8c5]">
+                        ₹{inv.marketingFeeAmount.toLocaleString("en-IN")}
+                      </td>
+                      <td className="py-3.5 px-4 font-mono text-orange-400">
+                        ₹{inv.centralKitchenSupplyCost.toLocaleString("en-IN")}
+                      </td>
+                      <td className="py-3.5 px-4 font-black text-white font-mono text-sm">
+                        ₹{inv.totalPayable.toLocaleString("en-IN")}
+                      </td>
+                      <td className="py-3.5 px-4 text-right">
+                        <div className="flex items-center justify-end gap-2">
+                          <span className={cn(
+                            "px-2 py-0.5 rounded-full text-[10px] font-bold",
+                            inv.status === "paid" ? "bg-emerald-500/10 text-emerald-400" :
+                            inv.status === "disputed" ? "bg-rose-500/10 text-rose-400" :
+                            "bg-amber-500/10 text-amber-400"
+                          )}>
+                            {inv.status}
+                          </span>
 
-                        <Button
-                          size="sm"
-                          variant="ghost"
-                          onClick={() => setSelectedInvoice(inv)}
-                          className="text-xs text-amber-400 hover:text-amber-300 font-bold gap-1"
-                        >
-                          <FileText className="w-3.5 h-3.5" />
-                          <span>View Invoice</span>
-                        </Button>
-                      </div>
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            onClick={() => setSelectedInvoice(inv)}
+                            className="text-xs text-amber-400 hover:text-amber-300 font-bold gap-1"
+                          >
+                            <FileText className="w-3.5 h-3.5" />
+                            <span>View Invoice</span>
+                          </Button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan={8} className="py-12 text-center text-zinc-500 text-xs font-sans">
+                      No royalty statements generated yet. Statements are automatically calculated from verified outlet monthly turnover.
                     </td>
                   </tr>
-                ))}
+                )}
               </tbody>
             </table>
           </div>

@@ -50,33 +50,6 @@ import { StoreOpeningModal } from "@/components/modals/StoreOpeningModal";
 import { StoreClosingModal } from "@/components/modals/StoreClosingModal";
 import { SpitReloadModal } from "@/components/modals/SpitReloadModal";
 
-const STORE_HOURLY_SALES = [
-  { hour: "12 PM", sales: 3200, orders: 12 },
-  { hour: "02 PM", sales: 7400, orders: 28 },
-  { hour: "04 PM", sales: 4800, orders: 19 },
-  { hour: "06 PM", sales: 9800, orders: 36 },
-  { hour: "08 PM", sales: 18600, orders: 64 },
-  { hour: "10 PM", sales: 24200, orders: 82 },
-  { hour: "12 AM", sales: 11400, orders: 38 },
-];
-
-const HQ_HOURLY_SALES = [
-  { hour: "12 PM", sales: 14200 },
-  { hour: "02 PM", sales: 29800 },
-  { hour: "04 PM", sales: 21400 },
-  { hour: "06 PM", sales: 42600 },
-  { hour: "08 PM", sales: 88400 },
-  { hour: "10 PM", sales: 116200 },
-  { hour: "12 AM", sales: 54800 },
-];
-
-const MENU_SHARE_DATA = [
-  { name: "Chicken Shawarma Wraps", value: 52, color: "#f97316" },
-  { name: "Smoked Mutton Rolls", value: 24, color: "#ea580c" },
-  { name: "Loaded Combo Meals", value: 16, color: "#fb923c" },
-  { name: "Platters & Sides", value: 8, color: "#fed7aa" },
-];
-
 export default function AdminDashboardPage() {
   const {
     role,
@@ -92,7 +65,8 @@ export default function AdminDashboardPage() {
   } = useFranchise();
 
   const isSuperAdmin = role === "SUPER_ADMIN" && selectedOutletId === "all";
-  const currentOutlet = activeOutlet || outlets[0];
+  const outletName = activeOutlet?.name || outlets[0]?.name || "All Franchise Hubs";
+  const outletCode = activeOutlet?.code || outlets[0]?.code || "IK-HQ-01";
 
   const [orderSearch, setOrderSearch] = useState("");
   const [orderChannelFilter, setOrderChannelFilter] = useState<"all" | "Walk-in Counter" | "Zomato" | "Swiggy">("all");
@@ -100,6 +74,55 @@ export default function AdminDashboardPage() {
   const [isOpeningModalOpen, setIsOpeningModalOpen] = useState(false);
   const [isClosingModalOpen, setIsClosingModalOpen] = useState(false);
   const [isSpitReloadModalOpen, setIsSpitReloadModalOpen] = useState(false);
+
+  // Dynamic Hourly Sales calculation from real liveOrders
+  const dynamicHourlySales = [
+    { hour: "12 PM", hourNum: 12 },
+    { hour: "02 PM", hourNum: 14 },
+    { hour: "04 PM", hourNum: 16 },
+    { hour: "06 PM", hourNum: 18 },
+    { hour: "08 PM", hourNum: 20 },
+    { hour: "10 PM", hourNum: 22 },
+    { hour: "12 AM", hourNum: 0 },
+  ].map((slot) => {
+    const ordersInSlot = liveOrders.filter((o) => {
+      if (!o.time) return false;
+      const t = o.time.toLowerCase();
+      return t.includes(slot.hour.toLowerCase().replace(" ", "")) || t.includes(slot.hour.slice(0, 2));
+    });
+    const slotSales = ordersInSlot.reduce((sum, o) => sum + o.totalAmount, 0);
+    return {
+      hour: slot.hour,
+      sales: slotSales,
+      orders: ordersInSlot.length,
+    };
+  });
+
+  // Dynamic Menu Share from real liveOrders items
+  const categoryRevenue: Record<string, number> = {};
+  liveOrders.forEach((o) => {
+    o.items?.forEach((item) => {
+      const cat = item.name.includes("Mutton")
+        ? "Smoked Mutton Rolls"
+        : item.name.includes("Platter") || item.name.includes("Salad")
+        ? "Platters & Sides"
+        : item.name.includes("Chai") || item.name.includes("Drink")
+        ? "Irani Chai & Drinks"
+        : "Chicken Shawarma Wraps";
+      categoryRevenue[cat] = (categoryRevenue[cat] || 0) + (item.price * item.quantity);
+    });
+  });
+
+  const totalCatRevenue = Object.values(categoryRevenue).reduce((a, b) => a + b, 0);
+  const dynamicMenuShare = Object.keys(categoryRevenue).length > 0
+    ? Object.entries(categoryRevenue).map(([name, val], idx) => ({
+        name,
+        value: Math.round((val / totalCatRevenue) * 100),
+        color: ["#f97316", "#ea580c", "#fb923c", "#3b82f6", "#10b981"][idx % 5],
+      }))
+    : [
+        { name: "Chicken Shawarma Wraps", value: 100, color: "#f97316" },
+      ];
 
   // Filtered live orders for store view
   const filteredOrders = liveOrders.filter((o) => {
@@ -111,9 +134,9 @@ export default function AdminDashboardPage() {
   });
 
   const channelChartData = [
-    { name: "Walk-in Counter", value: outletTenderTotals.walkInSales || 44200, color: "#f97316" },
-    { name: "Zomato Delivery", value: outletTenderTotals.zomatoSales || 21800, color: "#ef4444" },
-    { name: "Swiggy Delivery", value: outletTenderTotals.swiggySales || 13400, color: "#f59e0b" },
+    { name: "Walk-in Counter", value: outletTenderTotals.walkInSales || 0, color: "#f97316" },
+    { name: "Zomato Delivery", value: outletTenderTotals.zomatoSales || 0, color: "#ef4444" },
+    { name: "Swiggy Delivery", value: outletTenderTotals.swiggySales || 0, color: "#f59e0b" },
   ];
 
   const totalChannelRevenue = channelChartData.reduce((acc, c) => acc + c.value, 0) || 1;
@@ -128,7 +151,7 @@ export default function AdminDashboardPage() {
             <span>
               {isSuperAdmin
                 ? "Brand HQ Global • Multi-Branch Operations"
-                : `${currentOutlet.name} • ${currentOutlet.code}`}
+                : `${outletName} • ${outletCode}`}
             </span>
           </p>
           <div className="flex items-center gap-3 flex-wrap">
@@ -368,7 +391,7 @@ export default function AdminDashboardPage() {
               <CardContent>
                 <div className="h-60 w-full">
                   <ResponsiveContainer width="100%" height="100%">
-                    <AreaChart data={HQ_HOURLY_SALES}>
+                    <AreaChart data={dynamicHourlySales}>
                       <defs>
                         <linearGradient id="hqSalesGrad" x1="0" y1="0" x2="0" y2="1">
                           <stop offset="5%" stopColor="#f97316" stopOpacity={0.3} />
@@ -418,8 +441,8 @@ export default function AdminDashboardPage() {
                   <div className="h-44 w-full sm:w-[48%] shrink-0">
                     <ResponsiveContainer width="100%" height="100%">
                       <PieChart>
-                        <Pie data={MENU_SHARE_DATA} cx="50%" cy="50%" innerRadius={44} outerRadius={68} paddingAngle={4} dataKey="value">
-                          {MENU_SHARE_DATA.map((entry, index) => (
+                        <Pie data={dynamicMenuShare} cx="50%" cy="50%" innerRadius={44} outerRadius={68} paddingAngle={4} dataKey="value">
+                          {dynamicMenuShare.map((entry, index) => (
                             <Cell key={`cell-${index}`} fill={entry.color} />
                           ))}
                         </Pie>
@@ -449,7 +472,7 @@ export default function AdminDashboardPage() {
 
                   {/* Right: Clean Aligned Breakdown */}
                   <div className="w-full sm:w-[52%] space-y-2">
-                    {MENU_SHARE_DATA.map((item) => (
+                    {dynamicMenuShare.map((item) => (
                       <div key={item.name} className="p-2.5 rounded-xl bg-[#161618] border border-[#303030] flex items-center justify-between gap-2 shadow-sm">
                         <div className="flex items-center gap-2 min-w-0">
                           <span className="h-2.5 w-2.5 rounded-full shrink-0" style={{ backgroundColor: item.color }} />
@@ -590,7 +613,7 @@ export default function AdminDashboardPage() {
               <CardContent>
                 <div className="h-60 w-full">
                   <ResponsiveContainer width="100%" height="100%">
-                    <AreaChart data={STORE_HOURLY_SALES}>
+                    <AreaChart data={dynamicHourlySales}>
                       <defs>
                         <linearGradient id="storeSalesGrad" x1="0" y1="0" x2="0" y2="1">
                           <stop offset="5%" stopColor="#f97316" stopOpacity={0.25} />

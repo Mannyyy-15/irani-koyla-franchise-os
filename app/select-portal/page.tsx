@@ -19,7 +19,8 @@ import { logout } from "@/app/actions/auth";
 export default function SelectPortalPage() {
   const router = useRouter();
   const { activeOutlet, outlets, role } = useFranchise();
-  const currentOutlet = activeOutlet || outlets[0];
+  const outletName = activeOutlet?.name || outlets[0]?.name || "All Franchise Hubs";
+  const outletCode = activeOutlet?.code || outlets[0]?.code || "IK-HQ-01";
   const isSuperAdmin = role === "SUPER_ADMIN";
 
   const handleSignOut = async () => {
@@ -42,7 +43,7 @@ export default function SelectPortalPage() {
               Irani Koyla Shawarma
             </span>
             <span className="text-[10px] font-bold text-orange-400 uppercase tracking-widest block">
-              {isSuperAdmin ? "Brand Central HQ" : `${currentOutlet.name} • ${currentOutlet.code}`}
+              {isSuperAdmin ? "Brand Central HQ" : `${outletName} • ${outletCode}`}
             </span>
           </div>
         </div>

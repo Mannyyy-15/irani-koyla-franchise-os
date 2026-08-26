@@ -76,10 +76,12 @@ export default function CompliancePage() {
   const handleMorningChecklistSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const targetO = activeOutlet || outlets[0];
+    const targetId = targetO?.id || "hq-main";
+    const targetName = targetO?.name || "Brand HQ";
 
     updateCompliance({
-      outletId: targetO.id,
-      outletName: targetO.name,
+      outletId: targetId,
+      outletName: targetName,
       inspectedBy: `${openingManagerSign} (Opening Audit)`,
       deepFreezerTemp: parseFloat(openingFreezerTemp) || -18.8,
       chillerTemp: parseFloat(openingChillerTemp) || 3.2,
@@ -99,10 +101,12 @@ export default function CompliancePage() {
   const handleNightChecklistSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const targetO = activeOutlet || outlets[0];
+    const targetId = targetO?.id || "hq-main";
+    const targetName = targetO?.name || "Brand HQ";
 
     updateCompliance({
-      outletId: targetO.id,
-      outletName: targetO.name,
+      outletId: targetId,
+      outletName: targetName,
       inspectedBy: `${closingManagerSign} (Closing EOD Audit)`,
       deepFreezerTemp: parseFloat(openingFreezerTemp) || -18.8,
       chillerTemp: parseFloat(openingChillerTemp) || 3.2,
@@ -122,9 +126,11 @@ export default function CompliancePage() {
   const handleAuditSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const targetO = outlets.find((o) => o.id === outletId) || outlets[0];
+    const targetId = targetO?.id || "hq-main";
+    const targetName = targetO?.name || "Brand HQ";
     updateCompliance({
-      outletId: targetO.id,
-      outletName: targetO.name,
+      outletId: targetId,
+      outletName: targetName,
       inspectedBy,
       deepFreezerTemp: parseFloat(deepFreezerTemp) || -18.5,
       chillerTemp: parseFloat(chillerTemp) || 3.5,

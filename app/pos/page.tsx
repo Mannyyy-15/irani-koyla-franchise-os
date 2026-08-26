@@ -411,7 +411,7 @@ export default function PosBillingTerminal() {
       } : undefined,
       status: "Completed" as const,
       customerName: customerToken.trim() || "Counter Customer",
-      outletId: currentOutlet.id,
+      outletId: currentOutlet?.id || "hq-main",
     };
 
     if (typeof navigator !== "undefined" && !navigator.onLine) {
