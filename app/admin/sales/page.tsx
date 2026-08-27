@@ -147,11 +147,11 @@ export default function DailySalesPage() {
               <Receipt className="w-6 h-6" />
             </div>
             <div className="min-w-0">
-              <span className="text-[11px] font-semibold text-zinc-400 block">Total Gross Sales</span>
+              <span className="text-[11px] font-semibold text-zinc-400 block">Total Sales</span>
               <p className="text-2xl font-bold text-white font-mono tracking-tight mt-0.5">
                 ₹{totalGross.toLocaleString("en-IN")}
               </p>
-              <span className="text-xs text-zinc-400 block mt-0.5">All reconciled shifts</span>
+              <span className="text-xs text-zinc-400 block mt-0.5">All shifts today</span>
             </div>
           </CardContent>
         </Card>
@@ -163,11 +163,11 @@ export default function DailySalesPage() {
               <Smartphone className="w-6 h-6" />
             </div>
             <div className="min-w-0">
-              <span className="text-[11px] font-semibold text-blue-300 block">UPI & QR Collections</span>
+              <span className="text-[11px] font-semibold text-blue-300 block">Online / UPI</span>
               <p className="text-2xl font-bold text-blue-400 font-mono tracking-tight mt-0.5">
                 ₹{totalUpi.toLocaleString("en-IN")}
               </p>
-              <span className="text-xs text-zinc-400 block mt-0.5">Direct bank settlement</span>
+              <span className="text-xs text-zinc-400 block mt-0.5">Direct bank QR</span>
             </div>
           </CardContent>
         </Card>
@@ -179,11 +179,11 @@ export default function DailySalesPage() {
               <Banknote className="w-6 h-6" />
             </div>
             <div className="min-w-0">
-              <span className="text-[11px] font-semibold text-emerald-300 block">Physical Cash in Hand</span>
+              <span className="text-[11px] font-semibold text-emerald-300 block">Cash in Drawer</span>
               <p className="text-2xl font-bold text-emerald-400 font-mono tracking-tight mt-0.5">
                 ₹{totalCash.toLocaleString("en-IN")}
               </p>
-              <span className="text-xs text-zinc-400 block mt-0.5">Counted drawer cash</span>
+              <span className="text-xs text-zinc-400 block mt-0.5">Counted by cashier</span>
             </div>
           </CardContent>
         </Card>
@@ -195,11 +195,11 @@ export default function DailySalesPage() {
               <Truck className="w-6 h-6" />
             </div>
             <div className="min-w-0">
-              <span className="text-[11px] font-semibold text-orange-300 block">Food Aggregators</span>
+              <span className="text-[11px] font-semibold text-orange-300 block">Zomato & Swiggy</span>
               <p className="text-2xl font-bold text-orange-400 font-mono tracking-tight mt-0.5">
                 ₹{totalAggregators.toLocaleString("en-IN")}
               </p>
-              <span className="text-xs text-zinc-400 block mt-0.5">Zomato + Swiggy payout</span>
+              <span className="text-xs text-zinc-400 block mt-0.5">Online deliveries</span>
             </div>
           </CardContent>
         </Card>

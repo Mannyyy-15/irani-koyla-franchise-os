@@ -16,6 +16,7 @@ import {
   MoreHorizontal,
   X,
   ChevronRight,
+  Truck,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import AdminSidebar from "@/components/AdminSidebar";
@@ -23,11 +24,11 @@ import TopNav from "@/components/TopNav";
 import { FranchiseProvider } from "@/lib/franchise-context";
 
 const drawerOptions = [
-  { name: "Royalty & Agreements", href: "/admin/royalties", icon: WalletCards, desc: "Franchise Invoices & Fees" },
-  { name: "Master Recipes & BOM", href: "/admin/menu", icon: UtensilsCrossed, desc: "Portion Standards & Margins" },
-  { name: "Food Safety & Audit", href: "/admin/compliance", icon: ShieldCheck, desc: "Temperature & FSSAI Checks" },
-  { name: "Operational Audit Log", href: "/admin/audit", icon: FilePieChart, desc: "System & Wastage History" },
-  { name: "System Settings", href: "/admin/settings", icon: Settings, desc: "Franchise Rules & Config" },
+  { name: "Royalties & Bills", href: "/admin/royalties", icon: WalletCards, desc: "Franchise Invoices & Dues" },
+  { name: "Menu & Recipes", href: "/admin/menu", icon: UtensilsCrossed, desc: "Portion Sizes & Costs" },
+  { name: "Stock & Supplies", href: "/admin/supply-chain", icon: Truck, desc: "Order Spices & Meat" },
+  { name: "Activity Log", href: "/admin/audit", icon: FilePieChart, desc: "Recent Actions History" },
+  { name: "Settings", href: "/admin/settings", icon: Settings, desc: "System Rules & Config" },
 ];
 
 const mainNavTabs = [

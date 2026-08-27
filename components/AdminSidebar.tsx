@@ -33,60 +33,58 @@ import { useFranchise } from "@/lib/franchise-context";
 
 const superAdminNav = [
   {
-    label: "HQ COMMAND",
+    label: "MAIN MENU",
     items: [
-      { name: "HQ Overview", href: "/admin", icon: LayoutDashboard },
+      { name: "Overview", href: "/admin", icon: LayoutDashboard },
       { name: "Monthly Performance", href: "/admin/monthly", icon: CalendarDays },
-      { name: "Franchise Hubs", href: "/admin/outlets", icon: Store },
-      { name: "Central Supply Chain", href: "/admin/supply-chain", icon: Truck },
-      { name: "Master Menu & Recipes", href: "/admin/menu", icon: UtensilsCrossed },
+      { name: "Outlets", href: "/admin/outlets", icon: Store },
+      { name: "Stock & Supplies", href: "/admin/supply-chain", icon: Truck },
+      { name: "Menu & Recipes", href: "/admin/menu", icon: UtensilsCrossed },
     ],
   },
   {
-    label: "FINANCE & AUDIT",
+    label: "FINANCE & TRACKING",
     items: [
-      { name: "Royalties & Invoices", href: "/admin/royalties", icon: WalletCards },
-      { name: "Sales & Shift Audit", href: "/admin/sales", icon: Receipt },
-      { name: "Meat Yield Benchmarks", href: "/admin/yield", icon: Flame },
-      { name: "FSSAI & Hygiene", href: "/admin/compliance", icon: ShieldCheck },
-      { name: "Audit Trail", href: "/admin/audit", icon: FilePieChart },
+      { name: "Royalties", href: "/admin/royalties", icon: WalletCards },
+      { name: "Daily Sales & Shifts", href: "/admin/sales", icon: Receipt },
+      { name: "Meat & Spit Yield", href: "/admin/yield", icon: Flame },
+      { name: "Activity Log", href: "/admin/audit", icon: FilePieChart },
     ],
   },
   {
-    label: "SYSTEM",
+    label: "SETTINGS",
     items: [
-      { name: "HQ Settings", href: "/admin/settings", icon: Settings },
+      { name: "Settings", href: "/admin/settings", icon: Settings },
     ],
   },
 ];
 
 const franchiseNav = [
   {
-    label: "STORE PULSE",
+    label: "MY STORE",
     items: [
       { name: "Store Overview", href: "/admin", icon: LayoutDashboard },
       { name: "Monthly Performance", href: "/admin/monthly", icon: CalendarDays },
-      { name: "Counter POS Register", href: "/pos", icon: Receipt },
+      { name: "Billing POS", href: "/pos", icon: Receipt },
     ],
   },
   {
-    label: "KITCHEN & STOCK",
+    label: "STOCK & KITCHEN",
     items: [
-      { name: "Spit & Meat Yield", href: "/admin/yield", icon: Flame },
       { name: "Order Raw Materials", href: "/admin/supply-chain", icon: Truck },
+      { name: "Meat & Spits", href: "/admin/yield", icon: Flame },
     ],
   },
   {
-    label: "FINANCE & ROYALTIES",
+    label: "FINANCE",
     items: [
-      { name: "P&L & Royalty Invoices", href: "/admin/royalties", icon: WalletCards },
+      { name: "Royalties & Bills", href: "/admin/royalties", icon: WalletCards },
     ],
   },
   {
-    label: "STANDARDS & SETUP",
+    label: "SETTINGS",
     items: [
-      { name: "SOPs & Food Hygiene", href: "/admin/compliance", icon: ShieldCheck },
-      { name: "Aggregator Connectors", href: "/admin/integrations", icon: Settings },
+      { name: "Zomato & Swiggy Connect", href: "/admin/integrations", icon: Settings },
     ],
   },
 ];

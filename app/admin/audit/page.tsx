@@ -26,7 +26,7 @@ export default function AuditTrailPage() {
   const [selectedModule, setSelectedModule] = useState<string>("all");
   const [searchQuery, setSearchQuery] = useState("");
 
-  const modules = ["all", "Sales", "Yield", "Royalty", "Compliance", "Pricing"];
+  const modules = ["all", "Sales", "Yield", "Royalty", "SupplyChain", "Pricing", "Operations"];
 
   const filteredLogs = auditLogs.filter((log) => {
     const matchModule = selectedModule === "all" || log.module === selectedModule;
@@ -44,7 +44,7 @@ export default function AuditTrailPage() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold text-white tracking-tight">
-            Audit Trail
+            Activity Log
           </h1>
         </div>
       </div>
@@ -74,7 +74,7 @@ export default function AuditTrailPage() {
                   : "text-[#b8b8c5]/70 hover:bg-[#303030] hover:text-white"
               )}
             >
-              {m}
+              {m === "all" ? "All" : m === "Yield" ? "Meat & Spits" : m === "SupplyChain" ? "Stock Orders" : m === "Pricing" ? "Menu Prices" : m}
             </button>
           ))}
         </div>
@@ -86,10 +86,10 @@ export default function AuditTrailPage() {
           <CardTitle className="text-sm font-bold text-white flex items-center justify-between">
             <div className="flex items-center gap-2">
               <Clock className="w-4 h-4 text-amber-500" />
-              <span>Audit Events Stream ({filteredLogs.length} Records)</span>
+              <span>Recent Activity ({filteredLogs.length} Records)</span>
             </div>
             <span className="text-[11px] text-[#b8b8c5]/50 font-mono">
-              Immutable SHA-256 Trail
+              Live Record
             </span>
           </CardTitle>
         </CardHeader>
@@ -100,7 +100,6 @@ export default function AuditTrailPage() {
                 log.module === "Sales" ? <Receipt className="w-4 h-4 text-amber-400" /> :
                 log.module === "Yield" ? <Flame className="w-4 h-4 text-orange-400" /> :
                 log.module === "Royalty" ? <WalletCards className="w-4 h-4 text-emerald-400" /> :
-                log.module === "Compliance" ? <ShieldCheck className="w-4 h-4 text-blue-400" /> :
                 <Store className="w-4 h-4 text-slate-400" />;
 
               return (
@@ -115,9 +114,9 @@ export default function AuditTrailPage() {
                   <div className="min-w-0 flex-1 space-y-1">
                     <div className="flex flex-wrap items-center justify-between gap-2">
                       <div className="flex items-center gap-2">
-                        <span className="font-black text-white text-xs">{log.action}</span>
+                        <span className="font-bold text-white text-xs">{log.action}</span>
                         <span className="text-[10px] font-bold text-amber-400 bg-amber-500/10 px-2 py-0.2 rounded border border-amber-500/20">
-                          {log.module}
+                          {log.module === "Yield" ? "Meat" : log.module === "SupplyChain" ? "Stock" : log.module}
                         </span>
                       </div>
                       <span className="text-[10px] text-[#b8b8c5]/50 font-mono">{log.timestamp}</span>
@@ -129,7 +128,7 @@ export default function AuditTrailPage() {
 
                     <div className="flex items-center gap-3 pt-1 text-[10px] text-[#b8b8c5]/50 font-mono">
                       <span>Outlet: <strong className="text-[#b8b8c5]">{log.outletName}</strong></span>
-                      <span>User: <strong className="text-[#b8b8c5]">{log.user} ({log.role})</strong></span>
+                      <span>By: <strong className="text-[#b8b8c5]">{log.user} ({log.role})</strong></span>
                     </div>
                   </div>
                 </div>

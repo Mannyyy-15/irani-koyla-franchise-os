@@ -158,7 +158,7 @@ export default function MeatYieldPage() {
               <Scale className="w-6 h-6" />
             </div>
             <div className="min-w-0">
-              <span className="text-[11px] font-semibold text-zinc-400 block">Raw Skewers Loaded</span>
+              <span className="text-[11px] font-semibold text-zinc-400 block">Raw Meat Loaded</span>
               <p className="text-2xl font-bold text-white font-mono tracking-tight mt-0.5">
                 {totalRawReceived.toFixed(1)} <span className="text-sm font-bold text-zinc-400 font-sans">kg</span>
               </p>
@@ -176,12 +176,12 @@ export default function MeatYieldPage() {
               <Percent className="w-6 h-6" />
             </div>
             <div className="min-w-0">
-              <span className="text-[11px] font-semibold text-emerald-300 block">Yield Efficiency</span>
+              <span className="text-[11px] font-semibold text-emerald-300 block">Meat Efficiency</span>
               <p className="text-2xl font-bold text-emerald-400 font-mono tracking-tight mt-0.5">
                 {avgEfficiency}%
               </p>
               <span className="text-xs text-emerald-400 font-medium block mt-0.5">
-                Target: &ge; 92.0% standard
+                Goal: 92% or higher
               </span>
             </div>
           </CardContent>
@@ -194,12 +194,12 @@ export default function MeatYieldPage() {
               <UtensilsCrossed className="w-6 h-6" />
             </div>
             <div className="min-w-0">
-              <span className="text-[11px] font-semibold text-zinc-400 block">Portions Produced</span>
+              <span className="text-[11px] font-semibold text-zinc-400 block">Total Wraps Made</span>
               <p className="text-2xl font-bold text-white font-mono tracking-tight mt-0.5">
                 {totalWrapsProduced.toLocaleString()}
               </p>
               <span className="text-xs text-zinc-400 block mt-0.5">
-                Avg 110g meat per roll
+                ~110g meat per wrap
               </span>
             </div>
           </CardContent>
@@ -212,12 +212,12 @@ export default function MeatYieldPage() {
               <AlertTriangle className="w-6 h-6" />
             </div>
             <div className="min-w-0">
-              <span className="text-[11px] font-semibold text-rose-300 block">Trimming & Scrap Waste</span>
+              <span className="text-[11px] font-semibold text-rose-300 block">Meat Waste & Scraps</span>
               <p className="text-2xl font-bold text-rose-400 font-mono tracking-tight mt-0.5">
                 {totalWaste.toFixed(1)} <span className="text-sm font-bold text-zinc-400 font-sans">kg</span>
               </p>
               <span className="text-xs text-zinc-400 block mt-0.5">
-                {((totalWaste / (totalRawReceived || 1)) * 100).toFixed(1)}% scrap ratio
+                {((totalWaste / (totalRawReceived || 1)) * 100).toFixed(1)}% waste
               </span>
             </div>
           </CardContent>
@@ -227,26 +227,26 @@ export default function MeatYieldPage() {
       {/* Row 2: Charts (Yield Trend & Portion Breakdown) */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Yield Efficiency by Batch Bar Chart */}
-        <Card className="lg:col-span-2 border-[#303030] bg-[#1f1f1f]">
+        <Card className="lg:col-span-2 border-[#2e2e30] bg-[#1a1a1c] shadow-sm rounded-2xl">
           <CardHeader className="pb-2 flex flex-row items-center justify-between">
             <CardTitle className="text-sm font-bold text-white flex items-center gap-2">
-              <TrendingUp className="w-4 h-4 text-amber-500" />
-              <span>Batch Yield Efficiency vs 92% Benchmark</span>
+              <TrendingUp className="w-4 h-4 text-orange-500" />
+              <span>Meat Efficiency per Batch</span>
             </CardTitle>
             <span className="text-xs font-mono text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20">
-              Target &ge; 92.0%
+              Goal: 92%
             </span>
           </CardHeader>
           <CardContent>
             <div className="h-56 w-full">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={yieldChartData} barSize={28}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#303030" vertical={false} />
-                  <XAxis dataKey="name" stroke="#b8b8c5" opacity={0.5} fontSize={11} tickLine={false} />
-                  <YAxis domain={[80, 100]} stroke="#b8b8c5" opacity={0.5} fontSize={11} tickLine={false} tickFormatter={(val) => `${val}%`} />
+                  <CartesianGrid strokeDasharray="3 3" stroke="#2a2a2e" vertical={false} />
+                  <XAxis dataKey="name" stroke="#888" fontSize={11} tickLine={false} />
+                  <YAxis domain={[80, 100]} stroke="#888" fontSize={11} tickLine={false} tickFormatter={(val) => `${val}%`} />
                   <Tooltip
-                    contentStyle={{ backgroundColor: "#1f1f1f", borderColor: "#303030", borderRadius: "12px", fontSize: "12px", color: "#fff" }}
-                    formatter={(val: any) => [`${val}%`, "Yield Efficiency"]}
+                    contentStyle={{ backgroundColor: "#141416", borderColor: "#2e2e30", borderRadius: "12px", fontSize: "12px", color: "#fff" }}
+                    formatter={(val: any) => [`${val}%`, "Efficiency"]}
                   />
                   <ReferenceLine y={92.0} stroke="#f59e0b" strokeDasharray="3 3" label={{ value: "Target 92%", fill: "#f59e0b", fontSize: 10, position: "top" }} />
                   <Bar dataKey="yield" radius={[6, 6, 0, 0]}>

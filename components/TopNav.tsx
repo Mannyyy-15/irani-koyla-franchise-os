@@ -38,25 +38,27 @@ function titleFromPath(pathname: string): string {
   const last = segs[segs.length - 1] ?? "overview";
   switch (last) {
     case "admin":
-      return "Franchise Management Overview";
+      return "Overview";
     case "pos":
-      return "Counter POS & Ordering Terminal";
+      return "Billing POS";
     case "outlets":
-      return "Franchise Outlets & Stores";
+      return "Outlets";
     case "yield":
-      return "Shawarma Batch & Meat Yield";
+      return "Meat & Spits";
     case "sales":
-      return "Daily Sales & Shift Registers";
+      return "Daily Sales";
     case "royalties":
-      return "Franchise Royalty Statements";
+      return "Royalties";
     case "menu":
-      return "Master Recipe BOM & Portion Standards";
-    case "compliance":
-      return "Food Safety & Quality Compliance";
+      return "Menu & Recipes";
+    case "supply-chain":
+      return "Stock & Supplies";
     case "audit":
-      return "Operational & System Audit Trail";
+      return "Audit History";
     case "settings":
-      return "System Settings & Franchise Configuration";
+      return "Settings";
+    case "monthly":
+      return "Monthly Performance";
     default:
       return last.replace(/-/g, " ").replace(/\b\w/g, (l) => l.toUpperCase());
   }
