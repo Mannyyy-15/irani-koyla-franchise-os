@@ -83,56 +83,50 @@ export default function TopNav({ onMenuClick }: { onMenuClick?: () => void }) {
   const [quickActionModal, setQuickActionModal] = useState<"meat" | "shift" | "temp" | null>(null);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [showNotifications, setShowNotifications] = useState(false);
+  const { supplyOrders, liveOrders, dailySession, shifts, filteredOrders } = useFranchise();
 
-  const { supplyOrders } = useFranchise();
+  // Dynamic Live Notifications strictly computed from real system events
+  const pendingHQOrders = supplyOrders.filter((o) => o.status === "pending");
+  const pendingFranchiseDispatches = supplyOrders.filter((o) => o.outletId === activeOutlet?.id && o.status === "dispatched");
+  const pendingFranchiseApprovals = supplyOrders.filter((o) => o.outletId === activeOutlet?.id && o.status === "approved");
+  const flaggedShifts = shifts.filter((s) => s.status === "variance_flagged");
 
-  // Dynamic Live Notifications for HQ and Franchisee
   const baseNotifications = role === "SUPER_ADMIN"
     ? [
-        ...(supplyOrders.filter((o) => o.status === "pending").map((o) => ({
+        // Real pending stock orders from franchise partners
+        ...(pendingHQOrders.map((o) => ({
           id: `notif-order-${o.id}`,
           type: "order",
-          title: `New Stock Order · ${o.outletName}`,
-          desc: `${o.orderNumber} (${o.totalQuantity} items · ₹${o.totalAmount.toLocaleString("en-IN")}) waiting for approval.`,
+          title: `New Stock Requisition · ${o.outletName}`,
+          desc: `Order #${o.orderNumber} (${o.totalQuantity} items · ₹${o.totalAmount.toLocaleString("en-IN")}) is awaiting your approval.`,
           time: o.createdAt || "Just now",
         }))),
-        {
-          id: "notif-shifts-active",
+        // Real shift variances flagged during register closing
+        ...(flaggedShifts.slice(0, 3).map((s) => ({
+          id: `notif-shift-${s.id}`,
           type: "alert",
-          title: "Daily Store Shifts Active",
-          desc: "4 franchise outlets are actively billing on counter POS.",
-          time: "10m ago",
-        },
-        {
-          id: "notif-royalties-ready",
-          type: "info",
-          title: "Monthly Royalty Invoices Ready",
-          desc: "August 2026 statements generated across all franchise network hubs.",
-          time: "1h ago",
-        },
+          title: `Cash Variance Flagged · ${s.outletName}`,
+          desc: `Shift discrepancy of ₹${Math.abs(s.cashDifference)} logged by ${s.cashierName}.`,
+          time: s.date || "Recent",
+        }))),
       ]
     : [
-        ...(supplyOrders.filter((o) => o.outletId === activeOutlet?.id && o.status === "dispatched").map((o) => ({
+        // Cold chain van in-transit for this store
+        ...(pendingFranchiseDispatches.map((o) => ({
           id: `notif-disp-${o.id}`,
           type: "urgent",
           title: "Cold-Chain Van Dispatched!",
-          desc: `Shipment ${o.trackingNumber || o.orderNumber} is on the way. Confirm with your 4-digit OTP.`,
+          desc: `Delivery for Requisition #${o.orderNumber} is in transit. Provide OTP (${o.deliveryOtp || "••••"}) to driver upon arrival.`,
           time: "In Transit",
         }))),
-        ...(supplyOrders.filter((o) => o.outletId === activeOutlet?.id && o.status === "approved").map((o) => ({
+        // Approved requisition notification
+        ...(pendingFranchiseApprovals.map((o) => ({
           id: `notif-appr-${o.id}`,
           type: "order",
-          title: "Stock Requisition Approved",
-          desc: `Order ${o.orderNumber} approved by Brand HQ for dispatch.`,
+          title: "Stock Requisition Approved by HQ",
+          desc: `Requisition #${o.orderNumber} has been approved by Central Commissary and is queued for dispatch.`,
           time: "Today",
         }))),
-        {
-          id: "notif-daily-target",
-          type: "info",
-          title: "Daily Store Targets",
-          desc: `Target today: ₹${activeOutlet?.dailyTargetSales.toLocaleString("en-IN") || "50,000"} · Maintain >92% Spit Yield.`,
-          time: "Morning",
-        },
       ];
 
   const [dismissedIds, setDismissedIds] = useState<string[]>([]);
