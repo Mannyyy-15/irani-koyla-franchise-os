@@ -345,7 +345,7 @@ html, body {
   }
 }
 
-/* POS Thermal Receipt ESC/POS Print Isolation */
+/* POS Thermal Receipt ESC/POS & Digital Legal Agreement Print Isolation */
 @media print {
   html, body {
     background: #ffffff !important;
@@ -357,7 +357,9 @@ html, body {
     visibility: hidden;
   }
   #thermal-print-receipt,
-  #thermal-print-receipt * {
+  #thermal-print-receipt *,
+  #legal-agreement-document,
+  #legal-agreement-document * {
     visibility: visible;
   }
   #thermal-print-receipt {
@@ -375,9 +377,22 @@ html, body {
     border-radius: 0 !important;
     font-family: 'Courier New', Courier, monospace !important;
   }
+  #legal-agreement-document {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 20mm 15mm !important;
+    background: #ffffff !important;
+    color: #111827 !important;
+    box-shadow: none !important;
+    border: none !important;
+    font-family: 'Times New Roman', Times, serif, system-ui !important;
+  }
   @page {
-    size: 80mm auto;
-    margin: 0mm;
+    size: auto;
+    margin: 10mm;
   }
 }
 

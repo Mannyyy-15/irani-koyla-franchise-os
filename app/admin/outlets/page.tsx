@@ -43,6 +43,7 @@ import {
   Ban,
   Power,
   Settings,
+  Printer,
 } from "lucide-react";
 import { useFranchise } from "@/lib/franchise-context";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
@@ -63,10 +64,11 @@ export default function OutletsPage() {
   // Modals & Drawers
   const [showAddModal, setShowAddModal] = useState(false);
   const [selectedDossierOutlet, setSelectedDossierOutlet] = useState<typeof outlets[0] | null>(null);
-  const [dossierTab, setDossierTab] = useState<"credentials" | "sales" | "yield" | "royalties" | "compliance" | "actions">("credentials");
+  const [dossierTab, setDossierTab] = useState<"credentials" | "agreement" | "sales" | "yield" | "royalties" | "actions">("credentials");
   const [showDispatchSuccess, setShowDispatchSuccess] = useState(false);
   const [copiedLink, setCopiedLink] = useState(false);
   const [copiedPack, setCopiedPack] = useState(false);
+  const [viewingLegalAgreement, setViewingLegalAgreement] = useState<typeof outlets[0] | null>(null);
 
   // Success Provisioning Modal
   const [createdOutletResult, setCreatedOutletResult] = useState<any | null>(null);
@@ -856,12 +858,12 @@ For central commissary refills or support, contact HQ Operations.
               {/* Dossier Tabs Bar */}
               <div className="flex items-center gap-2 pt-4 overflow-x-auto">
                 {[
-                  { id: "credentials", label: "Login & Magic Link", icon: Key },
-                  { id: "sales", label: "Live Sales & Orders", icon: Receipt },
-                  { id: "yield", label: "Spit Yield & Meat", icon: Flame },
-                  { id: "royalties", label: "Contract & Royalties", icon: DollarSign },
-                  { id: "compliance", label: "FSSAI & Hygiene", icon: ShieldCheck },
-                  { id: "actions", label: "HQ Terminal Control", icon: Layers },
+                  { id: "credentials", label: "Login & Password", icon: Key },
+                  { id: "agreement", label: "Digital Agreement & Legal", icon: FileText },
+                  { id: "sales", label: "Today Sales & Orders", icon: Receipt },
+                  { id: "yield", label: "Meat & Spits", icon: Flame },
+                  { id: "royalties", label: "Royalties & Bills", icon: DollarSign },
+                  { id: "actions", label: "Store Controls", icon: Layers },
                 ].map((tab) => (
                   <button
                     key={tab.id}
@@ -987,6 +989,97 @@ For central commissary refills or support, contact HQ Operations.
                     >
                       {copiedPack ? <Check className="w-3.5 h-3.5" /> : <Send className="w-3.5 h-3.5" />}
                       <span>{copiedPack ? "Pack Copied to Clipboard!" : "Copy WhatsApp Pack"}</span>
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* TAB: DIGITAL LEGAL AGREEMENT & CONTRACT */}
+            {dossierTab === "agreement" && selectedDossierOutlet && (
+              <div className="space-y-4 mt-4 text-xs">
+                {/* Agreement Summary Header */}
+                <div className="p-4 rounded-2xl bg-[#161618] border border-[#303030] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                  <div className="space-y-0.5">
+                    <div className="flex items-center gap-2">
+                      <FileText className="w-4 h-4 text-orange-400" />
+                      <span className="font-bold text-white text-sm">Master Franchise Legal Agreement</span>
+                      <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                        LEGAL-DOC-{selectedDossierOutlet.code}
+                      </span>
+                    </div>
+                    <span className="text-[11px] text-zinc-400 block">
+                      Auto-generated binding agreement based on brand standards and terms.
+                    </span>
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    <Button
+                      size="sm"
+                      onClick={() => setViewingLegalAgreement(selectedDossierOutlet)}
+                      className="bg-orange-600 hover:bg-orange-500 text-white font-bold text-xs h-8 px-3 rounded-xl gap-1.5 cursor-pointer shadow-md"
+                    >
+                      <Eye className="w-3.5 h-3.5" />
+                      <span>View & Print Document</span>
+                    </Button>
+                  </div>
+                </div>
+
+                {/* Key Legal Clauses Grid */}
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 font-mono">
+                  <div className="p-3.5 rounded-xl bg-[#141416] border border-[#27272a] space-y-1">
+                    <span className="text-[10px] text-zinc-500 uppercase font-sans font-bold block">Brand Licensor</span>
+                    <strong className="text-white text-xs font-sans block">Irani Koyla Shawarma HQ</strong>
+                    <span className="text-[10px] text-zinc-400 font-sans">ThePieCraft Brands Pvt. Ltd.</span>
+                  </div>
+
+                  <div className="p-3.5 rounded-xl bg-[#141416] border border-[#27272a] space-y-1">
+                    <span className="text-[10px] text-zinc-500 uppercase font-sans font-bold block">Franchise Licensee</span>
+                    <strong className="text-white text-xs font-sans block">{selectedDossierOutlet.ownerName}</strong>
+                    <span className="text-[10px] text-zinc-400 font-sans">{selectedDossierOutlet.name} ({selectedDossierOutlet.city})</span>
+                  </div>
+
+                  <div className="p-3.5 rounded-xl bg-[#141416] border border-[#27272a] space-y-1">
+                    <span className="text-[10px] text-zinc-500 uppercase font-sans font-bold block">Term & Exclusivity</span>
+                    <strong className="text-emerald-400 text-xs block">{selectedDossierOutlet.agreementTermYears || 5} Years Renewable</strong>
+                    <span className="text-[10px] text-zinc-400 font-sans">{selectedDossierOutlet.territoryRadiusKm || 3.0} km Territory Non-Compete</span>
+                  </div>
+                </div>
+
+                {/* Digital Agreement Document Preview Box */}
+                <div className="p-5 rounded-2xl bg-[#121214] border border-[#27272a] space-y-3.5 text-zinc-300 font-sans leading-relaxed">
+                  <div className="flex items-center justify-between border-b border-[#27272a] pb-2 text-xs font-mono">
+                    <span className="text-zinc-500 uppercase">Document Preview · Standard Terms</span>
+                    <span className="text-orange-400 font-bold">5-Year Renewable Standard Deed</span>
+                  </div>
+
+                  <div className="space-y-2 text-xs text-zinc-300">
+                    <p>
+                      <strong>1. GRANT OF FRANCHISE LICENSE:</strong> The Brand Licensor hereby grants to the Franchisee the non-exclusive, personal right to operate an <em>Irani Koyla Shawarma</em> franchise restaurant located at <strong>{selectedDossierOutlet.address || `${selectedDossierOutlet.area}, ${selectedDossierOutlet.city}`}</strong>, using the proprietary authentic coal-marination recipes, system marks, and trademarks.
+                    </p>
+                    <p>
+                      <strong>2. COMMERCIAL & ROYALTY TERMS:</strong> The Franchisee agrees to pay an ongoing monthly Royalty Fee of <strong>{selectedDossierOutlet.royaltyRatePercent || 6.5}%</strong> of monthly Gross Sales and a Brand Marketing Fund Contribution of <strong>{selectedDossierOutlet.marketingFeePercent || 2.0}%</strong> by the 10th of every succeeding calendar month.
+                    </p>
+                    <p>
+                      <strong>3. CENTRAL COMMISSARY & SPICE EXCLUSIVITY:</strong> To preserve brand recipe integrity, the Franchisee is legally required to purchase all proprietary marinated meat cones, signature 14-spice blends, and garlic toum exclusively through the Central Supply Chain portal. Sourcing unapproved spice mixes or meat constitutes a material breach of contract.
+                    </p>
+                    <p>
+                      <strong>4. QUALITY AUDIT & FSSAI COMPLIANCE:</strong> The Franchisee shall strictly maintain freezer core temperatures (≤ -18°C), spit cooking temperatures (≥ 75°C), and staff hygiene in accordance with FSSAI regulations.
+                    </p>
+                  </div>
+
+                  <div className="pt-3 border-t border-[#27272a] flex items-center justify-between">
+                    <div className="flex items-center gap-2 text-[11px] text-emerald-400 font-mono">
+                      <CheckCircle2 className="w-3.5 h-3.5" />
+                      <span>Digital Agreement Ready · Signed on {selectedDossierOutlet.openedAt || "2026-08-01"}</span>
+                    </div>
+                    <Button
+                      size="sm"
+                      onClick={() => setViewingLegalAgreement(selectedDossierOutlet)}
+                      className="bg-orange-600 hover:bg-orange-500 text-white font-bold text-xs h-8 px-3 rounded-xl gap-1.5 cursor-pointer shadow-md"
+                    >
+                      <Printer className="w-3.5 h-3.5" />
+                      <span>Open Printable Contract</span>
                     </Button>
                   </div>
                 </div>
@@ -1163,53 +1256,7 @@ For central commissary refills or support, contact HQ Operations.
               </div>
             )}
 
-            {/* TAB 4: FSSAI & HYGIENE COMPLIANCE */}
-            {dossierTab === "compliance" && (
-              <div className="space-y-4 mt-4">
-                <div className="p-4 rounded-2xl bg-[#161618] border border-[#303030] flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center font-bold text-emerald-400 text-lg">
-                      <ShieldCheck className="w-5 h-5" />
-                    </div>
-                    <div>
-                      <span className="text-xs font-bold text-white block">FSSAI Hygiene Score: {dossierCompliance.overallScore}/100</span>
-                      <span className="text-[10px] text-emerald-400 font-bold">Grade A - Full Certification Active</span>
-                    </div>
-                  </div>
-                  <span className="text-[10px] font-mono text-zinc-400">Inspected by {dossierCompliance.inspectedBy}</span>
-                </div>
-
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs font-mono">
-                  <div className="p-3 rounded-xl bg-[#161618] border border-[#303030]">
-                    <span className="text-[10px] text-zinc-500 block font-sans font-bold">Deep Freezer Temp</span>
-                    <span className="text-base font-black text-blue-400 mt-1 block">{dossierCompliance.deepFreezerTemp}°C</span>
-                    <span className="text-[9px] text-zinc-400">Target &le; -18°C</span>
-                  </div>
-                  <div className="p-3 rounded-xl bg-[#161618] border border-[#303030]">
-                    <span className="text-[10px] text-zinc-500 block font-sans font-bold">Chiller Walk-in</span>
-                    <span className="text-base font-black text-emerald-400 mt-1 block">{dossierCompliance.chillerTemp}°C</span>
-                    <span className="text-[9px] text-zinc-400">Target 2°C - 4°C</span>
-                  </div>
-                  <div className="p-3 rounded-xl bg-[#161618] border border-[#303030]">
-                    <span className="text-[10px] text-zinc-500 block font-sans font-bold">Spit Core Temp</span>
-                    <span className="text-base font-black text-orange-400 mt-1 block">{dossierCompliance.spitCoreTemp}°C</span>
-                    <span className="text-[9px] text-zinc-400">Target &ge; 75°C</span>
-                  </div>
-                  <div className="p-3 rounded-xl bg-[#161618] border border-[#303030]">
-                    <span className="text-[10px] text-zinc-500 block font-sans font-bold">Fryer Oil TPM %</span>
-                    <span className="text-base font-black text-amber-400 mt-1 block">{dossierCompliance.oilPolarCompoundPercent}%</span>
-                    <span className="text-[9px] text-zinc-400">Target &lt; 24%</span>
-                  </div>
-                </div>
-
-                <div className="p-3.5 rounded-2xl bg-[#161618] border border-[#303030] text-xs text-zinc-300">
-                  <span className="text-[10px] font-bold text-zinc-500 uppercase block mb-1">Inspector Notes & Remarks</span>
-                  <p>{dossierCompliance.remarks}</p>
-                </div>
-              </div>
-            )}
-
-            {/* TAB 5: HQ TERMINAL CONTROL ACTIONS */}
+            {/* TAB: HQ TERMINAL CONTROL ACTIONS */}
             {dossierTab === "actions" && (
               <div className="space-y-4 mt-4">
                 <div className="p-4 rounded-2xl bg-[#161618] border border-orange-500/30 space-y-3">
@@ -1884,6 +1931,163 @@ For central commissary refills or support, contact HQ Operations.
               >
                 Done & View Outlets
               </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
+      )}
+
+      {/* ── FULL LEGAL FRANCHISE AGREEMENT PRINT/VIEW MODAL ────────────────── */}
+      {viewingLegalAgreement && (
+        <Dialog open={true} onOpenChange={() => setViewingLegalAgreement(null)}>
+          <DialogContent className="max-w-4xl bg-[#141416] border border-[#2e2e30] text-white p-0 rounded-3xl overflow-hidden shadow-2xl">
+            {/* Modal Controls Header */}
+            <div className="p-4 border-b border-[#242427] bg-[#1a1a1c] flex items-center justify-between flex-wrap gap-2">
+              <div className="flex items-center gap-2">
+                <FileText className="w-5 h-5 text-orange-500" />
+                <div>
+                  <DialogTitle className="text-sm font-bold text-white">
+                    Master Franchise Agreement · {viewingLegalAgreement.name}
+                  </DialogTitle>
+                  <span className="text-[10px] text-zinc-400 font-mono">
+                    Ref: IK-AGR-{viewingLegalAgreement.code}-{viewingLegalAgreement.openedAt?.slice(0, 4) || "2026"}
+                  </span>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <Button
+                  size="sm"
+                  onClick={() => window.print()}
+                  className="bg-orange-600 hover:bg-orange-500 text-white font-bold text-xs h-8 px-3.5 rounded-xl gap-1.5 cursor-pointer shadow-md"
+                >
+                  <Printer className="w-3.5 h-3.5" />
+                  <span>Print Legal Document</span>
+                </Button>
+
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => setViewingLegalAgreement(null)}
+                  className="border-[#383838] bg-[#1f1f23] text-zinc-300 text-xs font-bold h-8 px-3 rounded-xl cursor-pointer"
+                >
+                  Close
+                </Button>
+              </div>
+            </div>
+
+            {/* Document Printable Viewport */}
+            <div className="p-8 max-h-[75vh] overflow-y-auto bg-white text-zinc-900 selection:bg-orange-100">
+              <div id="legal-agreement-document" className="max-w-3xl mx-auto space-y-6 text-sm font-serif leading-relaxed text-zinc-900">
+                {/* Brand Header */}
+                <div className="text-center border-b-2 border-zinc-900 pb-5 space-y-1">
+                  <span className="text-xs font-mono font-black tracking-widest text-orange-600 uppercase block font-sans">
+                    ThePieCraft Brands Pvt. Ltd.
+                  </span>
+                  <h1 className="text-2xl font-black uppercase tracking-wider text-zinc-950 font-sans">
+                    IRANI KOYLA SHAWARMA
+                  </h1>
+                  <h2 className="text-sm font-bold uppercase tracking-widest text-zinc-700 font-sans">
+                    MASTER UNIT FRANCHISE AGREEMENT
+                  </h2>
+                  <p className="text-[11px] text-zinc-500 font-sans pt-1">
+                    Official Franchise Partnership Contract & Trademark Operating License
+                  </p>
+                </div>
+
+                {/* Date & Parties */}
+                <div className="text-xs space-y-3 pt-2 text-justify">
+                  <p>
+                    This Franchise Operating Agreement is executed on this <strong>{viewingLegalAgreement.openedAt || new Date().toISOString().split("T")[0]}</strong>, by and between:
+                  </p>
+                  <p>
+                    <strong>1. THE FRANCHISOR / BRAND LICENSOR:</strong> <strong>ThePieCraft Brands Pvt. Ltd. / Irani Koyla Shawarma HQ</strong>, having its central master culinary commissary and corporate registered office in Mumbai, Maharashtra, India (hereinafter referred to as the <em>&quot;Brand HQ&quot;</em> or <em>&quot;Licensor&quot;</em>).
+                  </p>
+                  <p>
+                    <strong>2. THE FRANCHISEE / OPERATING PARTNER:</strong> <strong>{viewingLegalAgreement.ownerName}</strong>, residing at {viewingLegalAgreement.city}, Maharashtra (Phone: {viewingLegalAgreement.ownerPhone}, Email: {viewingLegalAgreement.loginEmail || viewingLegalAgreement.ownerEmail}) acting on behalf of <strong>{viewingLegalAgreement.name}</strong> located at <strong>{viewingLegalAgreement.address || `${viewingLegalAgreement.area}, ${viewingLegalAgreement.city}`}</strong> (hereinafter referred to as the <em>&quot;Franchisee&quot;</em>).
+                  </p>
+                </div>
+
+                {/* Recitals */}
+                <div className="text-xs space-y-4 pt-2">
+                  <div className="space-y-1">
+                    <h3 className="font-bold font-sans text-xs uppercase tracking-wider text-zinc-900 border-b border-zinc-300 pb-1">
+                      SECTION 1: GRANT OF FRANCHISE & EXCLUSIVITY
+                    </h3>
+                    <p className="text-justify text-zinc-700">
+                      Brand HQ hereby grants to the Franchisee the rights to operate an official <em>Irani Koyla Shawarma</em> dine-in and takeout restaurant at the approved territory of <strong>{viewingLegalAgreement.area}, {viewingLegalAgreement.city}</strong>. The Franchisee is granted a <strong>{viewingLegalAgreement.territoryRadiusKm || 3.0} KM radius territorial exclusivity non-compete protection</strong>, guaranteeing no other Irani Koyla company-owned or franchised unit shall be established within said radius without prior written consent.
+                    </p>
+                  </div>
+
+                  <div className="space-y-1">
+                    <h3 className="font-bold font-sans text-xs uppercase tracking-wider text-zinc-900 border-b border-zinc-300 pb-1">
+                      SECTION 2: COMMERCIAL FEES, ROYALTIES & MARKETING FUND
+                    </h3>
+                    <ul className="list-disc pl-5 space-y-1 text-zinc-700">
+                      <li>
+                        <strong>Upfront Franchise Fee:</strong> ₹{(viewingLegalAgreement.franchiseFeeAmount || 1500000).toLocaleString("en-IN")} + GST (Status: {viewingLegalAgreement.franchiseFeeStatus?.toUpperCase() || "PAID"}).
+                      </li>
+                      <li>
+                        <strong>Security Escrow Deposit:</strong> ₹{(viewingLegalAgreement.securityDepositAmount || 500000).toLocaleString("en-IN")} (Refundable upon amicable term completion).
+                      </li>
+                      <li>
+                        <strong>Ongoing Monthly Royalty:</strong> <strong>{viewingLegalAgreement.royaltyRatePercent || 6.5}%</strong> of monthly Gross Sales, calculated from POS logs and payable by the 10th of every month.
+                      </li>
+                      <li>
+                        <strong>Brand Marketing Fund:</strong> <strong>{viewingLegalAgreement.marketingFeePercent || 2.0}%</strong> of monthly Gross Sales dedicated to regional campaigns, Zomato/Swiggy brand visibility ads, and influencer promotions.
+                      </li>
+                    </ul>
+                  </div>
+
+                  <div className="space-y-1">
+                    <h3 className="font-bold font-sans text-xs uppercase tracking-wider text-zinc-900 border-b border-zinc-300 pb-1">
+                      SECTION 3: COMMISSARY RAW MATERIAL EXCLUSIVITY
+                    </h3>
+                    <p className="text-justify text-zinc-700">
+                      To preserve 100% taste consistency and prevent food adulteration, the Franchisee explicitly agrees to procure 100% of all pre-marinated Chicken/Mutton meat cones, proprietary 14-spice blends, and authentic Garlic Toum exclusively through the Central Supply Chain portal. Sourcing third-party marinades or unapproved meat skewers will result in immediate termination of trademark rights.
+                    </p>
+                  </div>
+
+                  <div className="space-y-1">
+                    <h3 className="font-bold font-sans text-xs uppercase tracking-wider text-zinc-900 border-b border-zinc-300 pb-1">
+                      SECTION 4: TERM & RENEWAL
+                    </h3>
+                    <p className="text-justify text-zinc-700">
+                      This Agreement is binding for an initial term of <strong>{viewingLegalAgreement.agreementTermYears || 5} (Five) Years</strong> from the store launch date, with a minimum lock-in period of 3 years. The agreement is renewable for subsequent 5-year periods subject to mutual compliance and performance standards.
+                    </p>
+                  </div>
+                </div>
+
+                {/* Signatures & Stamps */}
+                <div className="pt-8 border-t-2 border-zinc-900 grid grid-cols-2 gap-8 text-xs font-sans">
+                  <div className="space-y-6">
+                    <div>
+                      <span className="text-[10px] text-zinc-500 uppercase block font-bold">FOR BRAND HQ / LICENSOR</span>
+                      <strong className="text-sm font-bold text-zinc-900 block">ThePieCraft Brands Pvt. Ltd.</strong>
+                      <span className="text-xs text-zinc-600">Authorized Signatory / Executive Director</span>
+                    </div>
+                    <div className="h-12 border-b border-dashed border-zinc-400 flex items-end">
+                      <span className="font-mono text-xs text-zinc-400 italic">Digitally Signed & Verified [HQ-AUTH-KEY]</span>
+                    </div>
+                    <span className="text-[10px] text-zinc-400 block">Date: {viewingLegalAgreement.openedAt || new Date().toISOString().split("T")[0]}</span>
+                  </div>
+
+                  <div className="space-y-6">
+                    <div>
+                      <span className="text-[10px] text-zinc-500 uppercase block font-bold">FOR FRANCHISE PARTNER / LICENSEE</span>
+                      <strong className="text-sm font-bold text-zinc-900 block">{viewingLegalAgreement.ownerName}</strong>
+                      <span className="text-xs text-zinc-600">Managing Partner & Franchise Licensee</span>
+                    </div>
+                    <div className="h-12 border-b border-dashed border-zinc-400 flex items-end">
+                      <span className="font-mono text-xs text-zinc-400 italic">Digitally Signed & Accepted [FRAN-ACCEPT-KEY]</span>
+                    </div>
+                    <span className="text-[10px] text-zinc-400 block">Date: {viewingLegalAgreement.openedAt || new Date().toISOString().split("T")[0]}</span>
+                  </div>
+                </div>
+
+                <div className="text-center pt-4 border-t border-zinc-200 text-[10px] font-sans text-zinc-400">
+                  Document ID: IK-FRAN-AGR-{viewingLegalAgreement.code}-2026 · Confidential Franchise Operating Instrument
+                </div>
+              </div>
             </div>
           </DialogContent>
         </Dialog>
