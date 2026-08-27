@@ -140,19 +140,21 @@ function SidebarBody({
         )}
         suppressHydrationWarning
       >
-        <Link href="/admin" className="flex items-center gap-2.5 min-w-0" onClick={onNavigate}>
-          <div className="relative w-10 h-10 rounded-xl bg-gradient-to-br from-orange-500 via-amber-600 to-rose-700 flex items-center justify-center shadow-[0_0_20px_rgba(249,115,22,0.35)] shrink-0">
-            <Flame className="w-5 h-5 text-white animate-pulse" />
+        <Link href="/admin" className="flex items-center gap-3 min-w-0" onClick={onNavigate}>
+          <div className="relative w-9 h-9 rounded-xl bg-gradient-to-br from-amber-500 via-orange-500 to-rose-600 flex items-center justify-center shadow-md shadow-orange-500/20 shrink-0 border border-orange-400/30">
+            <Flame className="w-5 h-5 text-white" />
           </div>
           {!collapsed && (
-            <div className="flex flex-col leading-none min-w-0">
-              <span className="text-sm font-black text-white tracking-tight flex items-center gap-1.5 truncate">
-                Irani Koyla
-                <span className="text-[10px] bg-orange-500/20 text-orange-400 font-bold px-1.5 py-0.5 rounded border border-orange-500/30">
+            <div className="flex flex-col justify-center min-w-0">
+              <div className="flex items-center gap-1.5 leading-tight">
+                <span className="text-[13px] font-bold text-white tracking-tight truncate">
+                  Irani Koyla
+                </span>
+                <span className="text-[9px] font-black tracking-wider uppercase bg-orange-500/15 text-orange-400 border border-orange-500/30 px-1.5 py-0.5 rounded-md leading-none">
                   {role === "SUPER_ADMIN" ? "HQ" : "PARTNER"}
                 </span>
-              </span>
-              <span className="text-[10px] font-semibold text-zinc-400 uppercase tracking-widest mt-0.5 truncate">
+              </div>
+              <span className="text-[9px] font-bold text-zinc-400 uppercase tracking-widest leading-tight mt-0.5">
                 Franchise OS
               </span>
             </div>
@@ -164,10 +166,10 @@ function SidebarBody({
           <button
             type="button"
             onClick={onToggle}
-            className="p-1.5 rounded-xl bg-[#161618] border border-[#303030] text-zinc-400 hover:text-white hover:border-orange-500 transition-all cursor-pointer shrink-0"
-            title="Collapse Sidebar for Wider Screen"
+            className="p-1.5 rounded-lg bg-[#262629] hover:bg-[#303034] border border-[#38383c] text-zinc-400 hover:text-white transition-all cursor-pointer shrink-0"
+            title="Collapse Sidebar"
           >
-            <PanelLeftClose className="w-4 h-4 text-zinc-400" />
+            <PanelLeftClose className="w-4 h-4" />
           </button>
         )}
       </div>
