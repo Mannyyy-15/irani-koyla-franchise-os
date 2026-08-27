@@ -188,11 +188,11 @@ export default function OutletsPage() {
   const [loginPassword, setLoginPassword] = useState("KoylaPartner#2026");
   const [showPassword, setShowPassword] = useState(false);
 
-  // Commercial Terms
-  const [franchiseFeeAmount, setFranchiseFeeAmount] = useState("1500000");
+  // Commercials & Agreement States
+  const [franchiseFeeAmount, setFranchiseFeeAmount] = useState("800000");
   const [franchiseFeeStatus, setFranchiseFeeStatus] = useState<"paid" | "partial" | "pending">("paid");
   const [securityDepositAmount, setSecurityDepositAmount] = useState("500000");
-  const [royaltyRate, setRoyaltyRate] = useState("6.5");
+  const [royaltyRatePercent, setRoyaltyRatePercent] = useState("5.0");
   const [marketingFundRate, setMarketingFundRate] = useState("2.0");
   const [territoryRadius, setTerritoryRadius] = useState("3.0");
 
@@ -258,10 +258,10 @@ export default function OutletsPage() {
       panOrAadhaar,
       loginEmail: cleanEmail,
       loginPassword: cleanPass,
-      franchiseFeeAmount: parseFloat(franchiseFeeAmount) || 1500000,
+      franchiseFeeAmount: parseFloat(franchiseFeeAmount) || 800000,
       franchiseFeeStatus,
       securityDepositAmount: parseFloat(securityDepositAmount) || 500000,
-      royaltyRatePercent: parseFloat(royaltyRate) || 6.5,
+      royaltyRatePercent: parseFloat(royaltyRatePercent) || 5.0,
       marketingFeePercent: parseFloat(marketingFundRate) || 2.0,
       territoryRadiusKm: parseFloat(territoryRadius) || 3.0,
       agreementTermYears: 5,
@@ -1210,7 +1210,7 @@ For central commissary refills or support, contact HQ Operations.
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs font-mono">
                   <div className="p-3.5 rounded-2xl bg-[#161618] border border-[#303030]">
                     <span className="text-[10px] text-zinc-500 uppercase font-bold block font-sans">Franchise Fee</span>
-                    <span className="text-lg font-black text-emerald-400 mt-1 block">₹{((selectedDossierOutlet.franchiseFeeAmount || 1500000) / 100000).toFixed(1)} Lakhs</span>
+                    <span className="text-lg font-black text-emerald-400 mt-1 block">₹{((selectedDossierOutlet.franchiseFeeAmount || 800000) / 100000).toFixed(1)} Lakhs</span>
                     <span className="text-[10px] text-emerald-400 font-bold font-sans">✓ {selectedDossierOutlet.franchiseFeeStatus?.toUpperCase() || "PAID"}</span>
                   </div>
                   <div className="p-3.5 rounded-2xl bg-[#161618] border border-[#303030]">
@@ -1220,7 +1220,7 @@ For central commissary refills or support, contact HQ Operations.
                   </div>
                   <div className="p-3.5 rounded-2xl bg-[#161618] border border-[#303030]">
                     <span className="text-[10px] text-zinc-500 uppercase font-bold block font-sans">Royalty Rate</span>
-                    <span className="text-lg font-black text-orange-400 mt-1 block">{selectedDossierOutlet.royaltyRatePercent || 6.5}% Net</span>
+                    <span className="text-lg font-black text-orange-400 mt-1 block">{selectedDossierOutlet.royaltyRatePercent || 5.0}% Net</span>
                     <span className="text-[10px] text-zinc-400 font-sans">+ {selectedDossierOutlet.marketingFeePercent || 2.0}% Marketing</span>
                   </div>
                   <div className="p-3.5 rounded-2xl bg-[#161618] border border-[#303030]">
@@ -1786,8 +1786,8 @@ For central commissary refills or support, contact HQ Operations.
                     <input
                       type="number"
                       step="0.1"
-                      value={royaltyRate}
-                      onChange={(e) => setRoyaltyRate(e.target.value)}
+                      value={royaltyRatePercent}
+                      onChange={(e) => setRoyaltyRatePercent(e.target.value)}
                       className="w-full h-10 px-3 rounded-xl bg-[#161618] border border-[#303030] text-white font-mono"
                     />
                   </div>
@@ -2024,13 +2024,13 @@ For central commissary refills or support, contact HQ Operations.
                     </h3>
                     <ul className="list-disc pl-5 space-y-1 text-zinc-700">
                       <li>
-                        <strong>Upfront Franchise Fee:</strong> ₹{(viewingLegalAgreement.franchiseFeeAmount || 1500000).toLocaleString("en-IN")} + GST (Status: {viewingLegalAgreement.franchiseFeeStatus?.toUpperCase() || "PAID"}).
+                        <strong>Upfront Franchise Fee:</strong> ₹{(viewingLegalAgreement.franchiseFeeAmount || 800000).toLocaleString("en-IN")} + GST (Status: {viewingLegalAgreement.franchiseFeeStatus?.toUpperCase() || "PAID"}).
                       </li>
                       <li>
                         <strong>Security Escrow Deposit:</strong> ₹{(viewingLegalAgreement.securityDepositAmount || 500000).toLocaleString("en-IN")} (Refundable upon amicable term completion).
                       </li>
                       <li>
-                        <strong>Ongoing Monthly Royalty:</strong> <strong>{viewingLegalAgreement.royaltyRatePercent || 6.5}%</strong> of monthly Gross Sales, calculated from POS logs and payable by the 10th of every month.
+                        <strong>Ongoing Monthly Royalty:</strong> <strong>{viewingLegalAgreement.royaltyRatePercent || 5.0}%</strong> of monthly Gross Sales, calculated from POS logs and payable by the 10th of every month.
                       </li>
                       <li>
                         <strong>Brand Marketing Fund:</strong> <strong>{viewingLegalAgreement.marketingFeePercent || 2.0}%</strong> of monthly Gross Sales dedicated to regional campaigns, Zomato/Swiggy brand visibility ads, and influencer promotions.

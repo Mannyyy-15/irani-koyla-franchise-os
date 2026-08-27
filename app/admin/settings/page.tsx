@@ -49,12 +49,12 @@ export default function SettingsPage() {
 
   // HQ Settings states
   const [brandName, setBrandName] = useState("ThePieCraft Brands Pvt. Ltd. / Irani Koyla Shawarma");
-  const [hqAddress, setHqAddress] = useState("Central Commissary Hub, Marol Industrial Area, Andheri (E), Mumbai 400059");
-  const [hqPhone, setHqPhone] = useState("+91 98200 12345");
-  const [hqEmail, setHqEmail] = useState("operations@iranikoylashawarma.com");
+  const [hqAddress, setHqAddress] = useState("Head Office: Virar, Maharashtra / Central Commissary Hub, Mumbai");
+  const [hqPhone, setHqPhone] = useState("8698515532");
+  const [hqEmail, setHqEmail] = useState("iranikoylashawarma@gmail.com");
   const [gstin, setGstin] = useState("27AABCI4920F1ZV");
 
-  const [royaltyRate, setRoyaltyRate] = useState("6.5");
+  const [royaltyRate, setRoyaltyRate] = useState("5.0");
   const [marketingRate, setMarketingRate] = useState("2.0");
   const [invoiceDueDays, setInvoiceDueDays] = useState("10");
   const [latePaymentPenalty, setLatePaymentPenalty] = useState("1.5");
