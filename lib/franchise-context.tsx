@@ -15,6 +15,10 @@ import {
   SafeDrop,
   CentralShipment,
   RiderPickupOrder,
+  SupplyOrder,
+  SupplyCatalogItem,
+  SUPPLY_CATALOG,
+  INITIAL_SUPPLY_ORDERS,
   INITIAL_OUTLETS,
   INITIAL_MEAT_BATCHES,
   INITIAL_SHIFTS,
@@ -161,6 +165,26 @@ interface FranchiseContextType {
   riderOrders: RiderPickupOrder[];
   verifyRiderOtp: (orderId: string, enteredOtp: string) => { success: boolean; message: string };
   updateRiderStatus: (orderId: string, status: RiderPickupOrder["status"]) => void;
+
+  // Supply Chain & Raw Material Requisition
+  supplyOrders: SupplyOrder[];
+  placeSupplyOrder: (data: {
+    outletId: string;
+    urgency: SupplyOrder["urgency"];
+    requestedDeliveryDate: string;
+    items: { itemId: string; quantity: number }[];
+    notes?: string;
+  }) => { success: boolean; orderId: string; message: string };
+  approveSupplyOrder: (orderId: string, estimatedDelivery?: string) => void;
+  declineSupplyOrder: (orderId: string, reason: string) => void;
+  dispatchSupplyOrder: (orderId: string, dispatchDetails: {
+    driverName: string;
+    driverPhone: string;
+    vehicleNumber: string;
+    temperatureCelsius: number;
+    securitySealNumber: string;
+  }) => void;
+  markSupplyOrderDelivered: (orderId: string, enteredOtp?: string) => { success: boolean; message: string };
   
   // Helpers
   activeOutlet: Outlet | null;
@@ -221,6 +245,7 @@ export function FranchiseProvider({ children }: { children: React.ReactNode }) {
   const [safeDropsList, setSafeDropsList] = useState<SafeDrop[]>(INITIAL_SAFE_DROPS);
   const [shipments, setShipments] = useState<CentralShipment[]>(INITIAL_SHIPMENTS);
   const [riderOrders, setRiderOrders] = useState<RiderPickupOrder[]>(INITIAL_RIDER_ORDERS);
+  const [supplyOrders, setSupplyOrders] = useState<SupplyOrder[]>(INITIAL_SUPPLY_ORDERS);
 
   const DEFAULT_DAILY_SESSION: DailyStoreSession = {
     date: new Date().toISOString().split("T")[0],
@@ -257,6 +282,7 @@ export function FranchiseProvider({ children }: { children: React.ReactNode }) {
         if (parsed.pettyCashList) setPettyCashList(parsed.pettyCashList);
         if (parsed.safeDropsList) setSafeDropsList(parsed.safeDropsList);
         if (parsed.riderOrders) setRiderOrders(parsed.riderOrders);
+        if (parsed.supplyOrders) setSupplyOrders(parsed.supplyOrders);
       }
     } catch {
       // Ignore local storage error
@@ -279,6 +305,7 @@ export function FranchiseProvider({ children }: { children: React.ReactNode }) {
         dailySession,
         pettyCashList,
         safeDropsList,
+        supplyOrders,
         ...updatedState,
       };
       localStorage.setItem(STORAGE_KEY, JSON.stringify(current));
@@ -993,6 +1020,295 @@ export function FranchiseProvider({ children }: { children: React.ReactNode }) {
     saveState({ menuItems: updatedMenu });
   };
 
+  // ── SUPPLY CHAIN REQUISITION METHODS ──────────────────────────────────────
+  const placeSupplyOrder = (data: {
+    outletId: string;
+    urgency: SupplyOrder["urgency"];
+    requestedDeliveryDate: string;
+    items: { itemId: string; quantity: number }[];
+    notes?: string;
+  }): { success: boolean; orderId: string; message: string } => {
+    const targetOutlet = outlets.find((o) => o.id === data.outletId) || activeOutlet || outlets[0];
+    if (!targetOutlet) {
+      return { success: false, orderId: "", message: "Outlet not found." };
+    }
+
+    const orderId = `sup-${Date.now()}`;
+    const orderNumber = `REQ-K-${Math.floor(10000 + Math.random() * 90000)}`;
+    const now = new Date();
+    const createdAt = `${now.toISOString().split("T")[0]} ${now.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", hour12: true })}`;
+    const deliveryOtp = String(Math.floor(1000 + Math.random() * 9000));
+
+    // Resolve items from catalog
+    const resolvedItems = data.items
+      .map((itemReq) => {
+        const catItem = SUPPLY_CATALOG.find((c) => c.id === itemReq.itemId);
+        if (!catItem || itemReq.quantity <= 0) return null;
+        return {
+          itemId: catItem.id,
+          itemName: catItem.name,
+          category: catItem.category,
+          unit: catItem.unit,
+          unitPrice: catItem.unitPrice,
+          quantity: itemReq.quantity,
+          totalPrice: catItem.unitPrice * itemReq.quantity,
+        };
+      })
+      .filter(Boolean) as SupplyOrder["items"];
+
+    if (resolvedItems.length === 0) {
+      return { success: false, orderId: "", message: "No valid items selected for requisition." };
+    }
+
+    const totalQuantity = resolvedItems.reduce((sum, item) => sum + item.quantity, 0);
+    const totalAmount = resolvedItems.reduce((sum, item) => sum + item.totalPrice, 0);
+
+    const newOrder: SupplyOrder = {
+      id: orderId,
+      orderNumber,
+      outletId: targetOutlet.id,
+      outletName: targetOutlet.name,
+      outletCode: targetOutlet.code,
+      createdAt,
+      urgency: data.urgency,
+      status: "pending",
+      items: resolvedItems,
+      totalQuantity,
+      totalAmount,
+      requestedDeliveryDate: data.requestedDeliveryDate,
+      notes: data.notes || "",
+      deliveryOtp,
+    };
+
+    const updatedOrders = [newOrder, ...supplyOrders];
+    setSupplyOrders(updatedOrders);
+
+    const logEntry: AuditLog = {
+      id: `audit-${Date.now()}`,
+      timestamp: new Date().toISOString().replace("T", " ").substring(0, 19),
+      outletName: targetOutlet.name,
+      user: targetOutlet.managerName || targetOutlet.ownerName || "Franchise Partner",
+      role: "Franchise Partner",
+      action: `Placed Supply Stock Requisition #${orderNumber}`,
+      module: "SupplyChain",
+      severity: "info",
+      details: `Requested ${totalQuantity} items (Total: ₹${totalAmount.toLocaleString("en-IN")}) with ${data.urgency} urgency. Requested date: ${data.requestedDeliveryDate}.`,
+    };
+
+    const updatedLogs = [logEntry, ...auditLogs];
+    setAuditLogs(updatedLogs);
+    saveState({ supplyOrders: updatedOrders, auditLogs: updatedLogs });
+
+    return {
+      success: true,
+      orderId,
+      message: `Stock order #${orderNumber} submitted to Central Commissary HQ for approval!`,
+    };
+  };
+
+  const approveSupplyOrder = (orderId: string, estimatedDelivery?: string) => {
+    const timeNow = new Date().toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", hour12: true });
+    const todayStr = new Date().toISOString().split("T")[0];
+
+    const updatedOrders = supplyOrders.map((o) => {
+      if (o.id === orderId) {
+        return {
+          ...o,
+          status: "approved" as const,
+          approvedAt: `${todayStr} ${timeNow}`,
+          requestedDeliveryDate: estimatedDelivery || o.requestedDeliveryDate,
+        };
+      }
+      return o;
+    });
+
+    const targetOrder = supplyOrders.find((o) => o.id === orderId);
+    setSupplyOrders(updatedOrders);
+
+    const logEntry: AuditLog = {
+      id: `audit-${Date.now()}`,
+      timestamp: new Date().toISOString().replace("T", " ").substring(0, 19),
+      outletName: targetOrder?.outletName || "Franchise Hub",
+      user: "Commissary HQ",
+      role: "Super Admin",
+      action: `Approved Supply Requisition #${targetOrder?.orderNumber || orderId}`,
+      module: "SupplyChain",
+      severity: "info",
+      details: `Approved by Central Logistics. Preparing cold-chain packing queue.`,
+    };
+
+    const updatedLogs = [logEntry, ...auditLogs];
+    setAuditLogs(updatedLogs);
+    saveState({ supplyOrders: updatedOrders, auditLogs: updatedLogs });
+  };
+
+  const declineSupplyOrder = (orderId: string, reason: string) => {
+    const updatedOrders = supplyOrders.map((o) => {
+      if (o.id === orderId) {
+        return {
+          ...o,
+          status: "declined" as const,
+          declineReason: reason,
+        };
+      }
+      return o;
+    });
+
+    const targetOrder = supplyOrders.find((o) => o.id === orderId);
+    setSupplyOrders(updatedOrders);
+
+    const logEntry: AuditLog = {
+      id: `audit-${Date.now()}`,
+      timestamp: new Date().toISOString().replace("T", " ").substring(0, 19),
+      outletName: targetOrder?.outletName || "Franchise Hub",
+      user: "Commissary HQ",
+      role: "Super Admin",
+      action: `Declined Supply Requisition #${targetOrder?.orderNumber || orderId}`,
+      module: "SupplyChain",
+      severity: "warning",
+      details: `Requisition declined. Reason: ${reason}`,
+    };
+
+    const updatedLogs = [logEntry, ...auditLogs];
+    setAuditLogs(updatedLogs);
+    saveState({ supplyOrders: updatedOrders, auditLogs: updatedLogs });
+  };
+
+  const dispatchSupplyOrder = (
+    orderId: string,
+    dispatchDetails: {
+      driverName: string;
+      driverPhone: string;
+      vehicleNumber: string;
+      temperatureCelsius: number;
+      securitySealNumber: string;
+    }
+  ) => {
+    const timeNow = new Date().toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", hour12: true });
+    const todayStr = new Date().toISOString().split("T")[0];
+    const trackingNumber = `TRK-${Date.now().toString().slice(-6)}`;
+
+    const targetOrder = supplyOrders.find((o) => o.id === orderId);
+
+    const updatedOrders = supplyOrders.map((o) => {
+      if (o.id === orderId) {
+        return {
+          ...o,
+          status: "dispatched" as const,
+          dispatchedAt: `${todayStr} ${timeNow}`,
+          trackingNumber,
+          driverDetails: `${dispatchDetails.driverName} (${dispatchDetails.driverPhone}) · ${dispatchDetails.vehicleNumber}`,
+        };
+      }
+      return o;
+    });
+
+    setSupplyOrders(updatedOrders);
+
+    // Also automatically create a shipment record in CentralShipment for live temperature telemetry
+    if (targetOrder) {
+      const chickenCones = targetOrder.items.find((i) => i.itemId === "cat-meat-01")?.quantity || 0;
+      const muttonCones = targetOrder.items.find((i) => i.itemId === "cat-meat-02")?.quantity || 0;
+      const spiceBags = targetOrder.items.filter((i) => i.category === "Spices & Marinades").reduce((s, i) => s + i.quantity, 0);
+      const toumJars = targetOrder.items.filter((i) => i.category === "Sauces & Dips").reduce((s, i) => s + i.quantity, 0);
+      const totalWeight = chickenCones * 30 + muttonCones * 18 + spiceBags * 5 + toumJars * 10;
+
+      const newShipment: CentralShipment = {
+        id: `shp-${Date.now()}`,
+        shipmentNumber: trackingNumber,
+        outletId: targetOrder.outletId,
+        outletName: targetOrder.outletName,
+        dispatchedAt: `${todayStr} ${timeNow}`,
+        status: "in_transit",
+        chickenConesCount: chickenCones,
+        muttonConesCount: muttonCones,
+        totalMeatWeightKg: totalWeight,
+        spiceMixBagsCount: spiceBags,
+        toumJarsCount: toumJars,
+        vanVehicleNumber: dispatchDetails.vehicleNumber,
+        driverName: dispatchDetails.driverName,
+        driverPhone: dispatchDetails.driverPhone,
+        temperatureCelsius: dispatchDetails.temperatureCelsius,
+        securitySealNumber: dispatchDetails.securitySealNumber,
+      };
+
+      const updatedShipments = [newShipment, ...shipments];
+      setShipments(updatedShipments);
+
+      const logEntry: AuditLog = {
+        id: `audit-${Date.now()}`,
+        timestamp: new Date().toISOString().replace("T", " ").substring(0, 19),
+        outletName: targetOrder.outletName,
+        user: "Commissary Dispatcher",
+        role: "Super Admin",
+        action: `Dispatched Supply Order #${targetOrder.orderNumber}`,
+        module: "SupplyChain",
+        severity: "info",
+        details: `Dispatched via ${dispatchDetails.vehicleNumber} (Driver: ${dispatchDetails.driverName}). Temp: ${dispatchDetails.temperatureCelsius}°C, Seal: ${dispatchDetails.securitySealNumber}, Tracking: ${trackingNumber}. Delivery OTP sent to outlet.`,
+      };
+
+      const updatedLogs = [logEntry, ...auditLogs];
+      setAuditLogs(updatedLogs);
+      saveState({ supplyOrders: updatedOrders, shipments: updatedShipments, auditLogs: updatedLogs });
+    } else {
+      saveState({ supplyOrders: updatedOrders });
+    }
+  };
+
+  const markSupplyOrderDelivered = (orderId: string, enteredOtp?: string): { success: boolean; message: string } => {
+    const target = supplyOrders.find((o) => o.id === orderId);
+    if (!target) {
+      return { success: false, message: "Requisition order not found." };
+    }
+
+    if (enteredOtp && target.deliveryOtp && enteredOtp.trim() !== target.deliveryOtp.trim()) {
+      return { success: false, message: "Invalid delivery OTP. Please verify with the driver." };
+    }
+
+    const timeNow = new Date().toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", hour12: true });
+    const todayStr = new Date().toISOString().split("T")[0];
+
+    const updatedOrders = supplyOrders.map((o) => {
+      if (o.id === orderId) {
+        return {
+          ...o,
+          status: "delivered" as const,
+          deliveredAt: `${todayStr} ${timeNow}`,
+        };
+      }
+      return o;
+    });
+
+    setSupplyOrders(updatedOrders);
+
+    // Also update matching shipment status to delivered if exists
+    const updatedShipments = shipments.map((s) => {
+      if (s.shipmentNumber === target.trackingNumber || s.outletId === target.outletId) {
+        return { ...s, status: "delivered" as const, deliveredAt: `${todayStr} ${timeNow}` };
+      }
+      return s;
+    });
+    setShipments(updatedShipments);
+
+    const logEntry: AuditLog = {
+      id: `audit-${Date.now()}`,
+      timestamp: new Date().toISOString().replace("T", " ").substring(0, 19),
+      outletName: target.outletName,
+      user: target.outletName,
+      role: "Franchise Partner",
+      action: `Confirmed Stock Delivery #${target.orderNumber}`,
+      module: "SupplyChain",
+      severity: "info",
+      details: `Received ${target.totalQuantity} items at store cold room. Tamper seals verified and stock ingested.`,
+    };
+
+    const updatedLogs = [logEntry, ...auditLogs];
+    setAuditLogs(updatedLogs);
+    saveState({ supplyOrders: updatedOrders, shipments: updatedShipments, auditLogs: updatedLogs });
+
+    return { success: true, message: `Stock order #${target.orderNumber} marked as Delivered and ingested into store stock!` };
+  };
+
   // Filtered views based on role and selectedOutletId
   const effectiveOutletId =
     role === "FRANCHISE_OWNER"
@@ -1168,6 +1484,12 @@ export function FranchiseProvider({ children }: { children: React.ReactNode }) {
         riderOrders,
         verifyRiderOtp,
         updateRiderStatus,
+        supplyOrders,
+        placeSupplyOrder,
+        approveSupplyOrder,
+        declineSupplyOrder,
+        dispatchSupplyOrder,
+        markSupplyOrderDelivered,
         activeOutlet,
         filteredMeatBatches,
         filteredShifts,

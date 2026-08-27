@@ -237,6 +237,214 @@ export interface CentralShipment {
   securitySealNumber: string;
 }
 
+export interface SupplyCatalogItem {
+  id: string;
+  name: string;
+  category: "Spices & Marinades" | "Raw Marinated Meat Cones" | "Sauces & Dips" | "Breads & Khubz" | "Packaging & Disposables";
+  unit: string; // e.g. "5 kg Bag", "30 kg Cone", "10 kg Jar", "Pack of 100", "Bundle of 500"
+  unitPrice: number;
+  moq: number; // Minimum order quantity
+  sku: string;
+  image: string;
+  description: string;
+  shelfLife: string;
+  inStock: boolean;
+}
+
+export interface SupplyOrderItem {
+  itemId: string;
+  itemName: string;
+  category: string;
+  unit: string;
+  unitPrice: number;
+  quantity: number;
+  totalPrice: number;
+}
+
+export interface SupplyOrder {
+  id: string;
+  orderNumber: string;
+  outletId: string;
+  outletName: string;
+  outletCode: string;
+  createdAt: string; // YYYY-MM-DD HH:MM
+  urgency: "Normal (24-48h)" | "Express Rush (12h)" | "Emergency Stockout (6h)";
+  status: "pending" | "approved" | "dispatched" | "delivered" | "declined";
+  items: SupplyOrderItem[];
+  totalQuantity: number;
+  totalAmount: number;
+  requestedDeliveryDate: string;
+  notes?: string;
+  declineReason?: string;
+  approvedAt?: string;
+  dispatchedAt?: string;
+  deliveredAt?: string;
+  trackingNumber?: string;
+  driverDetails?: string;
+  deliveryOtp?: string;
+}
+
+export const SUPPLY_CATALOG: SupplyCatalogItem[] = [
+  {
+    id: "cat-meat-01",
+    name: "Koyla Marinated Chicken Spit Cone (30kg)",
+    category: "Raw Marinated Meat Cones",
+    unit: "30 kg Spit Cone",
+    unitPrice: 7200,
+    moq: 1,
+    sku: "IK-SKU-CHK30",
+    image: "https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=400&q=80",
+    description: "Signature Irani spiced raw layered chicken spit ready for roasting. Vacuum tamper sealed.",
+    shelfLife: "48 hours in chiller (2°C - 4°C)",
+    inStock: true,
+  },
+  {
+    id: "cat-meat-02",
+    name: "Smoked Charcoal Mutton Spit Cone (18kg)",
+    category: "Raw Marinated Meat Cones",
+    unit: "18 kg Spit Cone",
+    unitPrice: 9900,
+    moq: 1,
+    sku: "IK-SKU-MUT18",
+    image: "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?auto=format&fit=crop&w=400&q=80",
+    description: "Premium tender mutton cone with slow charcoal smoke infusion. Strict temperature control.",
+    shelfLife: "36 hours in chiller (2°C - 4°C)",
+    inStock: true,
+  },
+  {
+    id: "cat-spice-01",
+    name: "Irani Secret Shawarma Spice Master Mix (5kg)",
+    category: "Spices & Marinades",
+    unit: "5 kg Foil Sealed Bag",
+    unitPrice: 1850,
+    moq: 1,
+    sku: "IK-SKU-SPICE5",
+    image: "https://images.unsplash.com/photo-1596040033229-a9821ebd058d?auto=format&fit=crop&w=400&q=80",
+    description: "Central secret proprietary blend of 14 roasted Persian & Middle Eastern spices.",
+    shelfLife: "6 Months",
+    inStock: true,
+  },
+  {
+    id: "cat-spice-02",
+    name: "Koyla Peri-Peri Seasoning Dust (2kg)",
+    category: "Spices & Marinades",
+    unit: "2 kg Air-tight Container",
+    unitPrice: 850,
+    moq: 1,
+    sku: "IK-SKU-PERI2",
+    image: "https://images.unsplash.com/photo-1509358271058-acd22cc93898?auto=format&fit=crop&w=400&q=80",
+    description: "Zesty spicy dusting spice for Peri Peri Shawarma & cheese fries garnish.",
+    shelfLife: "9 Months",
+    inStock: true,
+  },
+  {
+    id: "cat-spice-03",
+    name: "Smokey Koyla Charcoal Marinade Base (10kg)",
+    category: "Spices & Marinades",
+    unit: "10 kg Food Grade Bucket",
+    unitPrice: 2400,
+    moq: 1,
+    sku: "IK-SKU-MAR10",
+    image: "https://images.unsplash.com/photo-1506368249639-73a05d6f6488?auto=format&fit=crop&w=400&q=80",
+    description: "Liquid smoke and cold-pressed oil marinade base for in-store touch-up prep.",
+    shelfLife: "3 Months",
+    inStock: true,
+  },
+  {
+    id: "cat-sauce-01",
+    name: "Authentic Toum Garlic Dip Bucket (10kg)",
+    category: "Sauces & Dips",
+    unit: "10 kg Sealed Pail",
+    unitPrice: 2100,
+    moq: 1,
+    sku: "IK-SKU-TOUM10",
+    image: "https://images.unsplash.com/photo-1618449840665-9ed506d73a34?auto=format&fit=crop&w=400&q=80",
+    description: "Fluffy emulsified garlic paste made with fresh peeled garlic, lemon & sunflower oil. 0% preservatives.",
+    shelfLife: "14 days in chiller (2°C - 4°C)",
+    inStock: true,
+  },
+  {
+    id: "cat-sauce-02",
+    name: "Spicy Schezwan Garlic Chutney (5kg)",
+    category: "Sauces & Dips",
+    unit: "5 kg Jar",
+    unitPrice: 1150,
+    moq: 1,
+    sku: "IK-SKU-SCH5",
+    image: "https://images.unsplash.com/photo-1472476443507-c7a5948772fc?auto=format&fit=crop&w=400&q=80",
+    description: "Hot red chilli garlic fusion sauce for Schezwan wraps and open platters.",
+    shelfLife: "30 days in chiller",
+    inStock: true,
+  },
+  {
+    id: "cat-bread-01",
+    name: "Lebanese Khubz Pita Flatbread (Pack of 100)",
+    category: "Breads & Khubz",
+    unit: "100 Pcs Sealed Bag",
+    unitPrice: 650,
+    moq: 2,
+    sku: "IK-SKU-KHUBZ100",
+    image: "https://images.unsplash.com/photo-1509440159596-0249088772ff?auto=format&fit=crop&w=400&q=80",
+    description: "Double-pocket authentic Lebanese khubz bread, fresh baked daily.",
+    shelfLife: "4 days (Room Temp) / 10 days (Chilled)",
+    inStock: true,
+  },
+  {
+    id: "cat-bread-02",
+    name: "Traditional Rumali Roti Base (Pack of 100)",
+    category: "Breads & Khubz",
+    unit: "100 Pcs Sealed Pack",
+    unitPrice: 750,
+    moq: 2,
+    sku: "IK-SKU-RUMALI100",
+    image: "https://images.unsplash.com/photo-1601050690597-df0568f70950?auto=format&fit=crop&w=400&q=80",
+    description: "Thin hand-stretched rumali roti base for roll wraps.",
+    shelfLife: "3 days (Chilled)",
+    inStock: true,
+  },
+  {
+    id: "cat-pack-01",
+    name: "Irani Koyla Branded Foil Wrap Rolls (500m)",
+    category: "Packaging & Disposables",
+    unit: "500m Heavy-Duty Roll",
+    unitPrice: 950,
+    moq: 1,
+    sku: "IK-SKU-FOIL500",
+    image: "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=400&q=80",
+    description: "Food-grade heat retentive aluminium foil with brand watermarking.",
+    shelfLife: "N/A",
+    inStock: true,
+  },
+  {
+    id: "cat-pack-02",
+    name: "Kraft Paper Delivery Carry Bags (Pack of 500)",
+    category: "Packaging & Disposables",
+    unit: "500 Bags Bundle",
+    unitPrice: 1650,
+    moq: 1,
+    sku: "IK-SKU-BAG500",
+    image: "https://images.unsplash.com/photo-1530587191325-3db32d826c18?auto=format&fit=crop&w=400&q=80",
+    description: "Eco-friendly branded grease-proof kraft takeout bags with handles.",
+    shelfLife: "N/A",
+    inStock: true,
+  },
+  {
+    id: "cat-pack-03",
+    name: "Signature 60ml Dip Cups with Lids (Pack of 1000)",
+    category: "Packaging & Disposables",
+    unit: "1000 Cups + Lids",
+    unitPrice: 1200,
+    moq: 1,
+    sku: "IK-SKU-CUP1000",
+    image: "https://images.unsplash.com/photo-1615485290382-441e4d049cb5?auto=format&fit=crop&w=400&q=80",
+    description: "Tamper-proof leak-resistant portion cups for garlic toum & chutneys.",
+    shelfLife: "N/A",
+    inStock: true,
+  },
+];
+
+export const INITIAL_SUPPLY_ORDERS: SupplyOrder[] = [];
+
 export interface AuditLog {
   id: string;
   timestamp: string;
