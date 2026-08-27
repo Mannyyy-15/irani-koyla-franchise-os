@@ -242,64 +242,64 @@ export default function AdminDashboardPage() {
       {/* ── SUPER ADMIN DASHBOARD VIEW ──────────────────────────────────── */}
       {isSuperAdmin ? (
         <div className="space-y-6">
-          {/* Top 4 Network KPI Cards (Clean SaaS Design) */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+          {/* Top 4 Network KPI Cards (Clean 2-Column Mobile Grid) */}
+          <div className="grid grid-cols-2 xl:grid-cols-4 gap-3 sm:gap-4">
             <Card className="border-[#2e2e30] bg-[#1a1a1c] shadow-sm rounded-2xl">
-              <CardContent className="p-5 flex items-center gap-4">
-                <div className="w-12 h-12 rounded-xl bg-[#242427] border border-[#333336] flex items-center justify-center shrink-0">
-                  <Receipt className="w-6 h-6 text-zinc-300" />
+              <CardContent className="p-3.5 sm:p-5 flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4">
+                <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-[#242427] border border-[#333336] flex items-center justify-center shrink-0">
+                  <Receipt className="w-5 h-5 sm:w-6 sm:h-6 text-zinc-300" />
                 </div>
                 <div className="min-w-0">
-                  <span className="text-[11px] font-semibold text-zinc-400 block">Network Gross Sales</span>
-                  <p className="text-2xl font-bold text-white font-mono tracking-tight mt-0.5">
+                  <span className="text-[10px] sm:text-[11px] font-semibold text-zinc-400 block truncate">Gross Sales</span>
+                  <p className="text-lg sm:text-2xl font-bold text-white font-mono tracking-tight mt-0.5 truncate">
                     ₹{networkTotals.totalSalesToday.toLocaleString("en-IN")}
                   </p>
-                  <span className="text-xs text-zinc-400 block mt-0.5">{networkTotals.totalWrapsToday.toLocaleString()} Wraps Carved</span>
+                  <span className="text-[10px] sm:text-xs text-zinc-400 block mt-0.5 truncate">{networkTotals.totalWrapsToday.toLocaleString()} Wraps</span>
                 </div>
               </CardContent>
             </Card>
 
             <Card className="border-[#2e2e30] bg-[#1a1a1c] shadow-sm rounded-2xl">
-              <CardContent className="p-5 flex items-center gap-4">
-                <div className="w-12 h-12 rounded-xl bg-[#242427] border border-[#333336] flex items-center justify-center shrink-0">
-                  <Store className="w-6 h-6 text-zinc-300" />
+              <CardContent className="p-3.5 sm:p-5 flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4">
+                <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-[#242427] border border-[#333336] flex items-center justify-center shrink-0">
+                  <Store className="w-5 h-5 sm:w-6 sm:h-6 text-zinc-300" />
                 </div>
                 <div className="min-w-0">
-                  <span className="text-[11px] font-semibold text-zinc-400 block">Franchise Outlets</span>
-                  <p className="text-2xl font-bold text-white font-mono tracking-tight mt-0.5">
-                    {outlets.length} Branches
+                  <span className="text-[10px] sm:text-[11px] font-semibold text-zinc-400 block truncate">Franchise Outlets</span>
+                  <p className="text-lg sm:text-2xl font-bold text-white font-mono tracking-tight mt-0.5 truncate">
+                    {outlets.length} Hubs
                   </p>
-                  <span className="text-xs text-zinc-400 block mt-0.5">{outlets.filter(o => o.status === "active").length} Live & Billing</span>
+                  <span className="text-[10px] sm:text-xs text-zinc-400 block mt-0.5 truncate">{outlets.filter(o => o.status === "active").length} Live</span>
                 </div>
               </CardContent>
             </Card>
 
             <Card className="border-[#2e2e30] bg-[#1a1a1c] shadow-sm rounded-2xl">
-              <CardContent className="p-5 flex items-center gap-4">
-                <div className="w-12 h-12 rounded-xl bg-[#242427] border border-[#333336] flex items-center justify-center shrink-0">
-                  <Flame className="w-6 h-6 text-orange-400" />
+              <CardContent className="p-3.5 sm:p-5 flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4">
+                <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-[#242427] border border-[#333336] flex items-center justify-center shrink-0">
+                  <Flame className="w-5 h-5 sm:w-6 sm:h-6 text-orange-400" />
                 </div>
                 <div className="min-w-0">
-                  <span className="text-[11px] font-semibold text-zinc-400 block">Network Meat Yield</span>
-                  <p className="text-2xl font-bold text-white font-mono tracking-tight mt-0.5">
+                  <span className="text-[10px] sm:text-[11px] font-semibold text-zinc-400 block truncate">Spit Yield</span>
+                  <p className="text-lg sm:text-2xl font-bold text-white font-mono tracking-tight mt-0.5 truncate">
                     {networkTotals.avgSpitEfficiency}%
                   </p>
-                  <span className="text-xs text-zinc-400 block mt-0.5">{networkTotals.activeSpitsCount} Spits Active</span>
+                  <span className="text-[10px] sm:text-xs text-zinc-400 block mt-0.5 truncate">{networkTotals.activeSpitsCount} Active</span>
                 </div>
               </CardContent>
             </Card>
 
             <Card className="border-[#2e2e30] bg-[#1a1a1c] shadow-sm rounded-2xl">
-              <CardContent className="p-5 flex items-center gap-4">
-                <div className="w-12 h-12 rounded-xl bg-[#242427] border border-[#333336] flex items-center justify-center shrink-0">
-                  <DollarSign className="w-6 h-6 text-zinc-300" />
+              <CardContent className="p-3.5 sm:p-5 flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4">
+                <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-[#242427] border border-[#333336] flex items-center justify-center shrink-0">
+                  <DollarSign className="w-5 h-5 sm:w-6 sm:h-6 text-zinc-300" />
                 </div>
                 <div className="min-w-0">
-                  <span className="text-[11px] font-semibold text-zinc-400 block">Monthly Royalty</span>
-                  <p className="text-2xl font-bold text-white font-mono tracking-tight mt-0.5">
+                  <span className="text-[10px] sm:text-[11px] font-semibold text-zinc-400 block truncate">Royalty Dues</span>
+                  <p className="text-lg sm:text-2xl font-bold text-white font-mono tracking-tight mt-0.5 truncate">
                     ₹{(networkTotals.totalRoyaltyCollected / 100000).toFixed(2)}L
                   </p>
-                  <span className="text-xs text-zinc-400 block mt-0.5">Pending: ₹{networkTotals.totalRoyaltyPending.toLocaleString("en-IN")}</span>
+                  <span className="text-[10px] sm:text-xs text-zinc-400 block mt-0.5 truncate">₹{networkTotals.totalRoyaltyPending.toLocaleString("en-IN")} pend.</span>
                 </div>
               </CardContent>
             </Card>
@@ -490,73 +490,73 @@ export default function AdminDashboardPage() {
       ) : (
         /* ── FRANCHISE STORE OVERVIEW (CLEAN & PROFESSIONAL SAAS) ─────────── */
         <div className="space-y-6">
-          {/* Top 4 Store KPI Cards */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+          {/* Top 4 Outlet KPI Metric Cards (2-Column Mobile Grid) */}
+          <div className="grid grid-cols-2 xl:grid-cols-4 gap-3 sm:gap-4">
             <Card className="border-[#2e2e30] bg-[#1a1a1c] shadow-sm rounded-2xl">
-              <CardContent className="p-5 flex items-center gap-4">
-                <div className="w-12 h-12 rounded-xl bg-[#242427] border border-[#333336] flex items-center justify-center shrink-0">
-                  <Receipt className="w-6 h-6 text-zinc-300" />
+              <CardContent className="p-3.5 sm:p-5 flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4">
+                <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-[#242427] border border-[#333336] flex items-center justify-center shrink-0">
+                  <Receipt className="w-5 h-5 sm:w-6 sm:h-6 text-zinc-300" />
                 </div>
                 <div className="min-w-0">
-                  <span className="text-[11px] font-semibold text-zinc-400 block">Today&apos;s Sales</span>
-                  <p className="text-2xl font-bold text-white font-mono tracking-tight mt-0.5">
+                  <span className="text-[10px] sm:text-[11px] font-semibold text-zinc-400 block truncate">Today's Sales</span>
+                  <p className="text-lg sm:text-2xl font-bold text-white font-mono tracking-tight mt-0.5 truncate">
                     ₹{outletTenderTotals.totalGrossRevenue.toLocaleString("en-IN")}
                   </p>
-                  <span className="text-xs text-zinc-400 block mt-0.5">Live Gross Revenue</span>
+                  <span className="text-[10px] sm:text-xs text-zinc-400 block mt-0.5 truncate">{outletTenderTotals.totalOrdersToday} Orders</span>
                 </div>
               </CardContent>
             </Card>
 
             <Card className="border-[#2e2e30] bg-[#1a1a1c] shadow-sm rounded-2xl cursor-pointer hover:border-[#404040] transition-colors" onClick={() => setShowDrawerBreakdown(!showDrawerBreakdown)}>
-              <CardContent className="p-5 flex items-center justify-between gap-2">
-                <div className="flex items-center gap-4 min-w-0">
-                  <div className="w-12 h-12 rounded-xl bg-[#242427] border border-[#333336] flex items-center justify-center shrink-0">
-                    <Banknote className="w-6 h-6 text-emerald-400" />
+              <CardContent className="p-3.5 sm:p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
+                <div className="flex items-center gap-3 min-w-0">
+                  <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-[#242427] border border-[#333336] flex items-center justify-center shrink-0">
+                    <Banknote className="w-5 h-5 sm:w-6 sm:h-6 text-emerald-400" />
                   </div>
                   <div className="min-w-0">
-                    <span className="text-[11px] font-semibold text-zinc-400 block">Cash in Drawer</span>
-                    <p className="text-2xl font-bold text-white font-mono tracking-tight mt-0.5">
+                    <span className="text-[10px] sm:text-[11px] font-semibold text-zinc-400 block truncate">Cash in Drawer</span>
+                    <p className="text-lg sm:text-2xl font-bold text-white font-mono tracking-tight mt-0.5 truncate">
                       ₹{outletTenderTotals.expectedCashInDrawer.toLocaleString("en-IN")}
                     </p>
-                    <span className="text-xs text-emerald-400 block mt-0.5 font-medium">Counter Register</span>
+                    <span className="text-[10px] sm:text-xs text-emerald-400 block mt-0.5 font-medium truncate">Counter Register</span>
                   </div>
                 </div>
-                <span className="text-[10px] text-zinc-500 font-mono bg-[#242427] px-2 py-1 rounded-lg shrink-0">
+                <span className="text-[9px] sm:text-[10px] text-zinc-500 font-mono bg-[#242427] px-1.5 py-0.5 rounded shrink-0">
                   {showDrawerBreakdown ? "Hide" : "Audit"}
                 </span>
               </CardContent>
             </Card>
 
             <Card className="border-[#2e2e30] bg-[#1a1a1c] shadow-sm rounded-2xl">
-              <CardContent className="p-5 flex items-center gap-4">
-                <div className="w-12 h-12 rounded-xl bg-[#242427] border border-[#333336] flex items-center justify-center shrink-0">
-                  <ShoppingBag className="w-6 h-6 text-zinc-300" />
+              <CardContent className="p-3.5 sm:p-5 flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4">
+                <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-[#242427] border border-[#333336] flex items-center justify-center shrink-0">
+                  <ShoppingBag className="w-5 h-5 sm:w-6 sm:h-6 text-zinc-300" />
                 </div>
                 <div className="min-w-0">
-                  <span className="text-[11px] font-semibold text-zinc-400 block">Orders Today</span>
-                  <p className="text-2xl font-bold text-white font-mono tracking-tight mt-0.5">
+                  <span className="text-[10px] sm:text-[11px] font-semibold text-zinc-400 block truncate">Orders Today</span>
+                  <p className="text-lg sm:text-2xl font-bold text-white font-mono tracking-tight mt-0.5 truncate">
                     {outletTenderTotals.totalOrdersToday}
                   </p>
-                  <span className="text-xs text-zinc-400 block mt-0.5">
-                    Avg Ticket: ₹{Math.round(outletTenderTotals.totalGrossRevenue / (outletTenderTotals.totalOrdersToday || 1))}
+                  <span className="text-[10px] sm:text-xs text-zinc-400 block mt-0.5 truncate">
+                    Avg: ₹{Math.round(outletTenderTotals.totalGrossRevenue / (outletTenderTotals.totalOrdersToday || 1))}
                   </span>
                 </div>
               </CardContent>
             </Card>
 
             <Card className="border-[#2e2e30] bg-[#1a1a1c] shadow-sm rounded-2xl relative overflow-hidden">
-              <CardContent className="p-5 flex items-center justify-between gap-3">
-                <div className="flex items-center gap-3.5 min-w-0">
-                  <div className="w-12 h-12 rounded-xl bg-orange-500/10 border border-orange-500/30 flex items-center justify-center shrink-0 text-orange-400">
-                    <Flame className="w-6 h-6" />
+              <CardContent className="p-3.5 sm:p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 sm:gap-3">
+                <div className="flex items-center gap-3 min-w-0">
+                  <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-orange-500/10 border border-orange-500/30 flex items-center justify-center shrink-0 text-orange-400">
+                    <Flame className="w-5 h-5 sm:w-6 sm:h-6" />
                   </div>
                   <div className="min-w-0">
-                    <span className="text-[11px] font-semibold text-zinc-400 block">Spit Meat Loaded</span>
-                    <p className="text-2xl font-bold text-white font-mono tracking-tight mt-0.5">
-                      {(dailySession.totalSpitMeatLoadedKg || dailySession.spitMountedKg || dailySession.spit1MountedKg || 28)} <span className="text-sm font-bold text-zinc-400 font-sans">kg</span>
+                    <span className="text-[10px] sm:text-[11px] font-semibold text-zinc-400 block truncate">Spit Meat Loaded</span>
+                    <p className="text-lg sm:text-2xl font-bold text-white font-mono tracking-tight mt-0.5 truncate">
+                      {(dailySession.totalSpitMeatLoadedKg || dailySession.spitMountedKg || dailySession.spit1MountedKg || 28)} <span className="text-xs font-bold text-zinc-400 font-sans">kg</span>
                     </p>
-                    <span className="text-xs text-zinc-400 block mt-0.5 truncate">
-                      Spit Master: {dailySession.spitMasterName || "Chef Raheem"}
+                    <span className="text-[10px] sm:text-xs text-zinc-400 block mt-0.5 truncate">
+                      {dailySession.spitMasterName || "Chef Raheem"}
                     </span>
                   </div>
                 </div>
@@ -564,8 +564,8 @@ export default function AdminDashboardPage() {
                 <button
                   type="button"
                   onClick={() => setIsSpitReloadModalOpen(true)}
-                  className="px-2.5 py-1.5 rounded-xl bg-orange-600/15 hover:bg-orange-600 text-orange-400 hover:text-white border border-orange-500/30 text-[11px] font-black uppercase tracking-wider transition-all cursor-pointer shrink-0"
-                  title="Mount fresh meat cone when spit is empty"
+                  className="px-2 py-1 rounded-lg bg-orange-600/15 hover:bg-orange-600 text-orange-400 hover:text-white border border-orange-500/30 text-[10px] font-black uppercase tracking-wider transition-all cursor-pointer shrink-0 mt-1 sm:mt-0"
+                  title="Mount fresh meat cone"
                 >
                   + Reload
                 </button>

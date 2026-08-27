@@ -209,21 +209,21 @@ export default function MeatYieldPage() {
         </div>
       </div>
 
-      {/* KPI Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      {/* KPI Cards (2-Column Mobile Grid) */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         {/* Raw Meat Loaded */}
         <Card className="border-[#2e2e30] bg-[#1a1a1c] shadow-sm rounded-2xl">
-          <CardContent className="p-5 flex items-center gap-4">
-            <div className="w-12 h-12 rounded-xl bg-orange-500/10 border border-orange-500/30 flex items-center justify-center shrink-0 text-orange-400">
-              <Scale className="w-6 h-6" />
+          <CardContent className="p-3.5 sm:p-5 flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4">
+            <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-orange-500/10 border border-orange-500/30 flex items-center justify-center shrink-0 text-orange-400">
+              <Scale className="w-5 h-5 sm:w-6 sm:h-6" />
             </div>
             <div className="min-w-0">
-              <span className="text-[11px] font-semibold text-zinc-400 block">Raw Meat Loaded</span>
-              <p className="text-2xl font-bold text-white font-mono tracking-tight mt-0.5">
-                {totalRawReceived.toFixed(1)} <span className="text-sm font-bold text-zinc-400 font-sans">kg</span>
+              <span className="text-[10px] sm:text-[11px] font-semibold text-zinc-400 block truncate">Raw Loaded</span>
+              <p className="text-lg sm:text-2xl font-bold text-white font-mono tracking-tight mt-0.5 truncate">
+                {totalRawReceived.toFixed(1)} <span className="text-xs font-bold text-zinc-400 font-sans">kg</span>
               </p>
-              <span className="text-xs text-zinc-400 block mt-0.5">
-                Cooked: {totalCookedYield.toFixed(1)} kg carved
+              <span className="text-[10px] sm:text-xs text-zinc-400 block mt-0.5 truncate">
+                Cooked: {totalCookedYield.toFixed(1)} kg
               </span>
             </div>
           </CardContent>
@@ -231,17 +231,17 @@ export default function MeatYieldPage() {
 
         {/* Avg Spit Yield Efficiency */}
         <Card className="border-[#2e2e30] bg-[#1a1a1c] shadow-sm rounded-2xl">
-          <CardContent className="p-5 flex items-center gap-4">
-            <div className="w-12 h-12 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center shrink-0 text-emerald-400">
-              <Percent className="w-6 h-6" />
+          <CardContent className="p-3.5 sm:p-5 flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4">
+            <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center shrink-0 text-emerald-400">
+              <Percent className="w-5 h-5 sm:w-6 sm:h-6" />
             </div>
             <div className="min-w-0">
-              <span className="text-[11px] font-semibold text-emerald-300 block">Meat Efficiency</span>
-              <p className="text-2xl font-bold text-emerald-400 font-mono tracking-tight mt-0.5">
+              <span className="text-[10px] sm:text-[11px] font-semibold text-emerald-300 block truncate">Meat Efficiency</span>
+              <p className="text-lg sm:text-2xl font-bold text-emerald-400 font-mono tracking-tight mt-0.5 truncate">
                 {avgEfficiency}%
               </p>
-              <span className="text-xs text-emerald-400 font-medium block mt-0.5">
-                Goal: 92% or higher
+              <span className="text-[10px] sm:text-xs text-emerald-400 font-medium block mt-0.5 truncate">
+                Goal: 92%+
               </span>
             </div>
           </CardContent>
@@ -249,35 +249,35 @@ export default function MeatYieldPage() {
 
         {/* Wraps Produced */}
         <Card className="border-[#2e2e30] bg-[#1a1a1c] shadow-sm rounded-2xl">
-          <CardContent className="p-5 flex items-center gap-4">
-            <div className="w-12 h-12 rounded-xl bg-[#242427] border border-[#333336] flex items-center justify-center shrink-0 text-blue-400">
-              <UtensilsCrossed className="w-6 h-6" />
+          <CardContent className="p-3.5 sm:p-5 flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4">
+            <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-purple-500/10 border border-purple-500/30 flex items-center justify-center shrink-0 text-purple-400">
+              <UtensilsCrossed className="w-5 h-5 sm:w-6 sm:h-6" />
             </div>
             <div className="min-w-0">
-              <span className="text-[11px] font-semibold text-zinc-400 block">Total Wraps Made</span>
-              <p className="text-2xl font-bold text-white font-mono tracking-tight mt-0.5">
-                {totalWrapsProduced.toLocaleString()}
+              <span className="text-[10px] sm:text-[11px] font-semibold text-purple-300 block truncate">Wraps Made</span>
+              <p className="text-lg sm:text-2xl font-bold text-white font-mono tracking-tight mt-0.5 truncate">
+                {totalWrapsProduced.toLocaleString("en-IN")}
               </p>
-              <span className="text-xs text-zinc-400 block mt-0.5">
-                ~110g meat per wrap
+              <span className="text-[10px] sm:text-xs text-zinc-400 block mt-0.5 truncate">
+                Avg: {totalWrapsProduced > 0 ? (totalCookedYield * 1000 / totalWrapsProduced).toFixed(0) : 0}g / wrap
               </span>
             </div>
           </CardContent>
         </Card>
 
-        {/* Trimming & Waste */}
+        {/* Roasting Spits Active */}
         <Card className="border-[#2e2e30] bg-[#1a1a1c] shadow-sm rounded-2xl">
-          <CardContent className="p-5 flex items-center gap-4">
-            <div className="w-12 h-12 rounded-xl bg-rose-500/10 border border-rose-500/30 flex items-center justify-center shrink-0 text-rose-400">
-              <AlertTriangle className="w-6 h-6" />
+          <CardContent className="p-3.5 sm:p-5 flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4">
+            <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-blue-500/10 border border-blue-500/30 flex items-center justify-center shrink-0 text-blue-400">
+              <Flame className="w-5 h-5 sm:w-6 sm:h-6" />
             </div>
             <div className="min-w-0">
-              <span className="text-[11px] font-semibold text-rose-300 block">Meat Waste & Scraps</span>
-              <p className="text-2xl font-bold text-rose-400 font-mono tracking-tight mt-0.5">
-                {totalWaste.toFixed(1)} <span className="text-sm font-bold text-zinc-400 font-sans">kg</span>
+              <span className="text-[10px] sm:text-[11px] font-semibold text-blue-300 block truncate">Active Spits</span>
+              <p className="text-lg sm:text-2xl font-bold text-blue-400 font-mono tracking-tight mt-0.5 truncate">
+                {filteredMeatBatches.filter((b) => b.status === "roasting").length || filteredMeatBatches.length} Live
               </p>
-              <span className="text-xs text-zinc-400 block mt-0.5">
-                {((totalWaste / (totalRawReceived || 1)) * 100).toFixed(1)}% waste
+              <span className="text-[10px] sm:text-xs text-zinc-400 block mt-0.5 truncate">
+                {filteredMeatBatches.length} Total Batches
               </span>
             </div>
           </CardContent>

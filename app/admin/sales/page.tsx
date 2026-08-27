@@ -21,6 +21,7 @@ import {
   Banknote,
   ShieldCheck,
   ChevronDown,
+  ShoppingBag,
 } from "lucide-react";
 import { useFranchise } from "@/lib/franchise-context";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
@@ -199,68 +200,68 @@ export default function DailySalesPage() {
         </div>
       </div>
 
-      {/* KPI Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      {/* KPI Cards (2-Column Mobile Grid) */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         {/* Total Gross Sales */}
         <Card className="border-[#2e2e30] bg-[#1a1a1c] shadow-sm rounded-2xl">
-          <CardContent className="p-5 flex items-center gap-4">
-            <div className="w-12 h-12 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center shrink-0 text-amber-400">
-              <Receipt className="w-6 h-6" />
+          <CardContent className="p-3.5 sm:p-5 flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4">
+            <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center shrink-0 text-amber-400">
+              <Receipt className="w-5 h-5 sm:w-6 sm:h-6" />
             </div>
             <div className="min-w-0">
-              <span className="text-[11px] font-semibold text-zinc-400 block">Total Sales</span>
-              <p className="text-2xl font-bold text-white font-mono tracking-tight mt-0.5">
+              <span className="text-[10px] sm:text-[11px] font-semibold text-zinc-400 block truncate">Total Sales</span>
+              <p className="text-lg sm:text-2xl font-bold text-white font-mono tracking-tight mt-0.5 truncate">
                 ₹{totalGross.toLocaleString("en-IN")}
               </p>
-              <span className="text-xs text-zinc-400 block mt-0.5">All shifts today</span>
+              <span className="text-[10px] sm:text-xs text-zinc-400 block mt-0.5 truncate">All shifts today</span>
             </div>
           </CardContent>
         </Card>
 
         {/* UPI & QR Collections */}
         <Card className="border-[#2e2e30] bg-[#1a1a1c] shadow-sm rounded-2xl">
-          <CardContent className="p-5 flex items-center gap-4">
-            <div className="w-12 h-12 rounded-xl bg-blue-500/10 border border-blue-500/30 flex items-center justify-center shrink-0 text-blue-400">
-              <Smartphone className="w-6 h-6" />
+          <CardContent className="p-3.5 sm:p-5 flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4">
+            <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-blue-500/10 border border-blue-500/30 flex items-center justify-center shrink-0 text-blue-400">
+              <Smartphone className="w-5 h-5 sm:w-6 sm:h-6" />
             </div>
             <div className="min-w-0">
-              <span className="text-[11px] font-semibold text-blue-300 block">Online / UPI</span>
-              <p className="text-2xl font-bold text-blue-400 font-mono tracking-tight mt-0.5">
+              <span className="text-[10px] sm:text-[11px] font-semibold text-blue-300 block truncate">Online / UPI</span>
+              <p className="text-lg sm:text-2xl font-bold text-blue-400 font-mono tracking-tight mt-0.5 truncate">
                 ₹{totalUpi.toLocaleString("en-IN")}
               </p>
-              <span className="text-xs text-zinc-400 block mt-0.5">Direct bank QR</span>
+              <span className="text-[10px] sm:text-xs text-zinc-400 block mt-0.5 truncate">Direct bank QR</span>
             </div>
           </CardContent>
         </Card>
 
         {/* Physical Cash in Hand */}
         <Card className="border-[#2e2e30] bg-[#1a1a1c] shadow-sm rounded-2xl">
-          <CardContent className="p-5 flex items-center gap-4">
-            <div className="w-12 h-12 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center shrink-0 text-emerald-400">
-              <Banknote className="w-6 h-6" />
+          <CardContent className="p-3.5 sm:p-5 flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4">
+            <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center shrink-0 text-emerald-400">
+              <Banknote className="w-5 h-5 sm:w-6 sm:h-6" />
             </div>
             <div className="min-w-0">
-              <span className="text-[11px] font-semibold text-emerald-300 block">Cash in Drawer</span>
-              <p className="text-2xl font-bold text-emerald-400 font-mono tracking-tight mt-0.5">
+              <span className="text-[10px] sm:text-[11px] font-semibold text-emerald-300 block truncate">Cash in Drawer</span>
+              <p className="text-lg sm:text-2xl font-bold text-emerald-400 font-mono tracking-tight mt-0.5 truncate">
                 ₹{totalCash.toLocaleString("en-IN")}
               </p>
-              <span className="text-xs text-zinc-400 block mt-0.5">Counted by cashier</span>
+              <span className="text-[10px] sm:text-xs text-zinc-400 block mt-0.5 truncate">Counted register</span>
             </div>
           </CardContent>
         </Card>
 
-        {/* Food Aggregators */}
+        {/* 3rd-Party Delivery App Aggregators */}
         <Card className="border-[#2e2e30] bg-[#1a1a1c] shadow-sm rounded-2xl">
-          <CardContent className="p-5 flex items-center gap-4">
-            <div className="w-12 h-12 rounded-xl bg-orange-500/10 border border-orange-500/30 flex items-center justify-center shrink-0 text-orange-400">
-              <Truck className="w-6 h-6" />
+          <CardContent className="p-3.5 sm:p-5 flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4">
+            <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-orange-500/10 border border-orange-500/30 flex items-center justify-center shrink-0 text-orange-400">
+              <ShoppingBag className="w-5 h-5 sm:w-6 sm:h-6" />
             </div>
             <div className="min-w-0">
-              <span className="text-[11px] font-semibold text-orange-300 block">Zomato & Swiggy</span>
-              <p className="text-2xl font-bold text-orange-400 font-mono tracking-tight mt-0.5">
+              <span className="text-[10px] sm:text-[11px] font-semibold text-orange-300 block truncate">Zomato & Swiggy</span>
+              <p className="text-lg sm:text-2xl font-bold text-orange-400 font-mono tracking-tight mt-0.5 truncate">
                 ₹{totalAggregators.toLocaleString("en-IN")}
               </p>
-              <span className="text-xs text-zinc-400 block mt-0.5">Online deliveries</span>
+              <span className="text-[10px] sm:text-xs text-zinc-400 block mt-0.5 truncate">Online payout</span>
             </div>
           </CardContent>
         </Card>
