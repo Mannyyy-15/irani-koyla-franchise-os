@@ -506,54 +506,60 @@ For central commissary refills or support, contact HQ Operations.
       {/* Network Overview Summary Cards (Super Admin) */}
       {isSuperAdmin && (
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3.5">
-          <Card className="border-[#303030] bg-[#1f1f1f]">
+          <Card className="border-[#2e2e30] bg-[#1a1a1c]">
             <CardContent className="p-4 flex items-center gap-3.5">
               <div className="w-10 h-10 rounded-xl bg-orange-500/10 border border-orange-500/30 flex items-center justify-center shrink-0">
                 <Store className="w-5 h-5 text-orange-400" />
               </div>
               <div>
-                <span className="text-[10px] font-bold text-[#b8b8c5]/70 uppercase tracking-wider block">Network Hubs</span>
+                <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider block">Network Hubs</span>
                 <p className="text-xl font-black text-white font-mono mt-0.5">{outlets.length} Branches</p>
-                <span className="text-[10px] text-emerald-400 font-semibold block">{activeOutletsCount} Live & Billing · 1 Launching</span>
+                <span className="text-[10px] text-emerald-400 font-semibold block">
+                  {outlets.length === 0 ? "0 Registered" : `${activeOutletsCount} Active · ${outlets.filter((o) => o.status === "onboarding").length} Onboarding`}
+                </span>
               </div>
             </CardContent>
           </Card>
 
-          <Card className="border-[#303030] bg-[#1f1f1f]">
+          <Card className="border-[#2e2e30] bg-[#1a1a1c]">
             <CardContent className="p-4 flex items-center gap-3.5">
               <div className="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center shrink-0">
                 <TrendingUp className="w-5 h-5 text-emerald-400" />
               </div>
               <div>
-                <span className="text-[10px] font-bold text-[#b8b8c5]/70 uppercase tracking-wider block">Network Today Sales</span>
+                <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider block">Network Today Sales</span>
                 <p className="text-xl font-black text-emerald-400 font-mono mt-0.5">₹{totalNetworkSales.toLocaleString("en-IN")}</p>
-                <span className="text-[10px] text-[#b8b8c5]/60 block">{totalNetworkWraps.toLocaleString()} Wraps Carved Today</span>
+                <span className="text-[10px] text-zinc-400 block">{totalNetworkWraps.toLocaleString()} Wraps Carved Today</span>
               </div>
             </CardContent>
           </Card>
 
-          <Card className="border-[#303030] bg-[#1f1f1f]">
+          <Card className="border-[#2e2e30] bg-[#1a1a1c]">
             <CardContent className="p-4 flex items-center gap-3.5">
               <div className="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center shrink-0">
                 <Flame className="w-5 h-5 text-amber-400" />
               </div>
               <div>
-                <span className="text-[10px] font-bold text-[#b8b8c5]/70 uppercase tracking-wider block">Active Spit Roasters</span>
+                <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider block">Active Spit Roasters</span>
                 <p className="text-xl font-black text-white font-mono mt-0.5">{totalSpitsCount} Live Spits</p>
-                <span className="text-[10px] text-amber-400 font-semibold block">93.0% Avg Carving Yield</span>
+                <span className="text-[10px] text-amber-400 font-semibold block">
+                  {outlets.length === 0 ? "0% Avg Yield" : `${(outlets.reduce((s, o) => s + (o.spitEfficiency || 0), 0) / (outlets.length || 1)).toFixed(1)}% Avg Yield`}
+                </span>
               </div>
             </CardContent>
           </Card>
 
-          <Card className="border-[#303030] bg-[#1f1f1f]">
+          <Card className="border-[#2e2e30] bg-[#1a1a1c]">
             <CardContent className="p-4 flex items-center gap-3.5">
               <div className="w-10 h-10 rounded-xl bg-blue-500/10 border border-blue-500/30 flex items-center justify-center shrink-0">
                 <Receipt className="w-5 h-5 text-blue-400" />
               </div>
               <div>
-                <span className="text-[10px] font-bold text-[#b8b8c5]/70 uppercase tracking-wider block">Monthly System Royalty</span>
-                <p className="text-xl font-black text-blue-400 font-mono mt-0.5">₹5.20 Lakhs</p>
-                <span className="text-[10px] text-zinc-400 block">6.5% Gross + 2.0% Marketing</span>
+                <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider block">Monthly System Royalty</span>
+                <p className="text-xl font-black text-blue-400 font-mono mt-0.5">
+                  ₹{((royalties.reduce((sum, r) => sum + r.royaltyAmount, 0)) / 100000).toFixed(2)} Lakhs
+                </p>
+                <span className="text-[10px] text-zinc-400 block">5.0% Royalty + 2.0% Marketing</span>
               </div>
             </CardContent>
           </Card>
@@ -561,7 +567,7 @@ For central commissary refills or support, contact HQ Operations.
       )}
 
       {/* Search, Filter & Sort Controls */}
-      <div className="p-4 rounded-2xl bg-[#1f1f1f] border border-[#303030] flex flex-col lg:flex-row items-center justify-between gap-3">
+      <div className="p-4 rounded-2xl bg-[#1a1a1c] border border-[#2e2e30] flex flex-col lg:flex-row items-center justify-between gap-3">
         <div className="flex flex-col sm:flex-row items-center gap-2.5 w-full lg:w-auto">
           {/* Search Bar */}
           <div className="relative w-full sm:w-72">
@@ -571,7 +577,7 @@ For central commissary refills or support, contact HQ Operations.
               placeholder="Search branch name, code, owner, area…"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full h-10 pl-9 pr-3 rounded-xl bg-[#161618] border border-[#303030] text-xs text-white placeholder-zinc-500 focus:outline-none focus:border-orange-500 transition-colors"
+              className="w-full h-10 pl-9 pr-3 rounded-xl bg-[#141416] border border-[#2e2e30] text-xs text-white placeholder-zinc-500 focus:outline-none focus:border-orange-500 transition-colors"
             />
           </div>
 
@@ -585,7 +591,7 @@ For central commissary refills or support, contact HQ Operations.
                   "px-3 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all cursor-pointer",
                   cityFilter === c
                     ? "bg-orange-600 text-white shadow-sm"
-                    : "bg-[#161618] text-zinc-400 border border-[#303030] hover:text-white hover:border-orange-500/40"
+                    : "bg-[#141416] text-zinc-400 border border-[#2e2e30] hover:text-white hover:border-orange-500/40"
                 )}
               >
                 {c === "all" ? "All Cities" : c}
