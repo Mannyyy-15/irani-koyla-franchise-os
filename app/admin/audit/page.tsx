@@ -81,15 +81,15 @@ export default function AuditTrailPage() {
       </div>
 
       {/* Filter Bar */}
-      <div className="flex flex-col sm:flex-row items-center justify-between gap-3 bg-[#1f1f1f] p-3 rounded-2xl border border-[#303030]">
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-3 bg-[#1a1a1c] p-3 rounded-2xl border border-[#2e2e30]">
         <div className="relative w-full sm:w-80">
-          <Search className="w-3.5 h-3.5 text-[#b8b8c5]/40 absolute left-3 top-1/2 -translate-y-1/2" />
+          <Search className="w-3.5 h-3.5 text-zinc-500 absolute left-3 top-1/2 -translate-y-1/2" />
           <input
             type="text"
             placeholder="Search action, outlet, or staff..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full h-9 pl-9 pr-3 rounded-xl bg-[#161618] border border-[#303030] text-xs text-white placeholder-[#b8b8c5]/40 focus:outline-none focus:border-amber-500"
+            className="w-full h-9 pl-9 pr-3 rounded-xl bg-[#141416] border border-[#2e2e30] text-xs text-white placeholder-zinc-500 focus:outline-none focus:border-orange-500"
           />
         </div>
 
@@ -99,10 +99,10 @@ export default function AuditTrailPage() {
               key={m}
               onClick={() => setSelectedModule(m)}
               className={cn(
-                "px-3 py-1.5 rounded-xl text-xs font-bold capitalize transition-all cursor-pointer shrink-0",
+                "px-3 py-1.5 rounded-xl text-xs font-bold capitalize transition-all cursor-pointer shrink-0 border",
                 selectedModule === m
-                  ? "bg-amber-600 text-white shadow-sm"
-                  : "text-[#b8b8c5]/70 hover:bg-[#303030] hover:text-white"
+                  ? "bg-orange-600 border-orange-500 text-white shadow-sm"
+                  : "bg-[#141416] border-[#2e2e30] text-zinc-400 hover:text-white hover:border-orange-500/40"
               )}
             >
               {m === "all" ? "All" : m === "Yield" ? "Meat & Spits" : m === "SupplyChain" ? "Stock Orders" : m === "Pricing" ? "Menu Prices" : m}
@@ -120,53 +120,63 @@ export default function AuditTrailPage() {
               <span>Recent Activity ({filteredLogs.length} Records)</span>
             </div>
             <span className="text-[11px] text-zinc-500 font-mono">
-              Live Record
+              Live Audit Log
             </span>
           </CardTitle>
         </CardHeader>
         <CardContent className="p-0">
-          <div className="divide-y divide-[#2e2e30]">
-            {filteredLogs.map((log) => {
-              const moduleIcon =
-                log.module === "Sales" ? <Receipt className="w-4 h-4 text-amber-400" /> :
-                log.module === "Yield" ? <Flame className="w-4 h-4 text-orange-400" /> :
-                log.module === "Royalty" ? <WalletCards className="w-4 h-4 text-emerald-400" /> :
-                <Store className="w-4 h-4 text-zinc-400" />;
+          {filteredLogs.length === 0 ? (
+            <div className="py-16 text-center text-zinc-500 px-4">
+              <FilePieChart className="w-10 h-10 text-zinc-600 mx-auto mb-2 opacity-50" />
+              <p className="text-sm font-bold text-zinc-300">No activity logs recorded yet</p>
+              <p className="text-xs text-zinc-500 mt-1 max-w-sm mx-auto">
+                Real actions such as onboarding outlets, stock dispatches, menu pricing edits, and shift reconciliations will be logged here in real time.
+              </p>
+            </div>
+          ) : (
+            <div className="divide-y divide-[#2e2e30]">
+              {filteredLogs.map((log) => {
+                const moduleIcon =
+                  log.module === "Sales" ? <Receipt className="w-4 h-4 text-amber-400" /> :
+                  log.module === "Yield" ? <Flame className="w-4 h-4 text-orange-400" /> :
+                  log.module === "Royalty" ? <WalletCards className="w-4 h-4 text-emerald-400" /> :
+                  <Store className="w-4 h-4 text-zinc-400" />;
 
-              return (
-                <div
-                  key={log.id}
-                  className="p-4 sm:p-5 hover:bg-[#222225]/40 transition-colors flex items-start gap-3.5 text-xs"
-                >
-                  <div className="w-8 h-8 rounded-xl bg-[#141416] border border-[#2e2e30] flex items-center justify-center shrink-0 mt-0.5">
-                    {moduleIcon}
-                  </div>
+                return (
+                  <div
+                    key={log.id}
+                    className="p-4 sm:p-5 hover:bg-[#222226] transition-colors flex items-start gap-3.5 text-xs"
+                  >
+                    <div className="w-8 h-8 rounded-xl bg-[#141416] border border-[#2e2e30] flex items-center justify-center shrink-0 mt-0.5">
+                      {moduleIcon}
+                    </div>
 
-                  <div className="min-w-0 flex-1 space-y-1">
-                    <div className="flex flex-wrap items-center justify-between gap-2">
-                      <div className="flex items-center gap-2">
-                        <span className="font-bold text-white text-xs">{log.action}</span>
-                        <span className="text-[10px] font-bold text-orange-400 bg-orange-500/10 px-2 py-0.5 rounded-md border border-orange-500/20">
-                          {log.module === "Yield" ? "Meat" : log.module === "SupplyChain" ? "Stock" : log.module}
-                        </span>
+                    <div className="min-w-0 flex-1 space-y-1">
+                      <div className="flex flex-wrap items-center justify-between gap-2">
+                        <div className="flex items-center gap-2">
+                          <span className="font-bold text-white text-xs">{log.action}</span>
+                          <span className="text-[10px] font-bold text-orange-400 bg-orange-500/10 px-2 py-0.5 rounded-md border border-orange-500/20">
+                            {log.module === "Yield" ? "Meat" : log.module === "SupplyChain" ? "Stock" : log.module}
+                          </span>
+                        </div>
+                        <span className="text-[10px] text-zinc-500 font-mono">{log.timestamp}</span>
                       </div>
-                      <span className="text-[10px] text-zinc-500 font-mono">{log.timestamp}</span>
-                    </div>
 
-                    <p className="text-zinc-300 text-xs leading-relaxed">
-                      {log.details}
-                    </p>
+                      <p className="text-zinc-300 text-xs leading-relaxed">
+                        {log.details}
+                      </p>
 
-                    <div className="flex items-center gap-3 pt-1 text-[10px] text-zinc-500 font-mono">
-                      <span>Outlet: {log.outletName}</span>
-                      <span>•</span>
-                      <span>By: {log.user} ({log.role})</span>
+                      <div className="flex items-center gap-3 pt-1 text-[10px] text-zinc-500 font-mono">
+                        <span>Outlet: {log.outletName}</span>
+                        <span>•</span>
+                        <span>By: {log.user} ({log.role})</span>
+                      </div>
                     </div>
                   </div>
-                </div>
-              );
-            })}
-          </div>
+                );
+              })}
+            </div>
+          )}
         </CardContent>
       </Card>
     </div>
