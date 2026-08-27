@@ -70,11 +70,11 @@ export default function RoyaltiesPage() {
               <FileText className="w-6 h-6 text-zinc-300" />
             </div>
             <div className="min-w-0">
-              <span className="text-[11px] font-semibold text-zinc-400 block">Total Invoiced Dues</span>
+              <span className="text-[11px] font-semibold text-zinc-400 block">Total Royalty Invoiced</span>
               <p className="text-2xl font-bold text-white font-mono tracking-tight mt-0.5">
                 ₹{totalPayableAll.toLocaleString("en-IN")}
               </p>
-              <span className="text-xs text-zinc-400 block mt-0.5">{filteredRoyalties.length} Monthly Statements</span>
+              <span className="text-xs text-zinc-400 block mt-0.5">{filteredRoyalties.length} Monthly Bills</span>
             </div>
           </CardContent>
         </Card>
@@ -86,12 +86,12 @@ export default function RoyaltiesPage() {
               <CheckCircle2 className="w-6 h-6" />
             </div>
             <div className="min-w-0">
-              <span className="text-[11px] font-semibold text-emerald-300 block">Settled & Remitted</span>
+              <span className="text-[11px] font-semibold text-emerald-300 block">Total Paid</span>
               <p className="text-2xl font-bold text-emerald-400 font-mono tracking-tight mt-0.5">
                 ₹{totalPaid.toLocaleString("en-IN")}
               </p>
               <span className="text-xs text-emerald-400 font-medium block mt-0.5">
-                {((totalPaid / (totalPayableAll || 1)) * 100).toFixed(0)}% Remittance Rate
+                {((totalPaid / (totalPayableAll || 1)) * 100).toFixed(0)}% paid
               </span>
             </div>
           </CardContent>
@@ -104,29 +104,29 @@ export default function RoyaltiesPage() {
               <Clock className="w-6 h-6" />
             </div>
             <div className="min-w-0">
-              <span className="text-[11px] font-semibold text-amber-300 block">Pending / Under Review</span>
+              <span className="text-[11px] font-semibold text-amber-300 block">Pending Payment</span>
               <p className="text-2xl font-bold text-amber-400 font-mono tracking-tight mt-0.5">
                 ₹{totalPending.toLocaleString("en-IN")}
               </p>
-              <span className="text-xs text-zinc-400 block mt-0.5">Due by 10th of month</span>
+              <span className="text-xs text-zinc-400 block mt-0.5">Pay by 10th of month</span>
             </div>
           </CardContent>
         </Card>
       </div>
 
       {/* Royalty Statements Table */}
-      <Card className="border-[#303030] bg-[#1f1f1f] overflow-hidden">
-        <CardHeader className="border-b border-[#303030] pb-4">
+      <Card className="border-[#2e2e30] bg-[#1a1a1c] shadow-sm rounded-2xl overflow-hidden">
+        <CardHeader className="border-b border-[#2e2e30] pb-4">
           <CardTitle className="text-sm font-bold text-white flex items-center gap-2">
-            <Receipt className="w-4 h-4 text-amber-500" />
-            <span>Monthly Invoices & Commissary Statements</span>
+            <Receipt className="w-4 h-4 text-orange-400" />
+            <span>Monthly Royalty Bills</span>
           </CardTitle>
         </CardHeader>
         <CardContent className="p-0">
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs border-collapse">
               <thead>
-                <tr className="border-b border-[#303030] bg-[#161618] text-[#b8b8c5]/60 font-bold uppercase tracking-wider text-[10px]">
+                <tr className="border-b border-[#2e2e30] bg-[#141416] text-zinc-400 font-bold uppercase tracking-wider text-[10px]">
                   <th className="py-3 px-4">Invoice # & Month</th>
                   <th className="py-3 px-4">Franchise Outlet</th>
                   <th className="py-3 px-4">Gross Sales</th>

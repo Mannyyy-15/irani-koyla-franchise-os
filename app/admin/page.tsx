@@ -189,7 +189,7 @@ export default function AdminDashboardPage() {
                   className="bg-orange-600 hover:bg-orange-500 text-white font-bold text-xs rounded-xl gap-2 h-10 px-4 cursor-pointer"
                 >
                   <Sun className="w-4 h-4" />
-                  <span>Start Morning Shift</span>
+                  <span>Open Store Today</span>
                 </Button>
               ) : (
                 <>
@@ -198,7 +198,7 @@ export default function AdminDashboardPage() {
                     className="bg-[#242427] hover:bg-[#303035] border border-[#383838] hover:border-orange-500/50 text-zinc-200 hover:text-white font-bold text-xs rounded-xl gap-1.5 h-10 px-3.5 cursor-pointer"
                   >
                     <Flame className="w-3.5 h-3.5 text-orange-400" />
-                    <span>Reload Spit</span>
+                    <span>Add Meat to Spit</span>
                     <span className="font-mono text-[10px] bg-orange-500/20 text-orange-400 px-1.5 py-0.5 rounded-md">
                       {(dailySession.totalSpitMeatLoadedKg || dailySession.spitMountedKg || dailySession.spit1MountedKg || 28)}kg
                     </span>
@@ -209,7 +209,7 @@ export default function AdminDashboardPage() {
                     className="bg-indigo-600/15 hover:bg-indigo-600 border border-indigo-500/40 text-indigo-300 hover:text-white font-bold text-xs rounded-xl gap-1.5 h-10 px-3.5 cursor-pointer"
                   >
                     <Moon className="w-3.5 h-3.5" />
-                    <span>EOD Close</span>
+                    <span>Close Store</span>
                   </Button>
                 </>
               )}
