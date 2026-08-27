@@ -74,14 +74,14 @@ export default function DashboardLayout({
       <div className="flex flex-1 flex-col overflow-hidden relative min-w-0" suppressHydrationWarning>
         <TopNav />
 
-        <main id="main-content" className="flex-1 overflow-y-auto pb-24 lg:pb-6 overflow-x-hidden min-w-0" suppressHydrationWarning>
-          <div className="p-3 sm:p-5 lg:p-6 max-w-7xl mx-auto w-full" suppressHydrationWarning>{children}</div>
+        <main id="main-content" className="mobile-content-safe flex-1 overflow-y-auto lg:pb-0" suppressHydrationWarning>
+          <div className="p-3 sm:p-5 lg:p-6" suppressHydrationWarning>{children}</div>
         </main>
 
         {/* Floating Mobile Bottom Navigation */}
-        <div className="lg:hidden fixed bottom-4 left-3 right-3 z-40 select-none">
-          <nav aria-label="Primary navigation" className="bg-[#1c1c1f]/95 backdrop-blur-2xl border border-[#303030] rounded-2xl shadow-[0_8px_32px_rgba(0,0,0,0.8)]">
-            <div className="flex items-center justify-around h-16 px-1.5">
+        <div className="mobile-nav-safe lg:hidden fixed left-4 right-4 z-40 select-none">
+          <nav aria-label="Primary navigation" className="bg-[#1f1f1f]/95 backdrop-blur-2xl border border-[#303030] rounded-[28px] shadow-[0_4px_24px_rgba(0,0,0,0.6)]">
+            <div className="flex items-center justify-around h-16 px-2">
               {mainNavTabs.map((tab) => {
                 const isActive = tab.exact ? pathname === tab.href : pathname.startsWith(tab.href);
                 const IconComp = tab.icon;
