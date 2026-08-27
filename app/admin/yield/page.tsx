@@ -290,7 +290,7 @@ export default function MeatYieldPage() {
         <Card className="lg:col-span-2 border-[#2e2e30] bg-[#1a1a1c] shadow-sm rounded-2xl">
           <CardHeader className="pb-2 flex flex-row items-center justify-between">
             <CardTitle className="text-sm font-bold text-white flex items-center gap-2">
-              <TrendingUp className="w-4 h-4 text-orange-500" />
+              <TrendingUp className="w-4 h-4 text-orange-400" />
               <span>Meat Efficiency per Batch</span>
             </CardTitle>
             <span className="text-xs font-mono text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20">
@@ -302,10 +302,27 @@ export default function MeatYieldPage() {
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={yieldChartData} barSize={28}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#2a2a2e" vertical={false} />
-                  <XAxis dataKey="name" stroke="#888" fontSize={11} tickLine={false} />
-                  <YAxis domain={[80, 100]} stroke="#888" fontSize={11} tickLine={false} tickFormatter={(val) => `${val}%`} />
+                  <XAxis dataKey="name" stroke="#71717a" fontSize={11} tickLine={false} />
+                  <YAxis domain={[80, 100]} stroke="#71717a" fontSize={11} tickLine={false} tickFormatter={(val) => `${val}%`} />
                   <Tooltip
-                    contentStyle={{ backgroundColor: "#141416", borderColor: "#2e2e30", borderRadius: "12px", fontSize: "12px", color: "#fff" }}
+                    cursor={{ fill: "rgba(255, 255, 255, 0.04)" }}
+                    contentStyle={{
+                      backgroundColor: "#161618",
+                      borderColor: "#333336",
+                      borderRadius: "12px",
+                      fontSize: "12px",
+                      color: "#ffffff",
+                      boxShadow: "0 8px 32px rgba(0,0,0,0.5)",
+                    }}
+                    itemStyle={{
+                      color: "#ffffff",
+                      fontWeight: 600,
+                    }}
+                    labelStyle={{
+                      color: "#f97316",
+                      fontWeight: 600,
+                      marginBottom: "4px",
+                    }}
                     formatter={(val: any) => [`${val}%`, "Efficiency"]}
                   />
                   <ReferenceLine y={92.0} stroke="#f59e0b" strokeDasharray="3 3" label={{ value: "Target 92%", fill: "#f59e0b", fontSize: 10, position: "top" }} />
@@ -321,10 +338,10 @@ export default function MeatYieldPage() {
         </Card>
 
         {/* Portion Mix Output */}
-        <Card className="border-[#303030] bg-[#1f1f1f]">
+        <Card className="border-[#2e2e30] bg-[#1a1a1c] shadow-sm rounded-2xl">
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-bold text-white flex items-center gap-2">
-              <Layers className="w-4 h-4 text-orange-500" />
+              <Layers className="w-4 h-4 text-orange-400" />
               <span>Portions Produced Breakdown</span>
             </CardTitle>
           </CardHeader>
@@ -340,7 +357,7 @@ export default function MeatYieldPage() {
                   <Tooltip
                     contentStyle={{
                       backgroundColor: "#161618",
-                      borderColor: "#383838",
+                      borderColor: "#333336",
                       borderRadius: "12px",
                       fontSize: "12px",
                       color: "#ffffff",
@@ -348,11 +365,11 @@ export default function MeatYieldPage() {
                     }}
                     itemStyle={{
                       color: "#ffffff",
-                      fontWeight: 700,
+                      fontWeight: 600,
                     }}
                     labelStyle={{
                       color: "#f97316",
-                      fontWeight: 700,
+                      fontWeight: 600,
                       marginBottom: "4px",
                     }}
                     formatter={(val: any) => [`${val} units`, "Produced"]}
@@ -360,11 +377,11 @@ export default function MeatYieldPage() {
                 </PieChart>
               </ResponsiveContainer>
             </div>
-            <div className="space-y-2 pt-2 border-t border-[#303030]">
+            <div className="space-y-2 pt-2 border-t border-[#2e2e30]">
               {portionData.map((item) => (
                 <div key={item.name} className="flex items-center gap-2 text-xs">
                   <span className="h-2 w-2 rounded-full shrink-0" style={{ backgroundColor: item.color }} />
-                  <span className="text-[#b8b8c5]/70">{item.name}</span>
+                  <span className="text-zinc-400">{item.name}</span>
                   <span className="font-bold text-white ml-auto font-mono">{item.value.toLocaleString()} units</span>
                 </div>
               ))}
@@ -374,34 +391,34 @@ export default function MeatYieldPage() {
       </div>
 
       {/* Row 3: Spit Batch History Table */}
-      <Card className="border-[#303030] bg-[#1f1f1f] overflow-hidden">
-        <CardHeader className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#303030] pb-4">
+      <Card className="border-[#2e2e30] bg-[#1a1a1c] shadow-sm rounded-2xl overflow-hidden">
+        <CardHeader className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#2e2e30] pb-4">
           <div>
             <CardTitle className="text-sm font-bold text-white flex items-center gap-2">
-              <Flame className="w-4 h-4 text-amber-500" />
+              <Flame className="w-4 h-4 text-orange-400" />
               <span>Batch Logs & Skewer Calibration Trail</span>
             </CardTitle>
-            <p className="text-xs text-[#b8b8c5]/60 mt-0.5">
+            <p className="text-xs text-zinc-400 mt-0.5">
               Historical batches loaded on roasters with temperature and yield flags
             </p>
           </div>
 
           <div className="flex flex-wrap items-center gap-2">
             <div className="relative w-48 sm:w-56">
-              <Search className="w-3.5 h-3.5 text-[#b8b8c5]/40 absolute left-2.5 top-1/2 -translate-y-1/2" />
+              <Search className="w-3.5 h-3.5 text-zinc-500 absolute left-2.5 top-1/2 -translate-y-1/2" />
               <input
                 type="text"
                 placeholder="Search batch, staff..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full h-8 pl-8 pr-3 rounded-lg bg-[#161618] border border-[#303030] text-xs text-white placeholder-[#b8b8c5]/40 focus:outline-none focus:border-amber-500"
+                className="w-full h-9 pl-8 pr-3 rounded-xl bg-[#141416] border border-[#2e2e30] text-xs text-white placeholder-zinc-500 focus:outline-none focus:border-orange-500"
               />
             </div>
 
             <select
               value={meatTypeFilter}
               onChange={(e) => setMeatTypeFilter(e.target.value)}
-              className="h-8 px-2 rounded-lg bg-[#161618] border border-[#303030] text-xs text-[#b8b8c5] focus:outline-none focus:border-amber-500"
+              className="h-9 px-3 rounded-xl bg-[#141416] border border-[#2e2e30] text-xs font-semibold text-zinc-300 focus:outline-none focus:border-orange-500 cursor-pointer"
             >
               <option value="all">All Meat Recipes</option>
               <option value="Chicken">Chicken</option>
@@ -413,7 +430,7 @@ export default function MeatYieldPage() {
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs border-collapse">
               <thead>
-                <tr className="border-b border-[#303030] bg-[#161618] text-[#b8b8c5]/60 font-bold uppercase tracking-wider text-[10px]">
+                <tr className="border-b border-[#2e2e30] bg-[#141416] text-zinc-400 font-bold uppercase tracking-wider text-[10px]">
                   <th className="py-3 px-4">Batch Number</th>
                   <th className="py-3 px-4">Outlet & Spit</th>
                   <th className="py-3 px-4">Recipe Blend</th>
@@ -424,7 +441,7 @@ export default function MeatYieldPage() {
                   <th className="py-3 px-4 text-right">Status</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-[#303030]">
+              <tbody className="divide-y divide-[#2e2e30]">
                 {displayedBatches.map((batch) => (
                   <tr key={batch.id} className="hover:bg-[#303030]/40 transition-colors">
                     <td className="py-3.5 px-4">

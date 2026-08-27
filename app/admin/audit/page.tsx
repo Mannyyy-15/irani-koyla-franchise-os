@@ -112,33 +112,33 @@ export default function AuditTrailPage() {
       </div>
 
       {/* Audit Log Timeline Card */}
-      <Card className="border-[#303030] bg-[#1f1f1f] overflow-hidden">
-        <CardHeader className="border-b border-[#303030] pb-3">
+      <Card className="border-[#2e2e30] bg-[#1a1a1c] shadow-sm rounded-2xl overflow-hidden">
+        <CardHeader className="border-b border-[#2e2e30] pb-3">
           <CardTitle className="text-sm font-bold text-white flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <Clock className="w-4 h-4 text-amber-500" />
+              <Clock className="w-4 h-4 text-orange-400" />
               <span>Recent Activity ({filteredLogs.length} Records)</span>
             </div>
-            <span className="text-[11px] text-[#b8b8c5]/50 font-mono">
+            <span className="text-[11px] text-zinc-500 font-mono">
               Live Record
             </span>
           </CardTitle>
         </CardHeader>
         <CardContent className="p-0">
-          <div className="divide-y divide-[#303030]">
+          <div className="divide-y divide-[#2e2e30]">
             {filteredLogs.map((log) => {
               const moduleIcon =
                 log.module === "Sales" ? <Receipt className="w-4 h-4 text-amber-400" /> :
                 log.module === "Yield" ? <Flame className="w-4 h-4 text-orange-400" /> :
                 log.module === "Royalty" ? <WalletCards className="w-4 h-4 text-emerald-400" /> :
-                <Store className="w-4 h-4 text-slate-400" />;
+                <Store className="w-4 h-4 text-zinc-400" />;
 
               return (
                 <div
                   key={log.id}
-                  className="p-4 sm:p-5 hover:bg-[#303030]/30 transition-colors flex items-start gap-3.5 text-xs"
+                  className="p-4 sm:p-5 hover:bg-[#222225]/40 transition-colors flex items-start gap-3.5 text-xs"
                 >
-                  <div className="w-8 h-8 rounded-xl bg-[#161618] border border-[#303030] flex items-center justify-center shrink-0 mt-0.5">
+                  <div className="w-8 h-8 rounded-xl bg-[#141416] border border-[#2e2e30] flex items-center justify-center shrink-0 mt-0.5">
                     {moduleIcon}
                   </div>
 
@@ -146,20 +146,21 @@ export default function AuditTrailPage() {
                     <div className="flex flex-wrap items-center justify-between gap-2">
                       <div className="flex items-center gap-2">
                         <span className="font-bold text-white text-xs">{log.action}</span>
-                        <span className="text-[10px] font-bold text-amber-400 bg-amber-500/10 px-2 py-0.2 rounded border border-amber-500/20">
+                        <span className="text-[10px] font-bold text-orange-400 bg-orange-500/10 px-2 py-0.5 rounded-md border border-orange-500/20">
                           {log.module === "Yield" ? "Meat" : log.module === "SupplyChain" ? "Stock" : log.module}
                         </span>
                       </div>
-                      <span className="text-[10px] text-[#b8b8c5]/50 font-mono">{log.timestamp}</span>
+                      <span className="text-[10px] text-zinc-500 font-mono">{log.timestamp}</span>
                     </div>
 
-                    <p className="text-[#b8b8c5]/80 text-xs leading-relaxed">
+                    <p className="text-zinc-300 text-xs leading-relaxed">
                       {log.details}
                     </p>
 
-                    <div className="flex items-center gap-3 pt-1 text-[10px] text-[#b8b8c5]/50 font-mono">
-                      <span>Outlet: <strong className="text-[#b8b8c5]">{log.outletName}</strong></span>
-                      <span>By: <strong className="text-[#b8b8c5]">{log.user} ({log.role})</strong></span>
+                    <div className="flex items-center gap-3 pt-1 text-[10px] text-zinc-500 font-mono">
+                      <span>Outlet: {log.outletName}</span>
+                      <span>•</span>
+                      <span>By: {log.user} ({log.role})</span>
                     </div>
                   </div>
                 </div>
