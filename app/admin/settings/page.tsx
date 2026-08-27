@@ -17,6 +17,12 @@ import {
   Bell,
   Printer,
   Smartphone,
+  Share2,
+  CreditCard,
+  Radio,
+  Check,
+  ExternalLink,
+  Key,
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
@@ -31,13 +37,15 @@ export default function SettingsPage() {
   const SECTIONS = isSuperAdmin
     ? [
         { key: "brand", label: "Brand HQ Profile", icon: Building2, desc: "Franchisor corporate identity, address & GSTIN" },
-        { key: "royalty", label: "Royalty & Billing Rules", icon: WalletCards, desc: "Standard 6.5% royalty, 2% marketing, invoice due days" },
+        { key: "royalty", label: "Royalty & Billing Rules", icon: WalletCards, desc: "Standard 5.0% royalty, 2% marketing, invoice due days" },
         { key: "meat_rules", label: "Meat & Yield Standards", icon: Flame, desc: "BOM portion grams, minimum yield % & temperature" },
+        { key: "integrations", label: "Zomato, Swiggy & Payment APIs", icon: Share2, desc: "Aggregator webhooks, POS auto-accept & Razorpay gateway" },
         { key: "database", label: "Database & Reset Data", icon: RefreshCcw, desc: "Clear demo data, test accounts & factory reset" },
       ]
     : [
         { key: "store_profile", label: "My Store Profile", icon: Store, desc: "Store address, contact numbers & UPI handle" },
         { key: "pos_settings", label: "POS Register & Thermal Print", icon: Printer, desc: "80mm printer, audio sound effects & register float" },
+        { key: "integrations", label: "Food Aggregators & UPI QR", icon: Share2, desc: "Zomato Merchant ID, Swiggy Store UUID & Soundbox" },
         { key: "database", label: "Reset Demo Data", icon: RefreshCcw, desc: "Reset live store session to fresh morning" },
       ];
 
@@ -63,6 +71,18 @@ export default function SettingsPage() {
   const [wrapMeatPortionGrams, setWrapMeatPortionGrams] = useState("85");
   const [jumboMeatPortionGrams, setJumboMeatPortionGrams] = useState("130");
   const [spitMinTemp, setSpitMinTemp] = useState("75.0");
+
+  // Integrations states (Aggregators & Payment Gateways)
+  const [zomatoWebhookEnabled, setZomatoWebhookEnabled] = useState(true);
+  const [zomatoAutoAccept, setZomatoAutoAccept] = useState(true);
+  const [zomatoApiKey, setZomatoApiKey] = useState("zm_live_koyla_88492019a");
+  const [swiggyWebhookEnabled, setSwiggyWebhookEnabled] = useState(true);
+  const [swiggyAutoAccept, setSwiggyAutoAccept] = useState(true);
+  const [swiggyPartnerId, setSwiggyPartnerId] = useState("swg_ptr_irani_99201");
+  const [magicpinEnabled, setMagicpinEnabled] = useState(false);
+  const [razorpayKeyId, setRazorpayKeyId] = useState("rzp_live_9482910482");
+  const [razorpaySecret, setRazorpaySecret] = useState("••••••••••••••••••••••••");
+  const [paytmSoundboxLinked, setPaytmSoundboxLinked] = useState(true);
 
   // Franchisee Store Settings states
   const [storeName, setStoreName] = useState(activeOutlet?.name || "Mohak City Branch");
@@ -453,6 +473,153 @@ export default function SettingsPage() {
                     />
                   </div>
                 </>
+              )}
+
+              {/* SHARED SECTION: INTEGRATIONS & AGGREGATOR APIS */}
+              {active === "integrations" && (
+                <div className="space-y-4">
+                  {/* Zomato Integration Box */}
+                  <div className="p-4.5 rounded-2xl bg-[#141416] border border-[#2e2e30] space-y-3">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2.5">
+                        <div className="w-8 h-8 rounded-xl bg-red-500/10 border border-red-500/30 flex items-center justify-center text-red-400 font-black text-xs">
+                          Z
+                        </div>
+                        <div>
+                          <span className="text-xs font-bold text-white block">Zomato Food Delivery Gateway</span>
+                          <span className="text-[10px] text-zinc-400 block">Live Webhook: `/api/webhooks/zomato`</span>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center gap-2">
+                        <span className="text-[10px] font-mono text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded-full font-bold">
+                          ● Connected
+                        </span>
+                        <input
+                          type="checkbox"
+                          checked={zomatoWebhookEnabled}
+                          onChange={(e) => setZomatoWebhookEnabled(e.target.checked)}
+                          className="w-4 h-4 accent-orange-600 rounded cursor-pointer"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+                      <div>
+                        <label className="block text-[10px] font-bold text-zinc-400 uppercase tracking-wider mb-1">
+                          Merchant / API Key
+                        </label>
+                        <input
+                          type="text"
+                          value={zomatoApiKey}
+                          onChange={(e) => setZomatoApiKey(e.target.value)}
+                          className="w-full h-9 rounded-xl border border-[#2e2e30] bg-[#1a1a1c] px-3 text-xs font-mono text-zinc-300 focus:outline-none focus:border-orange-500"
+                        />
+                      </div>
+                      <div className="flex items-center justify-between p-2.5 rounded-xl bg-[#1a1a1c] border border-[#2e2e30] mt-auto">
+                        <span className="text-xs text-zinc-300">Auto-Accept Orders & Send to KOT</span>
+                        <input
+                          type="checkbox"
+                          checked={zomatoAutoAccept}
+                          onChange={(e) => setZomatoAutoAccept(e.target.checked)}
+                          className="w-4 h-4 accent-orange-600 rounded cursor-pointer"
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Swiggy Integration Box */}
+                  <div className="p-4.5 rounded-2xl bg-[#141416] border border-[#2e2e30] space-y-3">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2.5">
+                        <div className="w-8 h-8 rounded-xl bg-orange-500/10 border border-orange-500/30 flex items-center justify-center text-orange-400 font-black text-xs">
+                          S
+                        </div>
+                        <div>
+                          <span className="text-xs font-bold text-white block">Swiggy Partner Store API</span>
+                          <span className="text-[10px] text-zinc-400 block">Live Webhook: `/api/webhooks/swiggy`</span>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center gap-2">
+                        <span className="text-[10px] font-mono text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded-full font-bold">
+                          ● Connected
+                        </span>
+                        <input
+                          type="checkbox"
+                          checked={swiggyWebhookEnabled}
+                          onChange={(e) => setSwiggyWebhookEnabled(e.target.checked)}
+                          className="w-4 h-4 accent-orange-600 rounded cursor-pointer"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+                      <div>
+                        <label className="block text-[10px] font-bold text-zinc-400 uppercase tracking-wider mb-1">
+                          Partner Outlet UUID
+                        </label>
+                        <input
+                          type="text"
+                          value={swiggyPartnerId}
+                          onChange={(e) => setSwiggyPartnerId(e.target.value)}
+                          className="w-full h-9 rounded-xl border border-[#2e2e30] bg-[#1a1a1c] px-3 text-xs font-mono text-zinc-300 focus:outline-none focus:border-orange-500"
+                        />
+                      </div>
+                      <div className="flex items-center justify-between p-2.5 rounded-xl bg-[#1a1a1c] border border-[#2e2e30] mt-auto">
+                        <span className="text-xs text-zinc-300">Auto-Generate Rider Handover OTP</span>
+                        <input
+                          type="checkbox"
+                          checked={swiggyAutoAccept}
+                          onChange={(e) => setSwiggyAutoAccept(e.target.checked)}
+                          className="w-4 h-4 accent-orange-600 rounded cursor-pointer"
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Payment Gateway (Razorpay / UPI Soundbox) */}
+                  <div className="p-4.5 rounded-2xl bg-[#141416] border border-[#2e2e30] space-y-3">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2.5">
+                        <div className="w-8 h-8 rounded-xl bg-blue-500/10 border border-blue-500/30 flex items-center justify-center text-blue-400">
+                          <CreditCard className="w-4 h-4" />
+                        </div>
+                        <div>
+                          <span className="text-xs font-bold text-white block">Payment Gateway (Razorpay & Soundbox)</span>
+                          <span className="text-[10px] text-zinc-400 block">Dynamic QR code generation & instant payment settlement</span>
+                        </div>
+                      </div>
+
+                      <span className="text-[10px] font-mono text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded-full font-bold">
+                        ● Production Ready
+                      </span>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+                      <div>
+                        <label className="block text-[10px] font-bold text-zinc-400 uppercase tracking-wider mb-1">
+                          Razorpay Key ID
+                        </label>
+                        <input
+                          type="text"
+                          value={razorpayKeyId}
+                          onChange={(e) => setRazorpayKeyId(e.target.value)}
+                          className="w-full h-9 rounded-xl border border-[#2e2e30] bg-[#1a1a1c] px-3 text-xs font-mono text-blue-400 focus:outline-none focus:border-orange-500"
+                        />
+                      </div>
+                      <div className="flex items-center justify-between p-2.5 rounded-xl bg-[#1a1a1c] border border-[#2e2e30] mt-auto">
+                        <span className="text-xs text-zinc-300">Paytm / PhonePe Soundbox Voice Alert</span>
+                        <input
+                          type="checkbox"
+                          checked={paytmSoundboxLinked}
+                          onChange={(e) => setPaytmSoundboxLinked(e.target.checked)}
+                          className="w-4 h-4 accent-orange-600 rounded cursor-pointer"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
               )}
 
               {/* SHARED SECTION: DATABASE & RESET DEMO DATA */}
