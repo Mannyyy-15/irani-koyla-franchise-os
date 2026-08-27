@@ -38,6 +38,28 @@ export default function AuditTrailPage() {
     return matchModule && matchSearch;
   });
 
+  const exportActivityLogToCsv = () => {
+    const headers = ["Timestamp", "Module", "Action", "Outlet Name", "User", "Role", "Details"];
+    const rows = filteredLogs.map((l) => [
+      `"${l.timestamp}"`,
+      l.module,
+      `"${l.action}"`,
+      `"${l.outletName}"`,
+      `"${l.user}"`,
+      `"${l.role}"`,
+      `"${l.details.replace(/"/g, '""')}"`,
+    ]);
+
+    const csvContent = "data:text/csv;charset=utf-8," + [headers.join(","), ...rows.map((e) => e.join(","))].join("\n");
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", `irani_koyla_activity_log_${new Date().toISOString().slice(0, 10)}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -47,6 +69,15 @@ export default function AuditTrailPage() {
             Activity Log
           </h1>
         </div>
+
+        <Button
+          variant="outline"
+          onClick={exportActivityLogToCsv}
+          className="border-[#2e2e30] bg-[#1a1a1c] hover:bg-[#252528] text-zinc-300 hover:text-white font-bold text-xs h-10 px-3.5 rounded-xl gap-1.5 shadow-sm cursor-pointer"
+        >
+          <FilePieChart className="w-4 h-4 text-orange-400" />
+          <span>Export CSV</span>
+        </Button>
       </div>
 
       {/* Filter Bar */}

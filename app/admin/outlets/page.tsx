@@ -428,6 +428,33 @@ For central commissary refills or support, contact HQ Operations.
 
   const dossierBatches = meatBatches.filter((b) => b.outletId === selectedDossierOutlet?.id);
 
+  const exportOutletsToCsv = () => {
+    const headers = ["Code", "Outlet Name", "City", "Area", "Status", "Owner Name", "Phone", "Today Sales (INR)", "Today Wraps", "Spit Yield %", "Active Spits", "Royalty Rate %"];
+    const rows = filteredOutlets.map((o) => [
+      o.code,
+      `"${o.name}"`,
+      `"${o.city}"`,
+      `"${o.area}"`,
+      o.status,
+      `"${o.ownerName}"`,
+      `"${o.ownerPhone}"`,
+      o.currentDaySales,
+      o.currentDayWraps,
+      o.spitEfficiency,
+      o.activeSpits,
+      o.royaltyRatePercent,
+    ]);
+
+    const csvContent = "data:text/csv;charset=utf-8," + [headers.join(","), ...rows.map((e) => e.join(","))].join("\n");
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", `irani_koyla_outlets_${new Date().toISOString().slice(0, 10)}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   return (
     <div className="space-y-6">
       {/* Toast Notification */}
@@ -447,12 +474,21 @@ For central commissary refills or support, contact HQ Operations.
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-1">
         <div>
           <h1 className="text-2xl font-bold text-white tracking-tight">
-            {isSuperAdmin ? "Franchise Outlets" : activeOutlet?.name || "Store Profile"}
+            {isSuperAdmin ? "Outlets" : activeOutlet?.name || "Store Profile"}
           </h1>
         </div>
 
         {isSuperAdmin && (
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-wrap">
+            <Button
+              variant="outline"
+              onClick={exportOutletsToCsv}
+              className="border-[#2e2e30] bg-[#1a1a1c] hover:bg-[#252528] text-zinc-300 hover:text-white font-bold text-xs h-10 px-3.5 rounded-xl gap-1.5 shadow-sm cursor-pointer"
+            >
+              <FileText className="w-4 h-4 text-orange-400" />
+              <span>Export CSV</span>
+            </Button>
+
             <Link href="/admin/outlets/new">
               <Button
                 className="bg-orange-600 hover:bg-orange-500 text-white font-bold text-xs rounded-xl gap-2 h-10 px-4 cursor-pointer"

@@ -130,23 +130,63 @@ export default function MeatYieldPage() {
     setShowAddModal(false);
   };
 
+  const exportBatchesToCsv = () => {
+    const headers = ["Batch Number", "Date", "Outlet Name", "Meat Type", "Spit ID", "Time Loaded", "Raw Meat (kg)", "Marination Loss (kg)", "Mounted Weight (kg)", "Cooked Weight (kg)", "Wraps Produced", "Waste Scraps (kg)", "Actual Yield %", "Logged By"];
+    const rows = filteredMeatBatches.map((b) => [
+      b.batchNumber,
+      b.date,
+      `"${b.outletName}"`,
+      `"${b.meatType}"`,
+      `"${b.spitId}"`,
+      b.timeLoaded,
+      b.rawMeatReceivedKg,
+      b.marinationLossKg,
+      b.skewerWeightKg,
+      b.cookedWeightKg,
+      b.wrapsProduced + b.jumboWrapsProduced,
+      b.wasteScrapsKg,
+      b.actualYieldPercent,
+      `"${b.loggedBy}"`,
+    ]);
+
+    const csvContent = "data:text/csv;charset=utf-8," + [headers.join(","), ...rows.map((e) => e.join(","))].join("\n");
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", `irani_koyla_meat_yield_${new Date().toISOString().slice(0, 10)}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   return (
     <div className="space-y-6">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold text-white tracking-tight">
-            Meat Yield & Spits
+            Meat & Spits
           </h1>
         </div>
 
-        <Button
-          onClick={() => setShowAddModal(true)}
-          className="bg-orange-600 hover:bg-orange-500 text-white font-bold text-xs h-10 px-4 rounded-xl gap-2 shadow-md self-start sm:self-auto cursor-pointer"
-        >
-          <Plus className="w-4 h-4" />
-          <span>Log Batch</span>
-        </Button>
+        <div className="flex items-center gap-2 flex-wrap">
+          <Button
+            variant="outline"
+            onClick={exportBatchesToCsv}
+            className="border-[#2e2e30] bg-[#1a1a1c] hover:bg-[#252528] text-zinc-300 hover:text-white font-bold text-xs h-10 px-3.5 rounded-xl gap-1.5 shadow-sm cursor-pointer"
+          >
+            <Scale className="w-4 h-4 text-orange-400" />
+            <span>Download CSV</span>
+          </Button>
+
+          <Button
+            onClick={() => setShowAddModal(true)}
+            className="bg-orange-600 hover:bg-orange-500 text-white font-bold text-xs h-10 px-4 rounded-xl gap-2 shadow-md cursor-pointer"
+          >
+            <Plus className="w-4 h-4" />
+            <span>Log Batch</span>
+          </Button>
+        </div>
       </div>
 
       {/* KPI Cards */}

@@ -119,6 +119,36 @@ export default function DailySalesPage() {
     );
   });
 
+  const exportToCsv = () => {
+    const headers = ["Shift ID", "Date", "Shift Type", "Outlet Name", "Cashier", "Gross Sales", "UPI Sales", "Cash Sales Expected", "Cash in Drawer Counted", "Variance", "Petty Cash", "Zomato Sales", "Swiggy Sales", "Discounts", "Net Revenue"];
+    const rows = filteredShifts.map((s) => [
+      s.id,
+      s.date,
+      `"${s.shiftType}"`,
+      `"${s.outletName}"`,
+      `"${s.cashierName}"`,
+      s.totalGrossSales,
+      s.upiSales,
+      s.cashSalesExpected,
+      s.cashInDrawerActual,
+      s.cashDifference,
+      s.pettyCashExpenses,
+      s.zomatoSales,
+      s.swiggySales,
+      s.discountsGiven,
+      s.netRevenue,
+    ]);
+
+    const csvContent = "data:text/csv;charset=utf-8," + [headers.join(","), ...rows.map((e) => e.join(","))].join("\n");
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", `irani_koyla_sales_shifts_${new Date().toISOString().slice(0, 10)}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -129,13 +159,24 @@ export default function DailySalesPage() {
           </h1>
         </div>
 
-        <Button
-          onClick={() => setShowShiftModal(true)}
-          className="bg-orange-600 hover:bg-orange-500 text-white font-bold text-xs h-10 px-4 rounded-xl gap-2 shadow-md self-start sm:self-auto cursor-pointer"
-        >
-          <Plus className="w-4 h-4" />
-          <span>Close Shift</span>
-        </Button>
+        <div className="flex items-center gap-2 flex-wrap">
+          <Button
+            variant="outline"
+            onClick={exportToCsv}
+            className="border-[#2e2e30] bg-[#1a1a1c] hover:bg-[#252528] text-zinc-300 hover:text-white font-bold text-xs h-10 px-3.5 rounded-xl gap-1.5 shadow-sm cursor-pointer"
+          >
+            <FileText className="w-4 h-4 text-orange-400" />
+            <span>Download CSV</span>
+          </Button>
+
+          <Button
+            onClick={() => setShowShiftModal(true)}
+            className="bg-orange-600 hover:bg-orange-500 text-white font-bold text-xs h-10 px-4 rounded-xl gap-2 shadow-md cursor-pointer"
+          >
+            <Plus className="w-4 h-4" />
+            <span>Close Shift</span>
+          </Button>
+        </div>
       </div>
 
       {/* KPI Cards */}

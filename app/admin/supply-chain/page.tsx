@@ -284,6 +284,34 @@ export default function SupplyChainPage() {
   const dispatchedCount = supplyOrders.filter((o) => o.status === "dispatched").length;
   const deliveredCount = supplyOrders.filter((o) => o.status === "delivered").length;
 
+  // CSV Export
+  const exportSupplyOrdersToCsv = () => {
+    const headers = ["Order Number", "Outlet Code", "Outlet Name", "Status", "Urgency", "Items Summary", "Total Units", "Total Amount (INR)", "Created Date", "Required Date", "Tracking Number", "Driver"];
+    const rows = filteredOrders.map((o) => [
+      o.orderNumber,
+      o.outletCode,
+      `"${o.outletName}"`,
+      o.status,
+      `"${o.urgency}"`,
+      `"${o.items.map((i) => `${i.quantity}x ${i.itemName}`).join("; ")}"`,
+      o.totalQuantity,
+      o.totalAmount,
+      `"${o.createdAt}"`,
+      o.requestedDeliveryDate,
+      o.trackingNumber || "N/A",
+      `"${o.driverDetails || "N/A"}"`,
+    ]);
+
+    const csvContent = "data:text/csv;charset=utf-8," + [headers.join(","), ...rows.map((e) => e.join(","))].join("\n");
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", `irani_koyla_stock_orders_${new Date().toISOString().slice(0, 10)}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   return (
     <div className="space-y-6">
       {/* ── HEADER ──────────────────────────────────────────────────────── */}
@@ -291,7 +319,7 @@ export default function SupplyChainPage() {
         <div>
           <h1 className="text-2xl font-bold text-white tracking-tight flex items-center gap-2.5">
             <Truck className="w-6 h-6 text-orange-500" />
-            <span>Supply Chain & Stock Orders</span>
+            <span>Stock & Supplies</span>
           </h1>
         </div>
 
@@ -332,6 +360,15 @@ export default function SupplyChainPage() {
                   <span>Cold Fleet & Dispatch</span>
                 </button>
               </div>
+
+              <Button
+                variant="outline"
+                onClick={exportSupplyOrdersToCsv}
+                className="border-[#2e2e30] bg-[#1a1a1c] hover:bg-[#252528] text-zinc-300 hover:text-white font-bold text-xs h-9 px-3 rounded-xl gap-1.5 shadow-sm cursor-pointer"
+              >
+                <FileText className="w-3.5 h-3.5 text-orange-400" />
+                <span>Export CSV</span>
+              </Button>
 
               <Button
                 onClick={() => setShowManualDispatchModal(true)}

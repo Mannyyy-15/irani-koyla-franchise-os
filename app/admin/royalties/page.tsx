@@ -50,6 +50,33 @@ export default function RoyaltiesPage() {
     setDisputeReason("");
   };
 
+  const exportRoyaltiesToCsv = () => {
+    const headers = ["Invoice #", "Month", "Outlet Name", "Gross Sales", "Royalty Rate %", "Royalty Amount", "Marketing Fee", "Supply Cost", "GST Amount", "Total Payable", "Status", "Due Date"];
+    const rows = filteredRoyalties.map((r) => [
+      r.invoiceNumber,
+      `"${r.month}"`,
+      `"${r.outletName}"`,
+      r.grossSales,
+      r.royaltyRatePercent,
+      r.royaltyAmount,
+      r.marketingFeeAmount,
+      r.centralKitchenSupplyCost,
+      r.gstAmount,
+      r.totalPayable,
+      r.status,
+      r.dueDate,
+    ]);
+
+    const csvContent = "data:text/csv;charset=utf-8," + [headers.join(","), ...rows.map((e) => e.join(","))].join("\n");
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", `irani_koyla_royalties_${new Date().toISOString().slice(0, 10)}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -59,6 +86,15 @@ export default function RoyaltiesPage() {
             Royalties
           </h1>
         </div>
+
+        <Button
+          variant="outline"
+          onClick={exportRoyaltiesToCsv}
+          className="border-[#2e2e30] bg-[#1a1a1c] hover:bg-[#252528] text-zinc-300 hover:text-white font-bold text-xs h-10 px-3.5 rounded-xl gap-1.5 shadow-sm cursor-pointer"
+        >
+          <FileText className="w-4 h-4 text-orange-400" />
+          <span>Download CSV</span>
+        </Button>
       </div>
 
       {/* KPI Metrics */}
