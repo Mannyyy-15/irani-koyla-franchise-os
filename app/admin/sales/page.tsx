@@ -31,7 +31,17 @@ import { cn } from "@/components/ui/cn";
 import { ShiftRegister } from "@/lib/mock-data";
 
 export default function DailySalesPage() {
-  const { filteredShifts, outlets, closeShift, selectedOutletId, setSelectedOutletId, role, activeOutlet } = useFranchise();
+  const {
+    filteredShifts,
+    outlets,
+    closeShift,
+    selectedOutletId,
+    setSelectedOutletId,
+    role,
+    activeOutlet,
+    dailySession,
+    outletTenderTotals,
+  } = useFranchise();
   const isSuperAdmin = role === "SUPER_ADMIN";
   const [showShiftModal, setShowShiftModal] = useState(false);
   const [selectedShiftView, setSelectedShiftView] = useState<ShiftRegister | null>(null);
@@ -267,86 +277,100 @@ export default function DailySalesPage() {
         </Card>
       </div>
 
-      {/* Row 2: Shift Cards (Morning vs Evening) */}
+      {/* Row 2: Live Register & Shift Status Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {/* Morning Shift */}
-        <div className="p-5 rounded-2xl bg-[#1f1f1f] border border-[#303030] space-y-3">
+        {/* Active Register Session */}
+        <div className="p-5 rounded-2xl bg-[#1a1a1c] border border-orange-500/30 space-y-3">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <Clock className="w-4 h-4 text-amber-500" />
-              <span className="font-bold text-white text-sm">Morning Shift (11:00 AM – 05:00 PM)</span>
+              <Clock className="w-4 h-4 text-orange-400 animate-pulse" />
+              <span className="font-bold text-white text-sm">
+                Active Store Register Session ({dailySession?.openedAt || "10:30 AM"} – Live)
+              </span>
             </div>
-            <span className="text-[10px] font-bold text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded-full">
-              Reconciled
+            <span className="text-[10px] font-bold text-orange-400 bg-orange-500/10 border border-orange-500/20 px-2.5 py-0.5 rounded-full font-mono">
+              ● {dailySession?.status === "OPEN" ? "POS Live / Open" : "Closed"}
             </span>
           </div>
 
-          <div className="grid grid-cols-3 gap-2 pt-2 border-t border-[#303030] text-xs">
+          <div className="grid grid-cols-3 gap-2 pt-2 border-t border-[#2e2e30] text-xs">
             <div>
-              <span className="text-[10px] text-[#b8b8c5]/60 block">Cashier</span>
-              <span className="font-bold text-white">Imran Shaikh</span>
+              <span className="text-[10px] text-zinc-500 block font-semibold">Active Cashier</span>
+              <span className="font-bold text-white truncate block">
+                {dailySession?.cashierName || activeOutlet?.managerName || "Counter Terminal"}
+              </span>
             </div>
             <div>
-              <span className="text-[10px] text-[#b8b8c5]/60 block">Gross Sales</span>
-              <span className="font-bold text-white font-mono">₹68,500</span>
+              <span className="text-[10px] text-zinc-500 block font-semibold">Today Live Sales</span>
+              <span className="font-bold text-orange-400 font-mono">
+                ₹{(outletTenderTotals?.totalGrossRevenue || totalGross).toLocaleString("en-IN")}
+              </span>
             </div>
             <div>
-              <span className="text-[10px] text-[#b8b8c5]/60 block">Cash Discrepancy</span>
-              <span className="font-bold text-emerald-400 font-mono">₹0.00 (Zero)</span>
+              <span className="text-[10px] text-zinc-500 block font-semibold">Drawer Float</span>
+              <span className="font-bold text-emerald-400 font-mono">
+                ₹{(dailySession?.openingFloat || 2000).toLocaleString("en-IN")}
+              </span>
             </div>
           </div>
         </div>
 
-        {/* Evening Shift */}
-        <div className="p-5 rounded-2xl bg-[#1f1f1f] border border-amber-500/30 space-y-3">
+        {/* Reconciled Shifts Summary */}
+        <div className="p-5 rounded-2xl bg-[#1a1a1c] border border-[#2e2e30] space-y-3">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <Clock className="w-4 h-4 text-orange-500 animate-pulse" />
-              <span className="font-bold text-white text-sm">Evening Shift (05:00 PM – 01:00 AM)</span>
+              <ShieldCheck className="w-4 h-4 text-emerald-400" />
+              <span className="font-bold text-white text-sm">Shift Reconciliation Status</span>
             </div>
-            <span className="text-[10px] font-bold text-amber-400 bg-amber-500/10 border border-amber-500/20 px-2 py-0.5 rounded-full">
-              Live / In Progress
+            <span className="text-[10px] font-bold text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2.5 py-0.5 rounded-full">
+              {filteredShifts.length} Shift{filteredShifts.length !== 1 ? "s" : ""} Logged
             </span>
           </div>
 
-          <div className="grid grid-cols-3 gap-2 pt-2 border-t border-[#303030] text-xs">
+          <div className="grid grid-cols-3 gap-2 pt-2 border-t border-[#2e2e30] text-xs">
             <div>
-              <span className="text-[10px] text-[#b8b8c5]/60 block">Active Cashier</span>
-              <span className="font-bold text-white">Sameer Khan</span>
+              <span className="text-[10px] text-zinc-500 block font-semibold">Reconciled Revenue</span>
+              <span className="font-bold text-white font-mono">
+                ₹{totalGross.toLocaleString("en-IN")}
+              </span>
             </div>
             <div>
-              <span className="text-[10px] text-[#b8b8c5]/60 block">Running Sales</span>
-              <span className="font-bold text-amber-400 font-mono">₹48,750</span>
+              <span className="text-[10px] text-zinc-500 block font-semibold">Net Cash Reconciled</span>
+              <span className="font-bold text-emerald-400 font-mono">
+                ₹{totalCash.toLocaleString("en-IN")}
+              </span>
             </div>
             <div>
-              <span className="text-[10px] text-[#b8b8c5]/60 block">Drawer Float</span>
-              <span className="font-bold text-white font-mono">₹5,000</span>
+              <span className="text-[10px] text-zinc-500 block font-semibold">Total Variances</span>
+              <span className="font-bold text-zinc-300 font-mono">
+                ₹{filteredShifts.reduce((acc, s) => acc + Math.abs(s.cashDifference), 0).toLocaleString("en-IN")}
+              </span>
             </div>
           </div>
         </div>
       </div>
 
       {/* Row 3: Reconciled Shift Register Archive */}
-      <Card className="border-[#303030] bg-[#1f1f1f] overflow-hidden">
-        <CardHeader className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#303030] pb-4">
+      <Card className="border-[#2e2e30] bg-[#1a1a1c] rounded-2xl overflow-hidden shadow-sm">
+        <CardHeader className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#2e2e30] pb-4">
           <div>
             <CardTitle className="text-sm font-bold text-white flex items-center gap-2">
-              <FileText className="w-4 h-4 text-amber-500" />
+              <FileText className="w-4 h-4 text-orange-400" />
               <span>Shift Register Reconciliation Logs</span>
             </CardTitle>
-            <p className="text-xs text-[#b8b8c5]/60 mt-0.5">
+            <p className="text-xs text-zinc-400 mt-0.5">
               Closed shift statements with cash differences and variance audits
             </p>
           </div>
 
           <div className="relative w-48 sm:w-56">
-            <Search className="w-3.5 h-3.5 text-[#b8b8c5]/40 absolute left-2.5 top-1/2 -translate-y-1/2" />
+            <Search className="w-3.5 h-3.5 text-zinc-500 absolute left-2.5 top-1/2 -translate-y-1/2" />
             <input
               type="text"
               placeholder="Search shift, date..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full h-8 pl-8 pr-3 rounded-lg bg-[#161618] border border-[#303030] text-xs text-white placeholder-[#b8b8c5]/40 focus:outline-none focus:border-amber-500"
+              className="w-full h-8 pl-8 pr-3 rounded-xl bg-[#141416] border border-[#2e2e30] text-xs text-white placeholder-zinc-500 focus:outline-none focus:border-orange-500"
             />
           </div>
         </CardHeader>
@@ -354,7 +378,7 @@ export default function DailySalesPage() {
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs border-collapse">
               <thead>
-                <tr className="border-b border-[#303030] bg-[#161618] text-[#b8b8c5]/60 font-bold uppercase tracking-wider text-[10px]">
+                <tr className="border-b border-[#2e2e30] bg-[#141416] text-zinc-400 font-bold uppercase tracking-wider text-[10px]">
                   <th className="py-3 px-4">Date & Shift</th>
                   <th className="py-3 px-4">Outlet & Cashier</th>
                   <th className="py-3 px-4">Gross Sales</th>
@@ -364,49 +388,59 @@ export default function DailySalesPage() {
                   <th className="py-3 px-4 text-right">Statement</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-[#303030]">
-                {displayedShifts.map((shift) => (
-                  <tr key={shift.id} className="hover:bg-[#303030]/40 transition-colors">
-                    <td className="py-3.5 px-4">
-                      <span className="font-bold text-white block">{shift.date}</span>
-                      <span className="text-[10px] text-[#b8b8c5]/50">{shift.shiftType}</span>
-                    </td>
-                    <td className="py-3.5 px-4">
-                      <span className="font-bold text-white block">{shift.outletName}</span>
-                      <span className="text-[10px] text-[#b8b8c5]/60">{shift.cashierName}</span>
-                    </td>
-                    <td className="py-3.5 px-4 font-black text-white font-mono">
-                      ₹{shift.totalGrossSales.toLocaleString("en-IN")}
-                    </td>
-                    <td className="py-3.5 px-4 text-blue-400 font-mono font-bold">
-                      ₹{shift.upiSales.toLocaleString("en-IN")}
-                    </td>
-                    <td className="py-3.5 px-4 text-emerald-400 font-mono font-bold">
-                      ₹{shift.cashInDrawerActual.toLocaleString("en-IN")}
-                    </td>
-                    <td className="py-3.5 px-4">
-                      <span className={cn(
-                        "px-2 py-0.5 rounded font-mono font-bold text-[10px]",
-                        shift.cashDifference === 0
-                          ? "text-emerald-400 bg-emerald-500/10"
-                          : "text-rose-400 bg-rose-500/10"
-                      )}>
-                        {shift.cashDifference === 0 ? "₹0.00 Reconciled" : `₹${shift.cashDifference > 0 ? "+" : ""}${shift.cashDifference}`}
-                      </span>
-                    </td>
-                    <td className="py-3.5 px-4 text-right">
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        onClick={() => setSelectedShiftView(shift)}
-                        className="text-xs text-amber-400 hover:text-amber-300 font-bold gap-1"
-                      >
-                        <FileText className="w-3.5 h-3.5" />
-                        <span>View Statement</span>
-                      </Button>
+              <tbody className="divide-y divide-[#2e2e30]">
+                {displayedShifts.length === 0 ? (
+                  <tr>
+                    <td colSpan={7} className="py-12 text-center text-zinc-500">
+                      <FileText className="w-8 h-8 text-zinc-600 mx-auto mb-2 opacity-50" />
+                      <p className="text-xs font-semibold text-zinc-400">No shift registers closed yet</p>
+                      <p className="text-[11px] text-zinc-600 mt-0.5">Click "+ Close Shift" or complete a store shift from the POS terminal.</p>
                     </td>
                   </tr>
-                ))}
+                ) : (
+                  displayedShifts.map((shift) => (
+                    <tr key={shift.id} className="hover:bg-[#222226] transition-colors">
+                      <td className="py-3.5 px-4">
+                        <span className="font-bold text-white block">{shift.date}</span>
+                        <span className="text-[10px] text-zinc-500">{shift.shiftType}</span>
+                      </td>
+                      <td className="py-3.5 px-4">
+                        <span className="font-bold text-white block">{shift.outletName}</span>
+                        <span className="text-[10px] text-zinc-400">{shift.cashierName}</span>
+                      </td>
+                      <td className="py-3.5 px-4 font-black text-white font-mono">
+                        ₹{shift.totalGrossSales.toLocaleString("en-IN")}
+                      </td>
+                      <td className="py-3.5 px-4 text-blue-400 font-mono font-bold">
+                        ₹{shift.upiSales.toLocaleString("en-IN")}
+                      </td>
+                      <td className="py-3.5 px-4 text-emerald-400 font-mono font-bold">
+                        ₹{shift.cashInDrawerActual.toLocaleString("en-IN")}
+                      </td>
+                      <td className="py-3.5 px-4">
+                        <span className={cn(
+                          "px-2 py-0.5 rounded font-mono font-bold text-[10px]",
+                          shift.cashDifference === 0
+                            ? "text-emerald-400 bg-emerald-500/10"
+                            : "text-rose-400 bg-rose-500/10"
+                        )}>
+                          {shift.cashDifference === 0 ? "₹0.00 Reconciled" : `₹${shift.cashDifference > 0 ? "+" : ""}${shift.cashDifference}`}
+                        </span>
+                      </td>
+                      <td className="py-3.5 px-4 text-right">
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={() => setSelectedShiftView(shift)}
+                          className="text-xs text-orange-400 hover:text-orange-300 font-bold gap-1 cursor-pointer"
+                        >
+                          <FileText className="w-3.5 h-3.5" />
+                          <span>View Statement</span>
+                        </Button>
+                      </td>
+                    </tr>
+                  ))
+                )}
               </tbody>
             </table>
           </div>
