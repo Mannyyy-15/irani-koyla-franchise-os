@@ -106,7 +106,7 @@ function LoginForm() {
         targetOutlet = "all";
       } else {
         targetRole = "FRANCHISE_OWNER";
-        const matchedOutlet = INITIAL_OUTLETS.find(
+        const matchedOutlet = outlets.find(
           (o) =>
             (o.loginEmail && o.loginEmail.toLowerCase() === cleanEmail) ||
             cleanEmail.includes(o.id) ||
@@ -115,7 +115,7 @@ function LoginForm() {
             (cleanEmail.includes("bandra") && o.id === "bandra-west") ||
             (cleanEmail.includes("andheri") && o.id === "andheri-east")
         );
-        targetOutlet = matchedOutlet ? matchedOutlet.id : "mohak-city";
+        targetOutlet = matchedOutlet ? matchedOutlet.id : (outlets[0]?.id || "mohak-city");
       }
 
       await mockLoginAction(targetRole);
