@@ -61,7 +61,8 @@ interface DayRecord {
 }
 
 export default function MonthlyOverviewPage() {
-  const { activeOutlet, outlets, liveOrders, shifts, meatBatches } = useFranchise();
+  const { activeOutlet, outlets, liveOrders, shifts, meatBatches, role, selectedOutletId, setSelectedOutletId } = useFranchise();
+  const isSuperAdmin = role === "SUPER_ADMIN";
   const outletName = activeOutlet?.name || outlets[0]?.name || "All Franchise Hubs";
   const outletCode = activeOutlet?.code || outlets[0]?.code || "IK-HQ-01";
 
@@ -237,7 +238,26 @@ export default function MonthlyOverviewPage() {
         </div>
 
         {/* Right Header Action Group */}
-        <div className="flex items-center gap-2 flex-wrap">
+        <div className="flex items-center gap-2.5 flex-wrap">
+          {/* Super Admin In-Page Outlet Filter */}
+          {isSuperAdmin && (
+            <div className="relative">
+              <select
+                value={selectedOutletId}
+                onChange={(e) => setSelectedOutletId(e.target.value)}
+                className="appearance-none bg-[#1a1a1c] border border-orange-500/40 hover:border-orange-500 text-orange-400 text-xs font-bold px-3.5 py-2.5 pr-8 rounded-xl focus:outline-none focus:border-orange-500 cursor-pointer shadow-sm"
+              >
+                <option value="all">🏢 All Outlets (Network)</option>
+                {outlets.map((o) => (
+                  <option key={o.id} value={o.id}>
+                    📍 {o.name} ({o.code})
+                  </option>
+                ))}
+              </select>
+              <ChevronDown className="w-3.5 h-3.5 text-orange-400 absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+            </div>
+          )}
+
           {/* Month Selector */}
           <div className="relative">
             <select

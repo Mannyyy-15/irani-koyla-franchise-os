@@ -87,21 +87,24 @@ export default function TopNav({ onMenuClick }: { onMenuClick?: () => void }) {
   const { supplyOrders } = useFranchise();
 
   // Dynamic Live Notifications for HQ and Franchisee
-  const notificationsList = role === "SUPER_ADMIN"
+  const baseNotifications = role === "SUPER_ADMIN"
     ? [
         ...(supplyOrders.filter((o) => o.status === "pending").map((o) => ({
+          id: `notif-order-${o.id}`,
           type: "order",
-          title: `New Stock Requisition · ${o.outletName}`,
-          desc: `${o.orderNumber} (${o.totalQuantity} items · ₹${o.totalAmount.toLocaleString("en-IN")}) requires approval.`,
+          title: `New Stock Order · ${o.outletName}`,
+          desc: `${o.orderNumber} (${o.totalQuantity} items · ₹${o.totalAmount.toLocaleString("en-IN")}) waiting for approval.`,
           time: o.createdAt || "Just now",
         }))),
         {
+          id: "notif-shifts-active",
           type: "alert",
           title: "Daily Store Shifts Active",
           desc: "4 franchise outlets are actively billing on counter POS.",
           time: "10m ago",
         },
         {
+          id: "notif-royalties-ready",
           type: "info",
           title: "Monthly Royalty Invoices Ready",
           desc: "August 2026 statements generated across all franchise network hubs.",
@@ -110,18 +113,21 @@ export default function TopNav({ onMenuClick }: { onMenuClick?: () => void }) {
       ]
     : [
         ...(supplyOrders.filter((o) => o.outletId === activeOutlet?.id && o.status === "dispatched").map((o) => ({
+          id: `notif-disp-${o.id}`,
           type: "urgent",
           title: "Cold-Chain Van Dispatched!",
           desc: `Shipment ${o.trackingNumber || o.orderNumber} is on the way. Confirm with your 4-digit OTP.`,
           time: "In Transit",
         }))),
         ...(supplyOrders.filter((o) => o.outletId === activeOutlet?.id && o.status === "approved").map((o) => ({
+          id: `notif-appr-${o.id}`,
           type: "order",
           title: "Stock Requisition Approved",
           desc: `Order ${o.orderNumber} approved by Brand HQ for dispatch.`,
           time: "Today",
         }))),
         {
+          id: "notif-daily-target",
           type: "info",
           title: "Daily Store Targets",
           desc: `Target today: ₹${activeOutlet?.dailyTargetSales.toLocaleString("en-IN") || "50,000"} · Maintain >92% Spit Yield.`,
@@ -129,7 +135,17 @@ export default function TopNav({ onMenuClick }: { onMenuClick?: () => void }) {
         },
       ];
 
+  const [dismissedIds, setDismissedIds] = useState<string[]>([]);
+  const notificationsList = baseNotifications.filter((n) => !dismissedIds.includes(n.id));
   const unreadNotificationsCount = notificationsList.length;
+
+  const handleDismissNotification = (id: string) => {
+    setDismissedIds((prev) => [...prev, id]);
+  };
+
+  const handleClearAllNotifications = () => {
+    setDismissedIds(baseNotifications.map((n) => n.id));
+  };
 
   // Form states for Quick Action
   const [spitMeatType, setSpitMeatType] = useState<"Koyla Marinated Chicken" | "Smoked Charcoal Mutton">("Koyla Marinated Chicken");
@@ -328,11 +344,11 @@ export default function TopNav({ onMenuClick }: { onMenuClick?: () => void }) {
 
                 <div className="space-y-2.5 max-h-72 overflow-y-auto">
                   {notificationsList.length > 0 ? (
-                    notificationsList.map((n, idx) => (
+                    notificationsList.map((n) => (
                       <div
-                        key={idx}
+                        key={n.id}
                         className={cn(
-                          "p-3 rounded-xl border transition-all text-xs space-y-1",
+                          "p-3 rounded-xl border transition-all text-xs space-y-1 relative group",
                           n.type === "urgent"
                             ? "bg-red-950/20 border-red-500/30 text-red-200"
                             : n.type === "order"
@@ -340,29 +356,48 @@ export default function TopNav({ onMenuClick }: { onMenuClick?: () => void }) {
                             : "bg-[#161618] border-[#2e2e30] text-zinc-300"
                         )}
                       >
-                        <div className="flex items-center justify-between">
+                        <div className="flex items-center justify-between pr-5">
                           <strong className="text-white text-xs font-semibold">{n.title}</strong>
                           <span className="text-[10px] text-zinc-500 font-mono">{n.time}</span>
                         </div>
                         <p className="text-[11px] text-zinc-400 leading-snug">{n.desc}</p>
+
+                        {/* Individual Delete / Dismiss Button */}
+                        <button
+                          type="button"
+                          onClick={() => handleDismissNotification(n.id)}
+                          className="absolute right-2 top-2 p-1 text-zinc-500 hover:text-red-400 rounded-md hover:bg-white/5 transition-all cursor-pointer opacity-70 group-hover:opacity-100"
+                          title="Delete notification"
+                        >
+                          <X className="w-3.5 h-3.5" />
+                        </button>
                       </div>
                     ))
                   ) : (
-                    <div className="p-4 text-center text-xs text-zinc-500">
+                    <div className="p-6 text-center text-xs text-zinc-500">
                       No new notifications right now.
                     </div>
                   )}
                 </div>
 
                 <div className="pt-3 mt-3 border-t border-[#2e2e30] flex justify-between items-center text-[11px]">
-                  <span className="text-zinc-500 font-mono">
-                    {role === "SUPER_ADMIN" ? "HQ Feed" : "Store Alerts"}
-                  </span>
+                  {notificationsList.length > 0 ? (
+                    <button
+                      onClick={handleClearAllNotifications}
+                      className="text-zinc-400 hover:text-red-400 font-bold cursor-pointer flex items-center gap-1"
+                    >
+                      <span>Clear all</span>
+                    </button>
+                  ) : (
+                    <span className="text-zinc-500 font-mono">
+                      {role === "SUPER_ADMIN" ? "HQ Feed" : "Store Alerts"}
+                    </span>
+                  )}
                   <button
                     onClick={() => setShowNotifications(false)}
                     className="text-orange-400 hover:text-orange-300 font-bold cursor-pointer"
                   >
-                    Dismiss
+                    Close
                   </button>
                 </div>
               </div>

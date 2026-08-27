@@ -163,7 +163,28 @@ export default function AdminDashboardPage() {
         </div>
 
         {/* Top Right Action Group */}
-        <div className="flex items-center gap-2 flex-wrap">
+        <div className="flex items-center gap-2.5 flex-wrap">
+          {/* Super Admin In-Page Outlet Filter */}
+          {isSuperAdmin && (
+            <div className="flex items-center gap-2">
+              <div className="relative">
+                <select
+                  value={selectedOutletId}
+                  onChange={(e) => setSelectedOutletId(e.target.value)}
+                  className="appearance-none bg-[#1a1a1c] border border-orange-500/40 hover:border-orange-500 text-orange-400 text-xs font-bold px-3.5 py-2.5 pr-8 rounded-xl focus:outline-none focus:border-orange-500 cursor-pointer shadow-sm"
+                >
+                  <option value="all">🏢 All Outlets (Network Total)</option>
+                  {outlets.map((o) => (
+                    <option key={o.id} value={o.id}>
+                      📍 {o.name} ({o.code})
+                    </option>
+                  ))}
+                </select>
+                <ChevronRight className="w-3.5 h-3.5 text-orange-400 absolute right-2.5 top-1/2 -translate-y-1/2 rotate-90 pointer-events-none" />
+              </div>
+            </div>
+          )}
+
           <Link href="/admin/monthly">
             <Button
               variant="outline"
