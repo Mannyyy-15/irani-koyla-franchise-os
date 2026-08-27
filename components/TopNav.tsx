@@ -80,9 +80,56 @@ export default function TopNav({ onMenuClick }: { onMenuClick?: () => void }) {
     updateCompliance,
   } = useFranchise();
 
-  // Quick Action Modal
   const [quickActionModal, setQuickActionModal] = useState<"meat" | "shift" | "temp" | null>(null);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const [showNotifications, setShowNotifications] = useState(false);
+
+  const { supplyOrders } = useFranchise();
+
+  // Dynamic Live Notifications for HQ and Franchisee
+  const notificationsList = role === "SUPER_ADMIN"
+    ? [
+        ...(supplyOrders.filter((o) => o.status === "pending").map((o) => ({
+          type: "order",
+          title: `New Stock Requisition · ${o.outletName}`,
+          desc: `${o.orderNumber} (${o.totalQuantity} items · ₹${o.totalAmount.toLocaleString("en-IN")}) requires approval.`,
+          time: o.createdAt || "Just now",
+        }))),
+        {
+          type: "alert",
+          title: "Daily Store Shifts Active",
+          desc: "4 franchise outlets are actively billing on counter POS.",
+          time: "10m ago",
+        },
+        {
+          type: "info",
+          title: "Monthly Royalty Invoices Ready",
+          desc: "August 2026 statements generated across all franchise network hubs.",
+          time: "1h ago",
+        },
+      ]
+    : [
+        ...(supplyOrders.filter((o) => o.outletId === activeOutlet?.id && o.status === "dispatched").map((o) => ({
+          type: "urgent",
+          title: "Cold-Chain Van Dispatched!",
+          desc: `Shipment ${o.trackingNumber || o.orderNumber} is on the way. Confirm with your 4-digit OTP.`,
+          time: "In Transit",
+        }))),
+        ...(supplyOrders.filter((o) => o.outletId === activeOutlet?.id && o.status === "approved").map((o) => ({
+          type: "order",
+          title: "Stock Requisition Approved",
+          desc: `Order ${o.orderNumber} approved by Brand HQ for dispatch.`,
+          time: "Today",
+        }))),
+        {
+          type: "info",
+          title: "Daily Store Targets",
+          desc: `Target today: ₹${activeOutlet?.dailyTargetSales.toLocaleString("en-IN") || "50,000"} · Maintain >92% Spit Yield.`,
+          time: "Morning",
+        },
+      ];
+
+  const unreadNotificationsCount = notificationsList.length;
 
   // Form states for Quick Action
   const [spitMeatType, setSpitMeatType] = useState<"Koyla Marinated Chicken" | "Smoked Charcoal Mutton">("Koyla Marinated Chicken");
@@ -206,39 +253,21 @@ export default function TopNav({ onMenuClick }: { onMenuClick?: () => void }) {
           </button>
         )}
 
-        {/* Role & Outlet Switcher */}
-        {role === "SUPER_ADMIN" ? (
-          <div className="flex items-center gap-2">
-            <div className="relative">
-              <select
-                value={selectedOutletId}
-                onChange={(e) => setSelectedOutletId(e.target.value)}
-                className="h-9 pl-3 pr-8 rounded-xl bg-[#161618] border border-orange-500/40 text-xs font-bold text-orange-400 focus:outline-none focus:border-orange-500 cursor-pointer appearance-none shadow-sm"
-              >
-                <option value="all">🏢 Brand HQ (All Outlets)</option>
-                {outlets.map((o) => (
-                  <option key={o.id} value={o.id}>
-                    📍 {o.name} ({o.code})
-                  </option>
-                ))}
-              </select>
-              <ChevronDown className="w-3.5 h-3.5 text-orange-400 absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
-            </div>
-
-            <span className="hidden md:inline-flex text-[10px] font-bold uppercase tracking-wider bg-orange-500/10 text-orange-400 border border-orange-500/30 px-2 py-1 rounded-md">
-              HQ Super Admin
+        {/* Store Title / Breadcrumb */}
+        <div className="flex items-center gap-3">
+          <span className="font-bold text-sm text-white tracking-tight">
+            {title}
+          </span>
+          {role === "FRANCHISE_OWNER" && activeOutlet && (
+            <span className="text-[11px] font-semibold text-orange-400 bg-orange-500/10 border border-orange-500/20 px-2.5 py-0.5 rounded-lg">
+              {activeOutlet.name}
             </span>
-          </div>
-        ) : (
-          <div className="flex items-center gap-2">
-            <span className="font-bold text-xs text-white bg-[#161618] border border-[#303030] px-3 py-1.5 rounded-xl flex items-center gap-2">
-              <Store className="w-3.5 h-3.5 text-orange-500" />
-              <span>{activeOutlet?.name || "Mohak City Branch"}</span>
-              <span className="text-[10px] font-mono font-bold text-orange-400 bg-orange-500/10 px-1.5 py-0.5 rounded border border-orange-500/30">
-                {activeOutlet?.code || "IK-MOH-01"}
-              </span>
-            </span>
+          )}
+        </div>
 
+        <div className="flex flex-1 items-center justify-end gap-2 relative">
+          {/* Quick POS access for Franchise Partner */}
+          {role === "FRANCHISE_OWNER" && (
             <Link
               href="/pos"
               className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-orange-600 hover:bg-orange-500 text-xs font-black text-white shadow-sm transition-all"
@@ -246,16 +275,14 @@ export default function TopNav({ onMenuClick }: { onMenuClick?: () => void }) {
               <Flame className="w-3.5 h-3.5" />
               <span>Counter POS</span>
             </Link>
-          </div>
-        )}
+          )}
 
-        <div className="flex flex-1 items-center justify-end gap-2 relative">
           {/* Global Search Bar */}
           <div className="group relative hidden w-48 text-left md:block lg:w-64">
             <Search className="pointer-events-none absolute inset-y-0 left-3 h-full w-4 text-zinc-500 group-hover:text-orange-500 transition-colors" />
             <input
               type="text"
-              placeholder="Search network, batches…"
+              placeholder="Search..."
               className="h-9 w-full rounded-xl border border-[#303030] bg-[#161618] pl-9 pr-4 text-xs text-zinc-300 placeholder-zinc-500 focus:outline-none focus:border-orange-500"
             />
           </div>
@@ -265,20 +292,82 @@ export default function TopNav({ onMenuClick }: { onMenuClick?: () => void }) {
             type="button"
             onClick={() => setQuickActionModal("meat")}
             className="inline-flex h-9 w-9 items-center justify-center rounded-xl border border-[#303030] bg-[#161618] text-zinc-300 hover:text-white hover:border-orange-500/50 transition-all cursor-pointer"
-            title="Quick Action Toolbar"
+            title="Quick Action"
           >
             <Plus className="h-4 w-4" />
           </button>
 
-          {/* Notifications */}
-          <button
-            type="button"
-            className="inline-flex h-9 w-9 items-center justify-center rounded-xl border border-[#303030] bg-[#161618] text-zinc-300 hover:text-white hover:border-orange-500/50 transition-all cursor-pointer relative"
-            title="Notifications"
-          >
-            <Bell className="h-4 w-4" />
-            <span className="absolute top-2 right-2 h-1.5 w-1.5 rounded-full bg-orange-500" />
-          </button>
+          {/* Notifications Trigger & Dropdown */}
+          <div className="relative">
+            <button
+              type="button"
+              onClick={() => setShowNotifications(!showNotifications)}
+              className="inline-flex h-9 w-9 items-center justify-center rounded-xl border border-[#303030] bg-[#161618] text-zinc-300 hover:text-white hover:border-orange-500/50 transition-all cursor-pointer relative"
+              title="Notifications"
+            >
+              <Bell className="h-4 w-4" />
+              {unreadNotificationsCount > 0 && (
+                <span className="absolute -top-1 -right-1 h-4 min-w-[16px] px-1 rounded-full bg-orange-600 text-[9px] font-black text-white flex items-center justify-center animate-pulse">
+                  {unreadNotificationsCount}
+                </span>
+              )}
+            </button>
+
+            {/* Live Notification Dropdown Menu */}
+            {showNotifications && (
+              <div className="absolute right-0 mt-2 w-80 sm:w-96 rounded-2xl bg-[#1a1a1c] border border-[#2e2e30] shadow-2xl p-4 z-50 text-white animate-in fade-in zoom-in-95">
+                <div className="flex items-center justify-between border-b border-[#2e2e30] pb-3 mb-3">
+                  <div className="flex items-center gap-2">
+                    <Bell className="w-4 h-4 text-orange-500" />
+                    <span className="font-bold text-xs uppercase tracking-wider text-white">Notifications</span>
+                  </div>
+                  <span className="text-[10px] text-zinc-400 font-mono">
+                    {notificationsList.length} recent
+                  </span>
+                </div>
+
+                <div className="space-y-2.5 max-h-72 overflow-y-auto">
+                  {notificationsList.length > 0 ? (
+                    notificationsList.map((n, idx) => (
+                      <div
+                        key={idx}
+                        className={cn(
+                          "p-3 rounded-xl border transition-all text-xs space-y-1",
+                          n.type === "urgent"
+                            ? "bg-red-950/20 border-red-500/30 text-red-200"
+                            : n.type === "order"
+                            ? "bg-orange-950/20 border-orange-500/30 text-orange-200"
+                            : "bg-[#161618] border-[#2e2e30] text-zinc-300"
+                        )}
+                      >
+                        <div className="flex items-center justify-between">
+                          <strong className="text-white text-xs font-semibold">{n.title}</strong>
+                          <span className="text-[10px] text-zinc-500 font-mono">{n.time}</span>
+                        </div>
+                        <p className="text-[11px] text-zinc-400 leading-snug">{n.desc}</p>
+                      </div>
+                    ))
+                  ) : (
+                    <div className="p-4 text-center text-xs text-zinc-500">
+                      No new notifications right now.
+                    </div>
+                  )}
+                </div>
+
+                <div className="pt-3 mt-3 border-t border-[#2e2e30] flex justify-between items-center text-[11px]">
+                  <span className="text-zinc-500 font-mono">
+                    {role === "SUPER_ADMIN" ? "HQ Feed" : "Store Alerts"}
+                  </span>
+                  <button
+                    onClick={() => setShowNotifications(false)}
+                    className="text-orange-400 hover:text-orange-300 font-bold cursor-pointer"
+                  >
+                    Dismiss
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
 
           {/* User Profile Avatar & Logout */}
           <button
@@ -289,7 +378,7 @@ export default function TopNav({ onMenuClick }: { onMenuClick?: () => void }) {
               } catch {}
               router.push("/login");
             }}
-            title="Sign out of FranchiseOS"
+            title="Sign out"
             className="inline-flex h-9 px-2.5 items-center justify-center rounded-xl bg-gradient-to-br from-orange-500 to-amber-600 text-white font-black text-xs shadow-sm hover:opacity-90 transition-all cursor-pointer gap-1"
           >
             <span>{role === "SUPER_ADMIN" ? "HQ Admin" : "Partner"}</span>
